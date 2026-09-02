@@ -1,6 +1,7 @@
-// Walk mode (SPEC s5.2): pointer-lock first person, WASD, collision against the clean layer only.
+// Walk mode (SPEC s5.2): pointer-lock first person, WASD, collision against the level's nav data only
+// (walls with openings + door state, floors, stairs, blockers). Never the render meshes.
 import * as THREE from 'three'
-import { type Level, type Wall, type Stair, floorOf, pointInPoly, stairRect, stairProgress, inRect, wallLength, wallDir } from './level'
+import { type Level, type Wall, type Stair, type DoorRuntime, floorOf, pointInPoly, stairRect, stairProgress, inRect, wallLength, wallDir, doorCentre } from './level'
 
 const RADIUS = 0.25
 const SPEED = 2.2, RUN = 4.2
@@ -11,6 +12,7 @@ export interface WalkState { level: string; x: number; z: number; feetY: number;
 export class Walker {
   readonly camera: THREE.PerspectiveCamera
   state: WalkState
+  doors: DoorRuntime[] = []
   private keys = new Set<string>()
   private lv: Level
   private dom: HTMLElement
@@ -34,16 +36,11 @@ export class Walker {
       this.state.yaw -= e.movementX * LOOK
       this.state.pitch = THREE.MathUtils.clamp(this.state.pitch - e.movementY * LOOK, -1.45, 1.45)
     })
-    window.addEventListener('keydown', (e) => {
-      if (isTyping(e)) return
-      this.keys.add(e.code)
-    })
+    window.addEventListener('keydown', (e) => { if (!isTyping(e)) this.keys.add(e.code) })
     window.addEventListener('keyup', (e) => this.keys.delete(e.code))
     window.addEventListener('blur', () => this.keys.clear())
     this.applyCamera()
   }
-
-  setLevel(lv: Level): void { this.lv = lv }
 
   teleport(level: string, x: number, z: number): void {
     this.state.level = level; this.state.x = x; this.state.z = z; this.state.onStair = null
@@ -62,7 +59,6 @@ export class Walker {
       if (fwd || side) {
         const speed = this.keys.has('ShiftLeft') || this.keys.has('ShiftRight') ? RUN : SPEED
         const len = Math.hypot(fwd, side); fwd /= len; side /= len
-        // camera looks along (-sin yaw, -cos yaw); right is (cos yaw, -sin yaw)
         const dx = (-Math.sin(s.yaw) * fwd + Math.cos(s.yaw) * side) * speed * dt
         const dz = (-Math.cos(s.yaw) * fwd - Math.sin(s.yaw) * side) * speed * dt
         this.tryMove(dx, dz)
@@ -73,7 +69,19 @@ export class Walker {
     this.applyCamera()
   }
 
-  /** move by a world-space delta with wall push-out and floor check (public for tests and teleport helpers) */
+  /** the nearest door with a leaf within reach, for the E key */
+  nearestDoor(maxDist = 1.6): DoorRuntime | null {
+    const s = this.state
+    let best: DoorRuntime | null = null, bd = maxDist
+    for (const d of this.doors) {
+      if (d.wall.level !== s.level) continue
+      const c = doorCentre(d)
+      const dist = Math.hypot(c.x - s.x, c.z - s.z)
+      if (dist < bd) { bd = dist; best = d }
+    }
+    return best
+  }
+
   tryMove(dx: number, dz: number): void {
     const s = this.state
     if (this.step(s.x + dx, s.z + dz)) return
@@ -81,11 +89,9 @@ export class Walker {
     this.step(s.x, s.z + dz)
   }
 
-  /** move to (x,z) if allowed: not through walls, and over a floor or stair of the current level */
   private step(x: number, z: number): boolean {
     const s = this.state
     let px = x, pz = z
-    // push out of walls
     for (let iter = 0; iter < 3; iter++) {
       let moved = false
       for (const w of this.lv.walls) {
@@ -95,11 +101,7 @@ export class Walker {
       }
       if (!moved) break
     }
-    // blockers
-    for (const b of this.lv.blockers) {
-      if (b.level !== s.level) continue
-      if (pointInPoly(px, pz, b.poly)) return false
-    }
+    for (const b of this.lv.blockers) if (b.level === s.level && pointInPoly(px, pz, b.poly)) return false
     if (!this.onGround(px, pz)) return false
     s.x = px; s.z = pz
     this.onChange?.(s)
@@ -109,11 +111,14 @@ export class Walker {
   private wallActive(w: Wall): boolean {
     const s = this.state
     if (w.level !== s.level) return false
-    // a wall over the current floor only if it spans the walker's height band
     return w.topY > s.feetY + 0.3 && w.baseY < s.feetY + 1.5
   }
 
-  /** circle vs segment; returns corrected position or null. Door openings let the walker through. */
+  private doorOpen(w: Wall, u: number): boolean {
+    const d = this.doors.find((dr) => dr.wall === w && Math.abs(dr.opening.u - u) < 1e-6)
+    return d ? d.open && d.t > 0.7 : true
+  }
+
   private pushOut(x: number, z: number, w: Wall): [number, number] | null {
     const L = wallLength(w), [dx, dz] = wallDir(w)
     const rx = x - w.a[0], rz = z - w.a[1]
@@ -125,10 +130,9 @@ export class Walker {
     if (d >= pad) return null
     for (const o of w.openings) {
       if (o.kind !== 'door') continue
-      if (u > o.u + RADIUS * 0.6 && u < o.u + o.w - RADIUS * 0.6 && o.h > 1.6) return null
+      if (u > o.u + RADIUS * 0.6 && u < o.u + o.w - RADIUS * 0.6 && o.h > 1.6 && this.doorOpen(w, o.u)) return null
     }
     if (d < 1e-6) {
-      // exactly on the line: push toward the room-facing side
       const nx = w.facing === '+x' ? 1 : w.facing === '-x' ? -1 : 0
       const nz = w.facing === '+z' ? 1 : w.facing === '-z' ? -1 : 0
       return [cx + nx * pad, cz + nz * pad]
@@ -136,15 +140,29 @@ export class Walker {
     return [cx + (ox / d) * pad, cz + (oz / d) * pad]
   }
 
+  /** the stair the walker is on or may step onto at (x,z). Stacked flights share a footprint, so pick by
+   *  state: the one already underfoot, else the one leaving this level at its bottom, else the one arriving
+   *  at this level at its top. Over a footprint but not at an end = the void. */
+  private stairHere(x: number, z: number): { st: Stair; p: number } | null {
+    const s = this.state
+    const cands = this.lv.stairs.filter((st) => inRect(x, z, stairRect(st), 0.05)).map((st) => ({ st, p: stairProgress(st, x, z) }))
+    if (!cands.length) return null
+    return cands.find((c) => c.st.id === s.onStair)
+      ?? cands.find((c) => c.st.level === s.level && c.p < 0.2)
+      ?? cands.find((c) => c.st.to === s.level && c.p > 0.8)
+      ?? null
+  }
+
   private onGround(x: number, z: number): boolean {
     const s = this.state
+    const c = this.stairHere(x, z)
+    if (c) return !(c.st.topBlocked !== undefined && c.p > c.st.topBlocked)
+    const floorY = floorOf(this.lv, s.level).floorY
     for (const st of this.lv.stairs) {
-      if (!inRect(x, z, stairRect(st), 0.05)) continue
-      if (s.onStair === st.id) return true // already on it: anywhere along it
-      // stepping on from the floor only at the matching end (never from the side of the void)
-      const p = stairProgress(st, x, z)
-      if (st.level === s.level && p < 0.2) return true
-      if (st.to === s.level && p > 0.8) return true
+      if (!inRect(x, z, stairRect(st), -0.05)) continue
+      if (st.to === s.level) return false // the hole where a flight arrives on this level
+      const h = st.bottomY + (st.topY - st.bottomY) * THREE.MathUtils.clamp(stairProgress(st, x, z), 0, 1)
+      if (st.level === s.level && h - floorY < 1.9) return false // treads too low to walk under
     }
     for (const f of this.lv.floors) if (f.level === s.level && pointInPoly(x, z, f.poly)) return true
     return false
@@ -152,15 +170,12 @@ export class Walker {
 
   private updateHeight(): void {
     const s = this.state
-    let st: Stair | null = null
-    for (const c of this.lv.stairs) {
-      if ((c.level === s.level || c.to === s.level) && inRect(s.x, s.z, stairRect(c), 0.05)) { st = c; break }
-    }
-    if (st) {
-      const p = THREE.MathUtils.clamp(stairProgress(st, s.x, s.z), 0, 1)
-      s.feetY = st.bottomY + (st.topY - st.bottomY) * p
-      s.onStair = st.id
-      const newLevel = p > 0.97 ? st.to : p < 0.03 ? st.level : s.level
+    const c = this.stairHere(s.x, s.z)
+    if (c) {
+      const p = THREE.MathUtils.clamp(c.p, 0, 1)
+      s.feetY = c.st.bottomY + (c.st.topY - c.st.bottomY) * p
+      s.onStair = c.st.id
+      const newLevel = p > 0.97 && c.st.to ? c.st.to : p < 0.03 ? c.st.level : s.level
       if (newLevel !== s.level) { s.level = newLevel; this.onChange?.(s) }
     } else {
       s.onStair = null

@@ -115,3 +115,6 @@ input:focus, select:focus { outline: none; border-color: var(--focus); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--dim); border: 3px solid transparent; border-radius: 6px; background-clip: padding-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: padding-box; border: 3px solid transparent; }
+
+/* door prompt (walk) */
+.viewport .doortip { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); background: rgba(0,0,0,.55); border: 1px solid var(--line2); border-radius: 4px; padding: 4px 10px; font-size: 12px; color: var(--txt-hi); pointer-events: none; }

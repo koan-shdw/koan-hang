@@ -1,15 +1,5 @@
 {
- "format": "koan-hang-level/1",
- "scan": {
-  "file": "scan.glb",
-  "rotationDeg": -1.79,
-  "rotationApplied": true,
-  "offset": [
-   0,
-   0,
-   0
-  ]
- },
+ "format": "koan-hang-level/2",
  "eyeHeight": 1.6,
  "spawn": {
   "level": "ground",
@@ -26,7 +16,7 @@
   },
   {
    "id": "first",
-   "name": "first",
+   "name": "second",
    "floorY": -2.14,
    "ceilY": 0.84
   }
@@ -34,25 +24,49 @@
  "floors": [
   {
    "level": "ground",
-   "name": "room + hallway",
+   "name": "room",
+   "poly": [
+    [
+     -5.89,
+     -2.42
+    ],
+    [
+     0.22,
+     -2.42
+    ],
+    [
+     0.22,
+     2.72
+    ],
+    [
+     -5.89,
+     2.72
+    ]
+   ],
+   "material": "concrete-polished"
+  },
+  {
+   "level": "ground",
+   "name": "hallway",
    "poly": [
     [
      -7.06,
      -2.42
     ],
     [
-     0.22,
+     -5.89,
      -2.42
     ],
     [
-     0.22,
+     -5.89,
      2.72
     ],
     [
      -7.06,
      2.72
     ]
-   ]
+   ],
+   "material": "concrete-polished"
   },
   {
    "level": "ground",
@@ -74,11 +88,12 @@
      0.22,
      3.62
     ]
-   ]
+   ],
+   "material": "stone-tiles"
   },
   {
    "level": "first",
-   "name": "room + landing",
+   "name": "room",
    "poly": [
     [
      -5.89,
@@ -93,9 +108,16 @@
      2.72
     ],
     [
-     -7.06,
+     -5.89,
      2.72
-    ],
+    ]
+   ],
+   "material": "concrete-bare"
+  },
+  {
+   "level": "first",
+   "name": "landing",
+   "poly": [
     [
      -7.06,
      1.7
@@ -103,14 +125,180 @@
     [
      -5.89,
      1.7
+    ],
+    [
+     -5.89,
+     2.72
+    ],
+    [
+     -7.06,
+     2.72
     ]
-   ]
+   ],
+   "material": "concrete-bare"
+  },
+  {
+   "level": "first",
+   "name": "stair foot",
+   "poly": [
+    [
+     -7.06,
+     -2.42
+    ],
+    [
+     -5.89,
+     -2.42
+    ],
+    [
+     -5.89,
+     -1.9
+    ],
+    [
+     -7.06,
+     -1.9
+    ]
+   ],
+   "material": "concrete-bare"
+  }
+ ],
+ "ceilings": [
+  {
+   "level": "ground",
+   "poly": [
+    [
+     -5.89,
+     -2.42
+    ],
+    [
+     0.22,
+     -2.42
+    ],
+    [
+     0.22,
+     2.72
+    ],
+    [
+     -5.89,
+     2.72
+    ]
+   ],
+   "material": "corrugated-ceiling"
+  },
+  {
+   "level": "ground",
+   "poly": [
+    [
+     -7.06,
+     -2.42
+    ],
+    [
+     -6.04,
+     -2.42
+    ],
+    [
+     -6.04,
+     -1.9
+    ],
+    [
+     -7.06,
+     -1.9
+    ]
+   ],
+   "material": "corrugated-ceiling"
+  },
+  {
+   "level": "first",
+   "poly": [
+    [
+     -5.89,
+     -2.42
+    ],
+    [
+     0.22,
+     -2.42
+    ],
+    [
+     0.22,
+     2.72
+    ],
+    [
+     -5.89,
+     2.72
+    ]
+   ],
+   "material": "corrugated-ceiling"
+  },
+  {
+   "level": "first",
+   "poly": [
+    [
+     -7.06,
+     -2.42
+    ],
+    [
+     -5.89,
+     -2.42
+    ],
+    [
+     -5.89,
+     -1.9
+    ],
+    [
+     -7.06,
+     -1.9
+    ]
+   ],
+   "material": "corrugated-ceiling"
+  },
+  {
+   "level": "first",
+   "poly": [
+    [
+     -7.06,
+     1.2
+    ],
+    [
+     -5.89,
+     1.2
+    ],
+    [
+     -5.89,
+     1.7
+    ],
+    [
+     -7.06,
+     1.7
+    ]
+   ],
+   "material": "corrugated-ceiling"
+  },
+  {
+   "level": "first",
+   "poly": [
+    [
+     -7.06,
+     1.7
+    ],
+    [
+     -5.89,
+     1.7
+    ],
+    [
+     -5.89,
+     2.72
+    ],
+    [
+     -7.06,
+     2.72
+    ]
+   ],
+   "material": "corrugated-ceiling"
   }
  ],
  "walls": [
   {
    "id": "g-west",
-   "name": "hallway west",
+   "name": "hallway west, windows behind the stair",
    "level": "ground",
    "a": [
     -7.06,
@@ -124,14 +312,45 @@
    "topY": -2.29,
    "thickness": 0.15,
    "facing": "+x",
-   "openings": [],
+   "openings": [
+    {
+     "kind": "window",
+     "u": 0.15,
+     "w": 3.45,
+     "bottom": 0.3,
+     "h": 2.76,
+     "grid": {
+      "cols": 4,
+      "bars": [
+       1.0,
+       2.1
+      ],
+      "cross": []
+     },
+     "frame": "steel-black"
+    },
+    {
+     "kind": "door",
+     "u": 3.72,
+     "w": 0.8,
+     "bottom": 0,
+     "h": 2.1,
+     "door": {
+      "type": "swing",
+      "open": false,
+      "toggle": false,
+      "leaf": true
+     }
+    }
+   ],
    "noHang": [],
    "hang": false,
-   "note": "street side; scan sees little here, glass likely; hand-check in level mode"
+   "material": "wall-blue",
+   "note": "owner: windows behind the 1st-to-2nd stair, and the street door on the other side at the stair bottom (floorplan gap z -1.8..-1.0)"
   },
   {
    "id": "g-stair-room",
-   "name": "room west (stair wall)",
+   "name": "back wall (stair wall), room side",
    "level": "ground",
    "a": [
     -5.89,
@@ -151,23 +370,43 @@
      "u": 0.12,
      "w": 0.8,
      "bottom": 0,
-     "h": 2.0
+     "h": 2.0,
+     "door": {
+      "type": "slide",
+      "open": true,
+      "toggle": true,
+      "leaf": false
+     }
+    },
+    {
+     "kind": "door",
+     "u": 4.34,
+     "w": 0.8,
+     "bottom": 0,
+     "h": 2.0,
+     "door": {
+      "type": "slide",
+      "open": true,
+      "toggle": true,
+      "leaf": false
+     }
     }
    ],
    "noHang": [],
    "hang": true,
-   "note": "doorway to the hallway at the north end (scan + first-person check)"
+   "material": "wall-white",
+   "note": "two same-size doors: left (north) slides, goes under the stairs; right (south) at the bottom of the stairs; leaves live on the hallway side (g-stair-hall)"
   },
   {
    "id": "g-stair-hall",
-   "name": "hallway east (stair wall)",
+   "name": "back wall, hallway side",
    "level": "ground",
    "a": [
-    -5.89,
+    -6.04,
     -2.42
    ],
    "b": [
-    -5.89,
+    -6.04,
     2.72
    ],
    "baseY": -5.5,
@@ -177,18 +416,38 @@
    "openings": [
     {
      "kind": "door",
+     "u": 0.0,
+     "w": 0.8,
+     "bottom": 0,
+     "h": 2.0,
+     "door": {
+      "type": "slide",
+      "open": true,
+      "toggle": true,
+      "leaf": true
+     }
+    },
+    {
+     "kind": "door",
      "u": 4.22,
      "w": 0.8,
      "bottom": 0,
-     "h": 2.0
+     "h": 2.0,
+     "door": {
+      "type": "slide",
+      "open": true,
+      "toggle": true,
+      "leaf": true
+     }
     }
    ],
    "noHang": [],
-   "hang": false
+   "hang": false,
+   "material": "wall-blue"
   },
   {
    "id": "g-east",
-   "name": "room east (courtyard glass + door)",
+   "name": "glass front",
    "level": "ground",
    "a": [
     0.22,
@@ -205,29 +464,54 @@
    "openings": [
     {
      "kind": "window",
-     "u": 0.0,
-     "w": 2.32,
+     "u": 0.1,
+     "w": 2.17,
      "bottom": 0,
-     "h": 3.21
+     "h": 3.21,
+     "grid": {
+      "cols": 3,
+      "bars": [
+       1.0
+      ],
+      "cross": [
+       1
+      ]
+     },
+     "frame": "steel-grey"
     },
     {
      "kind": "door",
      "u": 2.32,
      "w": 1.15,
      "bottom": 0,
-     "h": 2.1
+     "h": 2.3,
+     "door": {
+      "type": "swing",
+      "open": true,
+      "toggle": true,
+      "leaf": true
+     }
     },
     {
      "kind": "window",
-     "u": 3.47,
-     "w": 1.67,
+     "u": 3.52,
+     "w": 1.57,
      "bottom": 0,
-     "h": 3.21
+     "h": 3.21,
+     "grid": {
+      "cols": 3,
+      "bars": [
+       1.0
+      ],
+      "cross": []
+     },
+     "frame": "steel-grey"
     }
    ],
    "noHang": [],
-   "hang": true,
-   "note": "door measured z -0.10..1.05 (closed leaf in scan); rest is glass"
+   "hang": false,
+   "material": "wall-white",
+   "note": "owner: cross-bar window | door | three frames; one grey steel grid, bar at ~1 m"
   },
   {
    "id": "g-south",
@@ -251,12 +535,19 @@
      "u": 0.0,
      "w": 1.17,
      "bottom": 0,
-     "h": 2.1
+     "h": 2.1,
+     "door": {
+      "type": "swing",
+      "open": false,
+      "toggle": false,
+      "leaf": true
+     }
     }
    ],
    "noHang": [],
    "hang": true,
-   "note": "hallway end = street entrance door (floorplan)"
+   "material": "wall-white",
+   "note": "hallway end = street door, closed"
   },
   {
    "id": "g-north",
@@ -274,22 +565,14 @@
    "topY": -2.29,
    "thickness": 0.15,
    "facing": "-z",
-   "openings": [
-    {
-     "kind": "window",
-     "u": 6.11,
-     "w": 1.17,
-     "bottom": 0,
-     "h": 3.21
-    }
-   ],
+   "openings": [],
    "noHang": [],
    "hang": true,
-   "note": "hallway north end open in scan; kind unknown"
+   "material": "wall-white"
   },
   {
    "id": "c-1",
-   "name": "courtyard wall x4.49",
+   "name": "courtyard fence south",
    "level": "ground",
    "a": [
     4.49,
@@ -305,11 +588,12 @@
    "facing": "-x",
    "openings": [],
    "noHang": [],
-   "hang": false
+   "hang": false,
+   "material": "corrugated"
   },
   {
    "id": "c-2",
-   "name": "courtyard wall x6.84",
+   "name": "courtyard fence east",
    "level": "ground",
    "a": [
     6.84,
@@ -325,11 +609,12 @@
    "facing": "-x",
    "openings": [],
    "noHang": [],
-   "hang": false
+   "hang": false,
+   "material": "corrugated"
   },
   {
    "id": "c-3",
-   "name": "courtyard low wall z3.62",
+   "name": "courtyard low wall north",
    "level": "ground",
    "a": [
     5.53,
@@ -345,11 +630,12 @@
    "facing": "-z",
    "openings": [],
    "noHang": [],
-   "hang": false
+   "hang": false,
+   "material": "concrete"
   },
   {
    "id": "c-4",
-   "name": "courtyard wall z-0.40",
+   "name": "courtyard wall",
    "level": "ground",
    "a": [
     4.49,
@@ -365,11 +651,12 @@
    "facing": "+z",
    "openings": [],
    "noHang": [],
-   "hang": false
+   "hang": false,
+   "material": "concrete"
   },
   {
    "id": "c-5",
-   "name": "courtyard wall z-3.12",
+   "name": "courtyard low wall south",
    "level": "ground",
    "a": [
     0.6,
@@ -385,11 +672,33 @@
    "facing": "+z",
    "openings": [],
    "noHang": [],
-   "hang": false
+   "hang": false,
+   "material": "concrete"
+  },
+  {
+   "id": "c-6",
+   "name": "neighbour wall north",
+   "level": "ground",
+   "a": [
+    3.71,
+    4.25
+   ],
+   "b": [
+    -0.56,
+    4.25
+   ],
+   "baseY": -3.87,
+   "topY": -0.81,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "render"
   },
   {
    "id": "f-west",
-   "name": "west",
+   "name": "west, big window",
    "level": "first",
    "a": [
     -7.06,
@@ -406,19 +715,29 @@
    "openings": [
     {
      "kind": "window",
-     "u": 0.0,
-     "w": 3.32,
-     "bottom": 0,
-     "h": 2.98
+     "u": 0.17,
+     "w": 4.8,
+     "bottom": 0.25,
+     "h": 2.45,
+     "grid": {
+      "cols": 6,
+      "bars": [
+       1.0,
+       2.1
+      ],
+      "cross": []
+     },
+     "frame": "steel-black"
     }
    ],
    "noHang": [],
-   "hang": true,
-   "note": "scan shows no wall z -0.6..2.72: glass; check"
+   "hang": false,
+   "material": "wall-white",
+   "note": "one black grid six across, Tokyo street outside"
   },
   {
    "id": "f-east",
-   "name": "east",
+   "name": "east glass",
    "level": "first",
    "a": [
     0.22,
@@ -435,15 +754,56 @@
    "openings": [
     {
      "kind": "window",
-     "u": 0.0,
-     "w": 1.12,
+     "u": 0.1,
+     "w": 1.2,
      "bottom": 0,
-     "h": 2.98
+     "h": 2.98,
+     "grid": {
+      "cols": 1,
+      "bars": [
+       1.0,
+       2.1
+      ],
+      "cross": [
+       0
+      ]
+     },
+     "frame": "steel-black"
+    },
+    {
+     "kind": "door",
+     "u": 2.0,
+     "w": 0.9,
+     "bottom": 0,
+     "h": 2.1,
+     "door": {
+      "type": "metal",
+      "open": false,
+      "toggle": false,
+      "leaf": true
+     }
+    },
+    {
+     "kind": "window",
+     "u": 3.35,
+     "w": 1.69,
+     "bottom": 0,
+     "h": 2.98,
+     "grid": {
+      "cols": 2,
+      "bars": [
+       1.0,
+       2.1
+      ],
+      "cross": []
+     },
+     "frame": "steel-black"
     }
    ],
    "noHang": [],
-   "hang": true,
-   "note": "scan shows no wall z -2.42..-1.30: glass; check"
+   "hang": false,
+   "material": "wall-white",
+   "note": "owner: cross-bar window | closed metal door | two windows"
   },
   {
    "id": "f-south",
@@ -464,7 +824,7 @@
    "openings": [],
    "noHang": [],
    "hang": true,
-   "note": "scan gaps: x -5.9..-4.4 below 2.1 m, x -0.7..0.2 at 1.1..2.9 m; left solid, check"
+   "material": "wall-white"
   },
   {
    "id": "f-north",
@@ -484,7 +844,8 @@
    "facing": "-z",
    "openings": [],
    "noHang": [],
-   "hang": true
+   "hang": true,
+   "material": "wall-white"
   }
  ],
  "stairs": [
@@ -493,47 +854,273 @@
    "level": "ground",
    "to": "first",
    "from": [
-    -6.475,
+    -6.55,
     -1.9
    ],
    "dir": "+z",
-   "width": 1.17,
+   "width": 1.0,
    "run": 3.6,
    "bottomY": -5.5,
    "topY": -2.14,
    "treads": 16,
    "riser": 0.198,
-   "tread": 0.225
+   "tread": 0.225,
+   "nosing": 0.03,
+   "material": "stair-wood"
+  },
+  {
+   "id": "s2",
+   "level": "first",
+   "to": null,
+   "topBlocked": 0.9,
+   "from": [
+    -6.55,
+    -1.9
+   ],
+   "dir": "+z",
+   "width": 1.0,
+   "run": 3.6,
+   "bottomY": -2.14,
+   "topY": 0.99,
+   "treads": 16,
+   "riser": 0.184,
+   "tread": 0.225,
+   "nosing": 0.03,
+   "material": "stair-wood",
+   "sideWall": {
+    "side": "+x",
+    "height": 0.9,
+    "thickness": 0.15,
+    "material": "wall-white"
+   },
+   "note": "same flight again, up to the unused third floor; blocked near the top; the blue side wall is the diagonal band in the west window photo"
   }
  ],
  "blockers": [],
- "patches": [
+ "objects": [
   {
+   "kind": "ribs",
+   "level": "ground",
+   "dir": "+x",
+   "pitch": 0.15,
+   "depth": 0.05,
+   "width": 0.06
+  },
+  {
+   "kind": "ribs",
    "level": "first",
-   "name": "floor gap in scan",
-   "poly": [
+   "dir": "+x",
+   "pitch": 0.15,
+   "depth": 0.05,
+   "width": 0.06
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -4.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -2.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -0.8,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -4.6,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -2.6,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -0.8,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -4.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -2.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -0.8,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -4.6,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -2.6,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -0.8,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "aircon",
+   "level": "ground",
+   "at": [
+    -2.4,
+    0.4
+   ],
+   "size": [
+    0.95,
+    0.25,
+    0.95
+   ]
+  },
+  {
+   "kind": "aircon",
+   "level": "first",
+   "at": [
+    -3.2,
+    0.2
+   ],
+   "size": [
+    0.95,
+    0.25,
+    0.95
+   ]
+  },
+  {
+   "kind": "slab",
+   "name": "corridor over the courtyard",
+   "box": [
     [
-     -5.7,
-     0.8
+     0.22,
+     -2.29,
+     0.0
     ],
     [
-     -2.5,
-     0.8
-    ],
-    [
-     -2.5,
-     -1.0
-    ],
-    [
-     -5.7,
-     -1.0
+     6.0,
+     -2.14,
+     2.0
     ]
    ],
-   "note": "scan has no floor here (dark floor or the hole he saw); flat patch at floor height"
+   "material": "concrete"
+  },
+  {
+   "kind": "slab",
+   "name": "courtyard roof edge",
+   "box": [
+    [
+     0.22,
+     0.84,
+     -4.49
+    ],
+    [
+     6.84,
+     0.99,
+     3.62
+    ]
+   ],
+   "material": "corrugated"
   }
  ],
  "source": {
-  "made": "level/make_level.py 2026-09-02",
-  "from_": "scan/report.md + scan/measure.py + Polycam floorplan"
+  "made": "level/make_level.py 2026-09-02 v2",
+  "from_": "scan measurements + owner walk-through answers"
  }
 }

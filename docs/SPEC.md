@@ -91,8 +91,10 @@ dev server writes `docs/sheet/<name>.jpg` (BUILT, dev only).
 Metres, y up, the de-rotated scan frame. `levels` (floorY, ceilY), `floors` (polys), `walls`
 (`a→b` left→right as seen from the room, `facing`, `openings` door/window, `noHang`, `hang`),
 `stairs`, `blockers`, `patches`, `spawn`. Current values: PROVEN against the scan and the
-Polycam floorplan within 7 cm (SCAN-REPORT). Known fixes owed: the second stair-wall door
-(south, opens onto the bottom of the stair; user 2026-09-02), the white door's exact position.
+Polycam floorplan within 7 cm (SCAN-REPORT). Format v2 (`koan-hang-level/2`): openings carry `door` {type slide|swing|metal, open, toggle, leaf} or `grid`
+{cols, bars, cross}; `ceilings` are explicit polys; stairs carry `to` (null = unused upper floor), `topBlocked`,
+`sideWall`; `objects` (ribs, light, aircon, slab) live in the same file. The doors slide open and closed (pin
+delivered): E toggles the nearest door, leaves animate, closed leaves block the walker.
 
 ### 4.2 Objects — `level/objects.json`
 
@@ -186,7 +188,7 @@ Everything from v1 stays, with the scan removed:
 | P0 pipeline | scan cleaned, planes, compress | PROVEN 2026-09-02 |
 | P1 walk | shell, walk, stairs, minimap, themes, Pages | BUILT 2026-09-02; live; his walk found the missing south stair door |
 | **P1.5 object sheet** | `docs/OBJECT-SHEET.md` with shots and sizes | he ticks it |
-| **P2 geometry** | `objects.json` from his ticks, `build_level.py`, `level.glb` white (untextured), app loads it, scan gone | he walks the white level |
+| **P2 geometry** | BUILT 2026-09-02: the level is built at runtime by `web/src/level.ts` from `level/level.json` v2 (walls + openings, window grids, doors with slide/swing/metal leaves and E-key toggle, floors, ceilings, stairs with treads/nosings/side wall, ribs, lights, aircon, courtyard slabs). No `build_level.py`, no `level.glb`: runtime build, one file, instant edits. Scan gone from the app. Owner corrections folded in same day (two back-wall doors, hallway windows + street door, second flight over the first in front of the west window, plinth/desk removed). | he walks it; corrections still coming |
 | **P3 textures** | bake + ComfyUI fill, one wall shown first, then all | he judges the wall, then the room |
 | P4 hang | inventory, hang mode, HANG widget, autosave, file save/load, undo | he hangs a show |
 | P5 fix + share | level mode, GitHub token save, exports, flythrough | he saves to the repo, prints the hang list, renders a flythrough |

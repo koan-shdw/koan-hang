@@ -1,70 +1,122 @@
-"""Writes level/level.json from the measured scan (scan/report.md, scan/measure.py, SCAN-REPORT.md).
-Numbers are in the de-rotated scan frame, metres, y up. The scan.glb already carries the rotation.
-Wall a->b runs left->right as seen from the room (hang u increases left to right).
-Openings: door = walker passes, window = no hang, both = no hang."""
+"""Writes level/level.json (format koan-hang-level/2) from the scan measurements and the owner's walk-through
+answers of 2026-09-02. Metres, y up, the de-rotated scan frame.
+Wall a->b runs left->right as seen from the room. Openings: u from a, w width, bottom/h from the wall base.
+ door: {type: slide|swing|metal, open: bool, toggle: bool}   window: {grid: {cols, bars:[heights], cross:[col..]}, frame}
+Owner facts (2026-09-02): back wall ground = two same-size doors, left slides (under the stairs), right at the bottom
+of the stairs, both open in the game, slide function. Glass fronts: ground = cross-bar window | door | three frames;
+second floor = cross-bar window | closed metal door | two windows. West window second floor = one grid six across,
+Tokyo street outside. South wall second floor: the glass carries on at the window end. Second floor: no rail, the same
+flight again up to an unused third floor. Plinth + desk removed."""
 import json
 
 G0, G1 = -5.50, -2.29   # ground floor, ground ceiling
-F0, F1 = -2.14, 0.84    # first floor, first ceiling
-W, E, S, N, SW = -7.06, 0.22, -2.42, 2.72, -5.89  # west, east, south, north, stair wall
+F0, F1 = -2.14, 0.84    # second floor (id "first"), its ceiling
+T0 = 0.99               # third floor level (unused): F1 + 0.15 slab
+E, S, N, SW = 0.22, -2.42, 2.72, -5.89
+W = -7.06               # west face, both floors (scan)
+WG = W
+SWH = -6.04             # hallway face of the stair wall (0.15 thick); on the second floor the same slab carries on as flight 2's side wall
+STAIR_X = round((W + SWH) / 2, 3); STAIR_W = round(SWH - W - 0.02, 2)
+GH, FH = G1 - G0, F1 - F0
+GREY, BLACK = "steel-grey", "steel-black"
 
-def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), hang=True, note=None):
+def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), hang=True, material="wall-white", note=None):
     d = dict(id=id, name=name, level=level, a=a, b=b, baseY=baseY, topY=topY, thickness=0.15, facing=facing,
-             openings=list(openings), noHang=list(noHang), hang=hang)
+             openings=list(openings), noHang=list(noHang), hang=hang, material=material)
     if note: d["note"] = note
     return d
-def door(u, w, h=2.10): return dict(kind="door", u=u, w=w, bottom=0, h=h)
-def window(u, w, bottom, h): return dict(kind="window", u=u, w=w, bottom=bottom, h=h)
+def door(u, w, h, type, open, toggle=True, leaf=True):
+    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf))
+def window(u, w, bottom, h, cols, bars, frame, cross=()):
+    return dict(kind="window", u=u, w=w, bottom=bottom, h=h, grid=dict(cols=cols, bars=list(bars), cross=list(cross)), frame=frame)
 
-GH, FH = G1 - G0, F1 - F0
 walls = [
-    # ground
-    wall("g-west", "hallway west", "ground", [W, N], [W, S], "+x", G0, G1, hang=False,
-         note="street side; scan sees little here, glass likely; hand-check in level mode"),
-    # doorway room <-> hallway at the north end of the stair wall: scan shows no wall z 1.8..2.6 below 2.0 m
-    wall("g-stair-room", "room west (stair wall)", "ground", [SW, N], [SW, S], "+x", G0, G1,
-         openings=[door(0.12, 0.80, 2.00)], note="doorway to the hallway at the north end (scan + first-person check)"),
-    wall("g-stair-hall", "hallway east (stair wall)", "ground", [SW, S], [SW, N], "-x", G0, G1, hang=False,
-         openings=[door(4.22, 0.80, 2.00)]),
-    wall("g-east", "room east (courtyard glass + door)", "ground", [E, S], [E, N], "-x", G0, G1,
-         openings=[window(0.00, 2.32, 0, GH), door(2.32, 1.15), window(3.47, 1.67, 0, GH)],
-         note="door measured z -0.10..1.05 (closed leaf in scan); rest is glass"),
-    wall("g-south", "south", "ground", [W, S], [E, S], "+z", G0, G1,
-         openings=[door(0.00, 1.17)], note="hallway end = street entrance door (floorplan)"),
-    wall("g-north", "north", "ground", [E, N], [W, N], "-z", G0, G1,
-         openings=[window(6.11, 1.17, 0, GH)], note="hallway north end open in scan; kind unknown"),
-    # courtyard (scan-only, no hanging: user decision 2026-09-02)
-    wall("c-1", "courtyard wall x4.49", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False),
-    wall("c-2", "courtyard wall x6.84", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False),
-    wall("c-3", "courtyard low wall z3.62", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False),
-    wall("c-4", "courtyard wall z-0.40", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False),
-    wall("c-5", "courtyard wall z-3.12", "ground", [0.60, -3.12], [4.39, -3.12], "+z", G0, -2.30, hang=False),
-    # first
-    wall("f-west", "west", "first", [W, N], [W, S], "+x", F0, F1,
-         openings=[window(0.00, 3.32, 0, FH)], note="scan shows no wall z -0.6..2.72: glass; check"),
-    wall("f-east", "east", "first", [E, S], [E, N], "-x", F0, F1,
-         openings=[window(0.00, 1.12, 0, FH)], note="scan shows no wall z -2.42..-1.30: glass; check"),
-    wall("f-south", "south", "first", [W, S], [E, S], "+z", F0, F1,
-         note="scan gaps: x -5.9..-4.4 below 2.1 m, x -0.7..0.2 at 1.1..2.9 m; left solid, check"),
+    # ---------------- ground ----------------
+    wall("g-west", "hallway west, windows behind the stair", "ground", [WG, N], [WG, S], "+x", G0, G1, hang=False, material="wall-blue",
+         openings=[window(0.15, 3.45, 0.30, GH - 0.45, 4, [1.0, 2.1], BLACK),
+                   door(3.72, 0.80, 2.10, "swing", False, toggle=False)],
+         note="owner: windows behind the 1st-to-2nd stair, and the street door on the other side at the stair bottom (floorplan gap z -1.8..-1.0)"),
+    wall("g-stair-room", "back wall (stair wall), room side", "ground", [SW, N], [SW, S], "+x", G0, G1,
+         openings=[door(0.12, 0.80, 2.00, "slide", True, leaf=False), door(4.34, 0.80, 2.00, "slide", True, leaf=False)],
+         note="two same-size doors: left (north) slides, goes under the stairs; right (south) at the bottom of the stairs; leaves live on the hallway side (g-stair-hall)"),
+    wall("g-stair-hall", "back wall, hallway side", "ground", [SWH, S], [SWH, N], "-x", G0, G1, hang=False, material="wall-blue",
+         openings=[door(0.00, 0.80, 2.00, "slide", True), door(4.22, 0.80, 2.00, "slide", True)]),
+    wall("g-east", "glass front", "ground", [E, S], [E, N], "-x", G0, G1, hang=False,
+         openings=[window(0.10, 2.17, 0, GH, 3, [1.0], GREY, cross=[1]),
+                   door(2.32, 1.15, 2.30, "swing", True, toggle=True),
+                   window(3.52, 1.57, 0, GH, 3, [1.0], GREY)],
+         note="owner: cross-bar window | door | three frames; one grey steel grid, bar at ~1 m"),
+    wall("g-south", "south", "ground", [WG, S], [E, S], "+z", G0, G1,
+         openings=[door(0.00, 1.17, 2.10, "swing", False, toggle=False)], note="hallway end = street door, closed"),
+    wall("g-north", "north", "ground", [E, N], [WG, N], "-z", G0, G1),
+    # courtyard: scan-only in v1, rebuilt plain in v2; no hanging
+    wall("c-1", "courtyard fence south", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
+    wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
+    wall("c-3", "courtyard low wall north", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
+    wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
+    wall("c-5", "courtyard low wall south", "ground", [0.60, -3.12], [4.39, -3.12], "+z", G0, -2.30, hang=False, material="concrete"),
+    wall("c-6", "neighbour wall north", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
+    # ---------------- second floor (id "first") ----------------
+    wall("f-west", "west, big window", "first", [W, N], [W, S], "+x", F0, F1, hang=False,
+         openings=[window(0.17, 4.80, 0.25, 2.45, 6, [1.0, 2.1], BLACK)],
+         note="one black grid six across, Tokyo street outside"),
+    wall("f-east", "east glass", "first", [E, S], [E, N], "-x", F0, F1, hang=False,
+         openings=[window(0.10, 1.20, 0, FH, 1, [1.0, 2.1], BLACK, cross=[0]),
+                   door(2.00, 0.90, 2.10, "metal", False, toggle=False),
+                   window(3.35, 1.69, 0, FH, 2, [1.0, 2.1], BLACK)],
+         note="owner: cross-bar window | closed metal door | two windows"),
+    wall("f-south", "south", "first", [W, S], [E, S], "+z", F0, F1),
     wall("f-north", "north", "first", [E, N], [W, N], "-z", F0, F1),
 ]
+
 level = dict(
-    format="koan-hang-level/1",
-    scan=dict(file="scan.glb", rotationDeg=-1.79, rotationApplied=True, offset=[0, 0, 0]),
+    format="koan-hang-level/2",
     eyeHeight=1.60,
     spawn=dict(level="ground", x=-2.8, z=0.1, yawDeg=90),
     levels=[dict(id="ground", name="ground", floorY=G0, ceilY=G1),
-            dict(id="first", name="first", floorY=F0, ceilY=F1)],
-    floors=[dict(level="ground", name="room + hallway", poly=[[W, S], [E, S], [E, N], [W, N]]),
-            dict(level="ground", name="courtyard", poly=[[E, -4.49], [6.84, -4.49], [6.84, 3.62], [E, 3.62]]),
-            dict(level="first", name="room + landing", poly=[[SW, S], [E, S], [E, N], [W, N], [W, 1.7], [SW, 1.7]])],
+            dict(id="first", name="second", floorY=F0, ceilY=F1)],
+    floors=[
+        dict(level="ground", name="room", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="concrete-polished"),
+        dict(level="ground", name="hallway", poly=[[WG, S], [SW, S], [SW, N], [WG, N]], material="concrete-polished"),  # runs to the room face so the doorways have floor
+        dict(level="ground", name="courtyard", poly=[[E, -4.49], [6.84, -4.49], [6.84, 3.62], [E, 3.62]], material="stone-tiles"),
+        dict(level="first", name="room", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="concrete-bare"),
+        dict(level="first", name="landing", poly=[[W, 1.7], [SW, 1.7], [SW, N], [W, N]], material="concrete-bare"),
+        dict(level="first", name="stair foot", poly=[[W, S], [SW, S], [SW, -1.9], [W, -1.9]], material="concrete-bare"),
+    ],
+    ceilings=[
+        dict(level="ground", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="corrugated-ceiling"),
+        dict(level="ground", poly=[[WG, S], [SWH, S], [SWH, -1.9], [WG, -1.9]], material="corrugated-ceiling"),  # only over the stair foot; the flight's underside is the ceiling beyond
+        dict(level="first", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="corrugated-ceiling"),
+        dict(level="first", poly=[[W, S], [SW, S], [SW, -1.9], [W, -1.9]], material="corrugated-ceiling"),
+        dict(level="first", poly=[[W, 1.2], [SW, 1.2], [SW, 1.7], [W, 1.7]], material="corrugated-ceiling"),  # third-floor slab over the blocked top of flight 2
+        dict(level="first", poly=[[W, 1.7], [SW, 1.7], [SW, N], [W, N]], material="corrugated-ceiling"),
+    ],
     walls=walls,
-    stairs=[dict(id="s1", level="ground", to="first", **{"from": [-6.475, -1.9]}, dir="+z", width=1.17, run=3.6,
-                 bottomY=G0, topY=F0, treads=16, riser=0.198, tread=0.225)],
+    stairs=[
+        dict(id="s1", level="ground", to="first", **{"from": [STAIR_X, -1.9]}, dir="+z", width=STAIR_W, run=3.6,
+             bottomY=G0, topY=F0, treads=16, riser=round((F0 - G0) / 17, 3), tread=0.225, nosing=0.03,
+             material="stair-wood"),
+        dict(id="s2", level="first", to=None, topBlocked=0.9, **{"from": [STAIR_X, -1.9]}, dir="+z", width=STAIR_W, run=3.6,
+             bottomY=F0, topY=T0, treads=16, riser=round((T0 - F0) / 17, 3), tread=0.225, nosing=0.03,
+             material="stair-wood", sideWall=dict(side="+x", height=0.9, thickness=0.15, material="wall-white"),
+             note="same flight again, up to the unused third floor; blocked near the top; the blue side wall is the diagonal band in the west window photo"),
+    ],
     blockers=[],
-    patches=[dict(level="first", name="floor gap in scan", poly=[[-5.7, 0.8], [-2.5, 0.8], [-2.5, -1.0], [-5.7, -1.0]],
-                  note="scan has no floor here (dark floor or the hole he saw); flat patch at floor height")],
-    source=dict(made="level/make_level.py 2026-09-02", from_="scan/report.md + scan/measure.py + Polycam floorplan"),
+    objects=[
+        dict(kind="ribs", level="ground", dir="+x", pitch=0.15, depth=0.05, width=0.06),
+        dict(kind="ribs", level="first", dir="+x", pitch=0.15, depth=0.05, width=0.06),
+        dict(kind="light", level="ground", at=[-4.6, -1.2], size=[1.2, 0.08]), dict(kind="light", level="ground", at=[-2.6, -1.2], size=[1.2, 0.08]),
+        dict(kind="light", level="ground", at=[-0.8, -1.2], size=[1.2, 0.08]), dict(kind="light", level="ground", at=[-4.6, 1.4], size=[1.2, 0.08]),
+        dict(kind="light", level="ground", at=[-2.6, 1.4], size=[1.2, 0.08]), dict(kind="light", level="ground", at=[-0.8, 1.4], size=[1.2, 0.08]),
+        dict(kind="light", level="first", at=[-4.6, -1.2], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-2.6, -1.2], size=[1.2, 0.08]),
+        dict(kind="light", level="first", at=[-0.8, -1.2], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-4.6, 1.4], size=[1.2, 0.08]),
+        dict(kind="light", level="first", at=[-2.6, 1.4], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-0.8, 1.4], size=[1.2, 0.08]),
+        dict(kind="aircon", level="ground", at=[-2.4, 0.4], size=[0.95, 0.25, 0.95]),
+        dict(kind="aircon", level="first", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
+        dict(kind="slab", name="corridor over the courtyard", box=[[E, F0 - 0.15, 0.0], [6.0, F0, 2.0]], material="concrete"),
+        dict(kind="slab", name="courtyard roof edge", box=[[E, F1, -4.49], [6.84, F1 + 0.15, 3.62]], material="corrugated"),
+    ],
+    source=dict(made="level/make_level.py 2026-09-02 v2", from_="scan measurements + owner walk-through answers"),
 )
 json.dump(level, open("level/level.json", "w"), indent=1)
-print("wrote level/level.json:", len(walls), "walls")
+print("wrote level/level.json:", len(walls), "walls,", len(level["objects"]), "objects")
