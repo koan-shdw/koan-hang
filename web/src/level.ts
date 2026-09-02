@@ -35,14 +35,17 @@ export type LevelObject =
   | { kind: 'slab'; name?: string; box: [[number, number, number], [number, number, number]]; material?: string }
   | { kind: 'wallbox'; wall: string; u: number; y: number; w: number; h: number; d: number; material?: string }
   | { kind: 'pipe'; wall: string; u: number; y0: number; y1: number; r: number; d: number; material?: string }
-export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number }
+  | { kind: 'pavegrid'; name?: string; area: [[number, number], [number, number]]; skip?: [[number, number], [number, number]]; cell: number; edge: number; lift: number; tileEvery?: number; material?: string; tileMaterial?: string }
+  | { kind: 'hedge'; name?: string; along: [[number, number], [number, number]]; y: number; r: number; step: number; material?: string }
+export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number; slab?: number; roof?: number }
+export interface Ceiling extends Surface { draw?: boolean }
 export interface Level {
   format: string
   eyeHeight: number
   spawn?: { level: string; x: number; z: number; yawDeg: number }
   levels: LevelFloor[]
   floors: Surface[]
-  ceilings: Surface[]
+  ceilings: Ceiling[]
   walls: Wall[]
   stairs: Stair[]
   blockers: Blocker[]
@@ -144,6 +147,14 @@ const PALETTE: Record<string, { color: number; rough?: number; metal?: number; o
   'light': { color: 0xffffff, emissive: 0xfff2d8 },
   'aircon': { color: 0xf4f4f2, rough: 0.6, emissive: 0x3a3a38 },
   'rib': { color: 0xc8c6c0, rough: 0.6, metal: 0.3 },
+  'gravel': { color: 0x8a8a86, rough: 1 },
+  'concrete-path': { color: 0xb5b2aa, rough: 0.9 },
+  'red-tile': { color: 0xa5563a, rough: 0.8 },
+  'dirt': { color: 0x6e5a42, rough: 1 },
+  'corten': { color: 0x8a3b22, rough: 0.9 },
+  'foliage': { color: 0x4f7a3a, rough: 1 },
+  'stone': { color: 0x9a968e, rough: 0.9 },
+  'corrugated-white': { color: 0xe4e4e0, rough: 0.6, metal: 0.2 },
 }
 const cache = new Map<string, THREE.MeshStandardMaterial>()
 export function mat(name: string): THREE.MeshStandardMaterial {
@@ -158,12 +169,6 @@ export function mat(name: string): THREE.MeshStandardMaterial {
 }
 
 // ---- geometry -------------------------------------------------------------------------
-function polyShape(poly: [number, number][]): THREE.BufferGeometry {
-  const sh = new THREE.Shape(poly.map(([x, z]) => new THREE.Vector2(x, z)))
-  const g = new THREE.ShapeGeometry(sh)
-  g.rotateX(Math.PI / 2) // (x, y) -> (x, 0, y): shape y becomes world z, no mirror
-  return g
-}
 function bbox(poly: [number, number][]): { x0: number; x1: number; z0: number; z1: number } {
   let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity
   for (const [x, z] of poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z) }
@@ -286,13 +291,23 @@ export function buildLevel(lv: Level): Built {
       }
     }
   }
-  // floors + ceilings
+  // floors: solid slabs (top at floorY, going down by the level's slab thickness); the underside is the ceiling below
   for (const f of lv.floors) {
-    const g = polyShape(f.poly); g.translate(0, floorOf(lv, f.level).floorY, 0)
+    const L = floorOf(lv, f.level), th = L.slab ?? 0.2
+    const sh = new THREE.Shape(f.poly.map(([x, z]) => new THREE.Vector2(x, z)))
+    const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false })
+    g.rotateX(Math.PI / 2) // (x, y, z) -> (x, -z, y): the extrusion goes down, shape y becomes world z
+    g.translate(0, L.floorY, 0)
     const m = new THREE.Mesh(g, mat(f.material ?? 'concrete-bare')); group.add(m); addWire(g, m)
   }
   for (const c of lv.ceilings) {
-    const g = polyShape(c.poly); g.translate(0, floorOf(lv, c.level).ceilY, 0)
+    if (c.draw === false) continue
+    const L = floorOf(lv, c.level), th = L.roof ?? 0.15
+    const sh = new THREE.Shape(c.poly.map(([x, z]) => new THREE.Vector2(x, z)))
+    const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false })
+    g.rotateX(-Math.PI / 2) // extrusion goes up from the ceiling plane
+    g.scale(1, 1, -1)
+    g.translate(0, L.ceilY, 0)
     group.add(new THREE.Mesh(g, mat(c.material ?? 'corrugated-ceiling')))
   }
   // stairs
@@ -304,29 +319,32 @@ export function buildLevel(lv: Level): Built {
     const sgn = s.dir === '+z' || s.dir === '+x' ? 1 : -1
     const start = along ? (sgn > 0 ? r.z0 : r.z1) : (sgn > 0 ? r.x0 : r.x1)
     const treadM = s.treadMaterial ?? s.material ?? 'stair-wood', riserM = s.riserMaterial ?? s.material ?? 'stair-wood'
-    for (let i = 0; i < s.treads; i++) {
+    // treads i = 0..treads-1, risers i = 0..treads (the last riser rises onto the landing)
+    for (let i = 0; i <= s.treads; i++) {
       const topY = s.bottomY + riser * (i + 1)
       const a0 = start + sgn * stepRun * i, a1 = start + sgn * stepRun * (i + 1)
+      const rm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : 0.03, riser, along ? 0.03 : riser), mat(riserM))
+      if (along) rm.position.set(cx, topY - riser / 2, a0 + sgn * 0.015); else rm.position.set(a0 + sgn * 0.015, topY - riser / 2, cz)
+      group.add(rm)
+      if (i === s.treads) break
       const mid = (a0 + a1) / 2 - sgn * nos / 2
       const tm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : stepRun + nos, 0.04, along ? stepRun + nos : width), mat(treadM))
-      const rm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : 0.03, riser, along ? 0.03 : riser), mat(riserM))
-      if (along) { tm.position.set(cx, topY - 0.02, mid); rm.position.set(cx, topY - riser / 2, a0) }
-      else { tm.position.set(mid, topY - 0.02, cz); rm.position.set(a0, topY - riser / 2, cz) }
-      group.add(tm, rm)
+      if (along) tm.position.set(cx, topY - 0.02, mid); else tm.position.set(mid, topY - 0.02, cz)
+      group.add(tm)
     }
-    // underside slab: top face on the tread line so the steps sit in it, no gaps
+    // underside slab: top face on the line through the riser feet, 15 cm thick, ends inside the floor slabs
     const len = Math.hypot(s.run, rise), ang = Math.atan2(rise, s.run)
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(along ? width : len, 0.3, along ? len : width), mat('concrete'))
-    slab.position.set(cx, s.bottomY + rise / 2 - 0.15, cz)
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(along ? width : len, 0.15, along ? len : width), mat('concrete'))
+    slab.position.set(cx, s.bottomY + rise / 2 - 0.075 * Math.cos(ang), cz)
     if (along) slab.rotation.x = -sgn * ang; else slab.rotation.z = sgn * ang
     group.add(slab)
-    // stringers: plates on both edges, standing a set height above the tread line
+    // stringers: plates on both edges, from 5 cm under the line to a set height above it, same length as the flight
     if (s.stringers) {
-      const st = s.stringers
+      const st = s.stringers, h = st.height + 0.05
       for (const side of [-1, 1]) {
-        const pm = new THREE.Mesh(new THREE.BoxGeometry(along ? st.thickness : len, st.height + 0.3, along ? len : st.thickness), mat(st.material ?? 'stringer-blue'))
+        const pm = new THREE.Mesh(new THREE.BoxGeometry(along ? st.thickness : len, h, along ? len : st.thickness), mat(st.material ?? 'stringer-blue'))
         const off = side * (width / 2 - st.thickness / 2)
-        pm.position.set(along ? cx + off : cx, s.bottomY + rise / 2 + (st.height + 0.3) / 2 - 0.3, along ? cz : cz + off)
+        pm.position.set(along ? cx + off : cx, s.bottomY + rise / 2 + (h / 2 - 0.05) * Math.cos(ang), along ? cz : cz + off)
         if (along) pm.rotation.x = -sgn * ang; else pm.rotation.z = sgn * ang
         group.add(pm)
       }
@@ -381,6 +399,27 @@ export function buildLevel(lv: Level): Built {
       const w = wallById.get(o.wall); if (!w) continue
       const m = new THREE.Mesh(new THREE.CylinderGeometry(o.r, o.r, o.y1 - o.y0, 10), mat(o.material ?? 'pipe-white'))
       m.position.copy(wallPoint(w, o.u, w.baseY + (o.y0 + o.y1) / 2, o.d)); group.add(m)
+    } else if (o.kind === 'pavegrid') {
+      // concrete-edged squares over an area, gravel between, a red tile every n-th cell; the skip box (the path) is left out
+      const [[x0, z0], [x1, z1]] = o.area, y = floorOf(lv, 'ground').floorY
+      const inSkip = (x: number, z: number) => !!o.skip && x > o.skip[0][0] && x < o.skip[1][0] && z > o.skip[0][1] && z < o.skip[1][1]
+      const nx = Math.floor((x1 - x0) / o.cell), nz = Math.floor((z1 - z0) / o.cell)
+      let k = 0
+      for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) {
+        const cxp = x0 + (i + 0.5) * o.cell, czp = z0 + (j + 0.5) * o.cell
+        if (inSkip(cxp, czp)) continue
+        const e = new THREE.Mesh(new THREE.BoxGeometry(o.cell, o.lift, o.edge), mat(o.material ?? 'concrete')); e.position.set(cxp, y + o.lift / 2, z0 + j * o.cell); group.add(e)
+        const e2 = new THREE.Mesh(new THREE.BoxGeometry(o.edge, o.lift, o.cell), mat(o.material ?? 'concrete')); e2.position.set(x0 + i * o.cell, y + o.lift / 2, czp); group.add(e2)
+        if (o.tileEvery && (k++ % o.tileEvery) === 1) {
+          const tl = new THREE.Mesh(new THREE.BoxGeometry(o.cell - o.edge, o.lift * 0.8, o.cell - o.edge), mat(o.tileMaterial ?? 'red-tile')); tl.position.set(cxp, y + o.lift * 0.4, czp); group.add(tl)
+        }
+      }
+    } else if (o.kind === 'hedge') {
+      const [[ax, az], [bx, bz]] = o.along, L = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.floor(L / o.step))
+      for (let i = 0; i <= n; i++) {
+        const t = i / n, m = new THREE.Mesh(new THREE.SphereGeometry(o.r * (0.8 + 0.4 * ((i * 7) % 3) / 2), 10, 8), mat(o.material ?? 'foliage'))
+        m.position.set(ax + (bx - ax) * t, o.y + o.r * 0.6, az + (bz - az) * t + (((i * 5) % 3) - 1) * 0.12); m.scale.y = 0.7; group.add(m)
+      }
     }
   }
   return { group, wire, doors, lights }

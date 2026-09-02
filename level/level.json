@@ -12,19 +12,23 @@
    "id": "ground",
    "name": "ground",
    "floorY": -5.54,
-   "ceilY": -2.3
+   "ceilY": -2.3,
+   "slab": 0.2
   },
   {
    "id": "first",
    "name": "second",
    "floorY": -2.14,
-   "ceilY": 0.84
+   "ceilY": 0.84,
+   "slab": 0.16
   },
   {
    "id": "third",
    "name": "third",
    "floorY": 0.99,
-   "ceilY": 3.97
+   "ceilY": 3.97,
+   "slab": 0.15,
+   "roof": 0.15
   }
  ],
  "floors": [
@@ -95,7 +99,7 @@
      3.62
     ]
    ],
-   "material": "stone-tiles"
+   "material": "gravel"
   },
   {
    "level": "first",
@@ -126,11 +130,11 @@
    "poly": [
     [
      -7.08,
-     1.9
+     2.22
     ],
     [
      -5.87,
-     1.9
+     2.22
     ],
     [
      -5.87,
@@ -157,11 +161,11 @@
     ],
     [
      -5.87,
-     -1.87
+     -1.55
     ],
     [
      -7.08,
-     -1.87
+     -1.55
     ]
    ],
    "material": "concrete-bare"
@@ -195,11 +199,11 @@
    "poly": [
     [
      -7.08,
-     1.9
+     2.22
     ],
     [
      -5.87,
-     1.9
+     2.22
     ],
     [
      -5.87,
@@ -234,7 +238,8 @@
      2.72
     ]
    ],
-   "material": "corrugated-ceiling"
+   "material": "corrugated-ceiling",
+   "draw": false
   },
   {
    "level": "ground",
@@ -249,14 +254,15 @@
     ],
     [
      -5.87,
-     -1.87
+     -1.55
     ],
     [
      -7.08,
-     -1.87
+     -1.55
     ]
    ],
-   "material": "corrugated-ceiling"
+   "material": "corrugated-ceiling",
+   "draw": false
   },
   {
    "level": "first",
@@ -278,7 +284,8 @@
      2.69
     ]
    ],
-   "material": "corrugated-ceiling"
+   "material": "corrugated-ceiling",
+   "draw": false
   },
   {
    "level": "first",
@@ -293,25 +300,26 @@
     ],
     [
      -5.87,
-     -1.87
+     -1.55
     ],
     [
      -7.08,
-     -1.87
+     -1.55
     ]
    ],
-   "material": "corrugated-ceiling"
+   "material": "corrugated-ceiling",
+   "draw": false
   },
   {
    "level": "first",
    "poly": [
     [
      -7.08,
-     1.9
+     2.22
     ],
     [
      -5.87,
-     1.9
+     2.22
     ],
     [
      -5.87,
@@ -322,7 +330,8 @@
      2.69
     ]
    ],
-   "material": "corrugated-ceiling"
+   "material": "corrugated-ceiling",
+   "draw": false
   },
   {
    "level": "third",
@@ -368,7 +377,7 @@
     {
      "kind": "window",
      "u": 0.0,
-     "w": 3.87,
+     "w": 4.29,
      "bottom": 0.1,
      "h": 3.04,
      "frame": "steel-black",
@@ -388,7 +397,7 @@
     },
     {
      "kind": "door",
-     "u": 3.87,
+     "u": 4.29,
      "w": 0.8,
      "bottom": 0,
      "h": 2.05,
@@ -407,14 +416,6 @@
       "recess": 0.1,
       "leafH": null
      }
-    },
-    {
-     "kind": "panel",
-     "u": 4.67,
-     "w": 0.42,
-     "bottom": 0.0,
-     "h": 3.24,
-     "material": "corrugated"
     }
    ],
    "noHang": [],
@@ -657,10 +658,20 @@
    "topY": -2.3,
    "thickness": 0.14,
    "facing": "+z",
-   "openings": [],
+   "openings": [
+    {
+     "kind": "panel",
+     "u": 0.0,
+     "w": 1.21,
+     "bottom": 0.0,
+     "h": 3.24,
+     "material": "corrugated"
+    }
+   ],
    "noHang": [],
    "hang": true,
-   "material": "wall-white"
+   "material": "wall-white",
+   "note": "hallway end wall: corrugated, gas meter, boxes, pipes"
   },
   {
    "id": "g-north",
@@ -727,7 +738,7 @@
   },
   {
    "id": "c-3",
-   "name": "courtyard low wall north",
+   "name": "red rusted wall",
    "level": "ground",
    "a": [
     5.53,
@@ -738,13 +749,13 @@
     3.62
    ],
    "baseY": -5.54,
-   "topY": -3.97,
+   "topY": -3.45,
    "thickness": 0.14,
    "facing": "-z",
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "concrete"
+   "material": "corten"
   },
   {
    "id": "c-4",
@@ -790,7 +801,7 @@
   },
   {
    "id": "c-6",
-   "name": "neighbour wall north",
+   "name": "white corrugated building behind",
    "level": "ground",
    "a": [
     3.71,
@@ -807,7 +818,7 @@
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "render"
+   "material": "corrugated-white"
   },
   {
    "id": "f-west",
@@ -1151,7 +1162,7 @@
    "to": "first",
    "from": [
     -6.62,
-    -1.87
+    -1.55
    ],
    "dir": "+z",
    "width": 0.92,
@@ -1176,7 +1187,7 @@
    "to": "third",
    "from": [
     -6.62,
-    -1.87
+    -1.55
    ],
    "dir": "+z",
    "width": 0.92,
@@ -1193,12 +1204,6 @@
     "height": 0.25,
     "thickness": 0.03,
     "material": "stringer-blue"
-   },
-   "sideWall": {
-    "side": "+x",
-    "height": 0.9,
-    "thickness": 0.14,
-    "material": "wall-white"
    }
   }
  ],
@@ -1536,8 +1541,8 @@
   },
   {
    "kind": "wallbox",
-   "wall": "g-west",
-   "u": 4.88,
+   "wall": "g-south",
+   "u": 0.55,
    "y": 2.05,
    "w": 0.3,
    "h": 0.4,
@@ -1546,9 +1551,9 @@
   },
   {
    "kind": "wallbox",
-   "wall": "g-west",
-   "u": 4.77,
-   "y": 1.55,
+   "wall": "g-south",
+   "u": 0.4,
+   "y": 1.5,
    "w": 0.22,
    "h": 0.18,
    "d": 0.1,
@@ -1556,9 +1561,9 @@
   },
   {
    "kind": "wallbox",
-   "wall": "g-west",
-   "u": 4.97,
-   "y": 1.4,
+   "wall": "g-south",
+   "u": 0.78,
+   "y": 1.45,
    "w": 0.1,
    "h": 0.14,
    "d": 0.06,
@@ -1566,23 +1571,122 @@
   },
   {
    "kind": "pipe",
-   "wall": "g-west",
-   "u": 4.82,
+   "wall": "g-south",
+   "u": 0.62,
    "y0": 0.05,
    "y1": 1.85,
-   "r": 0.02,
-   "d": 0.05,
+   "r": 0.012,
+   "d": 0.04,
    "material": "pipe-white"
   },
   {
    "kind": "pipe",
-   "wall": "g-west",
-   "u": 5.0,
+   "wall": "g-south",
+   "u": 0.3,
    "y0": 0.05,
    "y1": 2.6,
-   "r": 0.015,
-   "d": 0.05,
+   "r": 0.01,
+   "d": 0.04,
    "material": "pipe-white"
+  },
+  {
+   "kind": "slab",
+   "name": "concrete path",
+   "box": [
+    [
+     0.22,
+     -5.54,
+     0.05
+    ],
+    [
+     4.4,
+     -5.51,
+     1.75
+    ]
+   ],
+   "material": "concrete-path"
+  },
+  {
+   "kind": "pavegrid",
+   "name": "gravel squares",
+   "area": [
+    [
+     0.22,
+     -4.49
+    ],
+    [
+     6.84,
+     3.62
+    ]
+   ],
+   "skip": [
+    [
+     0.22,
+     0.05
+    ],
+    [
+     4.4,
+     1.75
+    ]
+   ],
+   "cell": 0.95,
+   "edge": 0.1,
+   "lift": 0.03,
+   "tileEvery": 3,
+   "material": "concrete",
+   "tileMaterial": "red-tile"
+  },
+  {
+   "kind": "slab",
+   "name": "dirt strip",
+   "box": [
+    [
+     5.9,
+     -5.535,
+     -4.49
+    ],
+    [
+     6.84,
+     -5.5200000000000005,
+     3.62
+    ]
+   ],
+   "material": "dirt"
+  },
+  {
+   "kind": "hedge",
+   "name": "plants over the red wall",
+   "along": [
+    [
+     0.0,
+     3.55
+    ],
+    [
+     5.3,
+     3.55
+    ]
+   ],
+   "y": -3.45,
+   "r": 0.45,
+   "step": 0.55,
+   "material": "foliage"
+  },
+  {
+   "kind": "slab",
+   "name": "stone figure",
+   "box": [
+    [
+     0.15,
+     -5.54,
+     3.05
+    ],
+    [
+     0.55,
+     -4.79,
+     3.45
+    ]
+   ],
+   "material": "stone"
   },
   {
    "kind": "slab",

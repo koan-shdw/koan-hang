@@ -53,10 +53,12 @@ def back_window(base, top, u0, u1, origin_u):
 
 # ---------------- ground ----------------
 # back wall of the building (west), hallway side. a at NG (north) so u = NG - z. Column origin = the south corner (u = NG - SG).
+DOOR_N = round(SG + 0.80, 3)         # north edge of the street door (flush in the corner)
+STAIR_Z0 = round(DOOR_N + 0.02, 3)   # first riser just past the door edge
+STAIR_TOP = round(STAIR_Z0 + 3.77, 3)
 g_west_openings = [
-    back_window(G0, G1, 0.0, round(NG - (-1.15), 3), round(NG - SG, 3)),                  # window from the north corner to the door
-    door(round(NG - (-1.15), 3), 0.80, 2.05, "metal", False, toggle=False, face="steel", recess=0.10, panelAbove=round(GH - 2.05, 3)),
-    panel(round(NG - (-1.95), 3), round(-1.95 - SG, 3), 0.0, GH, "corrugated"),            # corrugated panel with the gas meter, south of the door
+    back_window(G0, G1, 0.0, round(NG - DOOR_N, 3), round(NG - SG, 3)),                    # window from the north corner to the door
+    door(round(NG - DOOR_N, 3), 0.80, 2.05, "metal", False, toggle=False, face="steel", recess=0.10, panelAbove=round(GH - 2.05, 3)),
 ]
 walls = [
     wall("g-west", "back wall of the building, ground (window, street door, meter panel)", "ground", [W, NG], [W, SG], "+x", G0, G1,
@@ -74,15 +76,16 @@ walls = [
                         jambW=0.10, frameMaterial="wood-dark", leafH=round(GH - 0.05, 3)),
                    window(round(1.35 - SG, 3), round(NG - 1.35, 3), 0, GH, GREY, uprights=[round(1.85 - 1.35, 3), round(2.40 - 1.35, 3)], bars=[0.9, 1.65])],
          note="4 panes | jamb post | door 85 hinged north, open, full height | fixed pane | 2 panes; X in pane 2"),
-    wall("g-south", "south", "ground", [W, SG], [E, SG], "+z", G0, G1),
+    wall("g-south", "south", "ground", [W, SG], [E, SG], "+z", G0, G1,
+         openings=[panel(0.0, round(SW - W, 3), 0.0, GH, "corrugated")], note="hallway end wall: corrugated, gas meter, boxes, pipes"),
     wall("g-north", "north", "ground", [E, NG], [W, NG], "-z", G0, G1),
     # courtyard (plain for now, textures later)
     wall("c-1", "courtyard fence south", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
     wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
-    wall("c-3", "courtyard low wall north", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
+    wall("c-3", "red rusted wall", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.45, hang=False, material="corten"),
     wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
     wall("c-5", "courtyard low wall south", "ground", [0.60, -3.12], [4.39, -3.12], "+z", G0, -2.30, hang=False, material="concrete"),
-    wall("c-6", "neighbour wall north", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
+    wall("c-6", "white corrugated building behind", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="corrugated-white"),
 ]
 # ---------------- second + third (identical) ----------------
 def upper(level, base, top, tag):
@@ -102,39 +105,39 @@ walls += upper("first", F0, F1, "f") + upper("third", T0, T1, "t")
 
 def strip_polys(level, floor_name, room_s, room_n, has_foot, has_landing):
     out = [dict(level=level, name=f"{floor_name} room", poly=[[SW, room_s], [E, room_s], [E, room_n], [SW, room_n]], material="concrete-bare")]
-    if has_landing: out.append(dict(level=level, name=f"{floor_name} landing", poly=[[W, 1.90], [SW, 1.90], [SW, room_n], [W, room_n]], material="concrete-bare"))
-    if has_foot: out.append(dict(level=level, name=f"{floor_name} stair foot", poly=[[W, room_s], [SW, room_s], [SW, -1.87], [W, -1.87]], material="concrete-bare"))
+    if has_landing: out.append(dict(level=level, name=f"{floor_name} landing", poly=[[W, STAIR_TOP], [SW, STAIR_TOP], [SW, room_n], [W, room_n]], material="concrete-bare"))
+    if has_foot: out.append(dict(level=level, name=f"{floor_name} stair foot", poly=[[W, room_s], [SW, room_s], [SW, STAIR_Z0], [W, STAIR_Z0]], material="concrete-bare"))
     return out
 
 level = dict(
     format="koan-hang-level/3",
     eyeHeight=1.60,
     spawn=dict(level="ground", x=-2.8, z=0.1, yawDeg=90),
-    levels=[dict(id="ground", name="ground", floorY=G0, ceilY=G1),
-            dict(id="first", name="second", floorY=F0, ceilY=F1),
-            dict(id="third", name="third", floorY=T0, ceilY=T1)],
+    levels=[dict(id="ground", name="ground", floorY=G0, ceilY=G1, slab=0.20),
+            dict(id="first", name="second", floorY=F0, ceilY=F1, slab=round(F0 - G1, 3)),
+            dict(id="third", name="third", floorY=T0, ceilY=T1, slab=round(T0 - F1, 3), roof=0.15)],
     floors=[
         dict(level="ground", name="gallery", poly=[[SW, SG], [E, SG], [E, NG], [SW, NG]], material="concrete-polished"),
         dict(level="ground", name="hallway", poly=[[W, SG], [SW, SG], [SW, NG], [W, NG]], material="concrete-grey"),
-        dict(level="ground", name="courtyard", poly=[[E, -4.49], [6.84, -4.49], [6.84, 3.62], [E, 3.62]], material="stone-tiles"),
+        dict(level="ground", name="courtyard", poly=[[E, -4.49], [6.84, -4.49], [6.84, 3.62], [E, 3.62]], material="gravel"),
     ] + strip_polys("first", "second", SF, NF, True, True) + strip_polys("third", "third", SF, NF, False, True),
     ceilings=[
-        dict(level="ground", poly=[[SW, SG], [E, SG], [E, NG], [SW, NG]], material="corrugated-ceiling"),
-        dict(level="ground", poly=[[W, SG], [SW, SG], [SW, -1.87], [W, -1.87]], material="corrugated-ceiling"),
-        dict(level="first", poly=[[SW, SF], [E, SF], [E, NF], [SW, NF]], material="corrugated-ceiling"),
-        dict(level="first", poly=[[W, SF], [SW, SF], [SW, -1.87], [W, -1.87]], material="corrugated-ceiling"),
-        dict(level="first", poly=[[W, 1.90], [SW, 1.90], [SW, NF], [W, NF]], material="corrugated-ceiling"),
+        # ceilings under a slab are the slab's underside (draw=False keeps them for the rib layout only)
+        dict(level="ground", poly=[[SW, SG], [E, SG], [E, NG], [SW, NG]], material="corrugated-ceiling", draw=False),
+        dict(level="ground", poly=[[W, SG], [SW, SG], [SW, STAIR_Z0], [W, STAIR_Z0]], material="corrugated-ceiling", draw=False),
+        dict(level="first", poly=[[SW, SF], [E, SF], [E, NF], [SW, NF]], material="corrugated-ceiling", draw=False),
+        dict(level="first", poly=[[W, SF], [SW, SF], [SW, STAIR_Z0], [W, STAIR_Z0]], material="corrugated-ceiling", draw=False),
+        dict(level="first", poly=[[W, STAIR_TOP], [SW, STAIR_TOP], [SW, NF], [W, NF]], material="corrugated-ceiling", draw=False),
         dict(level="third", poly=[[W, SF], [E, SF], [E, NF], [W, NF]], material="corrugated-ceiling"),
     ],
     walls=walls,
     stairs=[
-        dict(id="s1", level="ground", to="first", **{"from": [STAIR_X, -1.87]}, dir="+z", width=STAIR_W, run=3.77,
+        dict(id="s1", level="ground", to="first", **{"from": [STAIR_X, STAIR_Z0]}, dir="+z", width=STAIR_W, run=3.77,
              bottomY=G0, topY=F0, treads=16, riser=round((F0 - G0) / 17, 3), tread=0.222, nosing=0.0,
              treadMaterial="checker", riserMaterial="plywood", stringers=dict(height=0.25, thickness=0.03, material="stringer-blue")),
-        dict(id="s2", level="first", to="third", **{"from": [STAIR_X, -1.87]}, dir="+z", width=STAIR_W, run=3.77,
+        dict(id="s2", level="first", to="third", **{"from": [STAIR_X, STAIR_Z0]}, dir="+z", width=STAIR_W, run=3.77,
              bottomY=F0, topY=T0, treads=16, riser=round((T0 - F0) / 17, 3), tread=0.222, nosing=0.0,
-             treadMaterial="checker", riserMaterial="plywood", stringers=dict(height=0.25, thickness=0.03, material="stringer-blue"),
-             sideWall=dict(side="+x", height=0.9, thickness=0.14, material="wall-white")),
+             treadMaterial="checker", riserMaterial="plywood", stringers=dict(height=0.25, thickness=0.03, material="stringer-blue")),
     ],
     blockers=[],
     objects=[
@@ -149,12 +152,17 @@ level = dict(
         dict(kind="aircon", level="ground", at=[-2.4, 0.4], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="first", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="third", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
-        # gas meter, boxes, pipes on the corrugated panel (wall g-west, u from the north corner)
-        dict(kind="wallbox", wall="g-west", u=round(NG - (-2.16), 3), y=2.05, w=0.30, h=0.40, d=0.18, material="meter-box"),
-        dict(kind="wallbox", wall="g-west", u=round(NG - (-2.05), 3), y=1.55, w=0.22, h=0.18, d=0.10, material="junction-box"),
-        dict(kind="wallbox", wall="g-west", u=round(NG - (-2.25), 3), y=1.40, w=0.10, h=0.14, d=0.06, material="junction-box"),
-        dict(kind="pipe", wall="g-west", u=round(NG - (-2.10), 3), y0=0.05, y1=1.85, r=0.02, d=0.05, material="pipe-white"),
-        dict(kind="pipe", wall="g-west", u=round(NG - (-2.28), 3), y0=0.05, y1=2.60, r=0.015, d=0.05, material="pipe-white"),
+        # gas meter, boxes, pipes on the corrugated end wall of the hallway (wall g-south, u from the west corner)
+        dict(kind="wallbox", wall="g-south", u=0.55, y=2.05, w=0.30, h=0.40, d=0.18, material="meter-box"),
+        dict(kind="wallbox", wall="g-south", u=0.40, y=1.50, w=0.22, h=0.18, d=0.10, material="junction-box"),
+        dict(kind="wallbox", wall="g-south", u=0.78, y=1.45, w=0.10, h=0.14, d=0.06, material="junction-box"),
+        dict(kind="pipe", wall="g-south", u=0.62, y0=0.05, y1=1.85, r=0.012, d=0.04, material="pipe-white"),
+        dict(kind="pipe", wall="g-south", u=0.30, y0=0.05, y1=2.60, r=0.010, d=0.04, material="pipe-white"),
+        dict(kind="slab", name="concrete path", box=[[E, G0, 0.05], [4.4, G0 + 0.03, 1.75]], material="concrete-path"),
+        dict(kind="pavegrid", name="gravel squares", area=[[E, -4.49], [6.84, 3.62]], skip=[[E, 0.05], [4.4, 1.75]], cell=0.95, edge=0.10, lift=0.03, tileEvery=3, material="concrete", tileMaterial="red-tile"),
+        dict(kind="slab", name="dirt strip", box=[[5.9, G0 + 0.005, -4.49], [6.84, G0 + 0.02, 3.62]], material="dirt"),
+        dict(kind="hedge", name="plants over the red wall", along=[[0.0, 3.55], [5.3, 3.55]], y=-3.45, r=0.45, step=0.55, material="foliage"),
+        dict(kind="slab", name="stone figure", box=[[0.15, G0, 3.05], [0.55, G0 + 0.75, 3.45]], material="stone"),
         dict(kind="slab", name="corridor over the courtyard", box=[[E, F0 - 0.15, 0.0], [6.0, F0, 2.0]], material="concrete"),
         dict(kind="slab", name="courtyard roof edge", box=[[E, F1, -4.49], [6.84, F1 + 0.15, 3.62]], material="corrugated"),
     ],
