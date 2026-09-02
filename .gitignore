@@ -1,0 +1,6 @@
+web/node_modules/
+web/dist/
+level/scan.clean.glb
+scan/__pycache__/
+scan/*.npy
+*.pyc

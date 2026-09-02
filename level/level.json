@@ -1,0 +1,539 @@
+{
+ "format": "koan-hang-level/1",
+ "scan": {
+  "file": "scan.glb",
+  "rotationDeg": -1.79,
+  "rotationApplied": true,
+  "offset": [
+   0,
+   0,
+   0
+  ]
+ },
+ "eyeHeight": 1.6,
+ "spawn": {
+  "level": "ground",
+  "x": -2.8,
+  "z": 0.1,
+  "yawDeg": 90
+ },
+ "levels": [
+  {
+   "id": "ground",
+   "name": "ground",
+   "floorY": -5.5,
+   "ceilY": -2.29
+  },
+  {
+   "id": "first",
+   "name": "first",
+   "floorY": -2.14,
+   "ceilY": 0.84
+  }
+ ],
+ "floors": [
+  {
+   "level": "ground",
+   "name": "room + hallway",
+   "poly": [
+    [
+     -7.06,
+     -2.42
+    ],
+    [
+     0.22,
+     -2.42
+    ],
+    [
+     0.22,
+     2.72
+    ],
+    [
+     -7.06,
+     2.72
+    ]
+   ]
+  },
+  {
+   "level": "ground",
+   "name": "courtyard",
+   "poly": [
+    [
+     0.22,
+     -4.49
+    ],
+    [
+     6.84,
+     -4.49
+    ],
+    [
+     6.84,
+     3.62
+    ],
+    [
+     0.22,
+     3.62
+    ]
+   ]
+  },
+  {
+   "level": "first",
+   "name": "room + landing",
+   "poly": [
+    [
+     -5.89,
+     -2.42
+    ],
+    [
+     0.22,
+     -2.42
+    ],
+    [
+     0.22,
+     2.72
+    ],
+    [
+     -7.06,
+     2.72
+    ],
+    [
+     -7.06,
+     1.7
+    ],
+    [
+     -5.89,
+     1.7
+    ]
+   ]
+  }
+ ],
+ "walls": [
+  {
+   "id": "g-west",
+   "name": "hallway west",
+   "level": "ground",
+   "a": [
+    -7.06,
+    2.72
+   ],
+   "b": [
+    -7.06,
+    -2.42
+   ],
+   "baseY": -5.5,
+   "topY": -2.29,
+   "thickness": 0.15,
+   "facing": "+x",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "note": "street side; scan sees little here, glass likely; hand-check in level mode"
+  },
+  {
+   "id": "g-stair-room",
+   "name": "room west (stair wall)",
+   "level": "ground",
+   "a": [
+    -5.89,
+    2.72
+   ],
+   "b": [
+    -5.89,
+    -2.42
+   ],
+   "baseY": -5.5,
+   "topY": -2.29,
+   "thickness": 0.15,
+   "facing": "+x",
+   "openings": [
+    {
+     "kind": "door",
+     "u": 0.12,
+     "w": 0.8,
+     "bottom": 0,
+     "h": 2.0
+    }
+   ],
+   "noHang": [],
+   "hang": true,
+   "note": "doorway to the hallway at the north end (scan + first-person check)"
+  },
+  {
+   "id": "g-stair-hall",
+   "name": "hallway east (stair wall)",
+   "level": "ground",
+   "a": [
+    -5.89,
+    -2.42
+   ],
+   "b": [
+    -5.89,
+    2.72
+   ],
+   "baseY": -5.5,
+   "topY": -2.29,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [
+    {
+     "kind": "door",
+     "u": 4.22,
+     "w": 0.8,
+     "bottom": 0,
+     "h": 2.0
+    }
+   ],
+   "noHang": [],
+   "hang": false
+  },
+  {
+   "id": "g-east",
+   "name": "room east (courtyard glass + door)",
+   "level": "ground",
+   "a": [
+    0.22,
+    -2.42
+   ],
+   "b": [
+    0.22,
+    2.72
+   ],
+   "baseY": -5.5,
+   "topY": -2.29,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [
+    {
+     "kind": "window",
+     "u": 0.0,
+     "w": 2.32,
+     "bottom": 0,
+     "h": 3.21
+    },
+    {
+     "kind": "door",
+     "u": 2.32,
+     "w": 1.15,
+     "bottom": 0,
+     "h": 2.1
+    },
+    {
+     "kind": "window",
+     "u": 3.47,
+     "w": 1.67,
+     "bottom": 0,
+     "h": 3.21
+    }
+   ],
+   "noHang": [],
+   "hang": true,
+   "note": "door measured z -0.10..1.05 (closed leaf in scan); rest is glass"
+  },
+  {
+   "id": "g-south",
+   "name": "south",
+   "level": "ground",
+   "a": [
+    -7.06,
+    -2.42
+   ],
+   "b": [
+    0.22,
+    -2.42
+   ],
+   "baseY": -5.5,
+   "topY": -2.29,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [
+    {
+     "kind": "door",
+     "u": 0.0,
+     "w": 1.17,
+     "bottom": 0,
+     "h": 2.1
+    }
+   ],
+   "noHang": [],
+   "hang": true,
+   "note": "hallway end = street entrance door (floorplan)"
+  },
+  {
+   "id": "g-north",
+   "name": "north",
+   "level": "ground",
+   "a": [
+    0.22,
+    2.72
+   ],
+   "b": [
+    -7.06,
+    2.72
+   ],
+   "baseY": -5.5,
+   "topY": -2.29,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [
+    {
+     "kind": "window",
+     "u": 6.11,
+     "w": 1.17,
+     "bottom": 0,
+     "h": 3.21
+    }
+   ],
+   "noHang": [],
+   "hang": true,
+   "note": "hallway north end open in scan; kind unknown"
+  },
+  {
+   "id": "c-1",
+   "name": "courtyard wall x4.49",
+   "level": "ground",
+   "a": [
+    4.49,
+    -4.49
+   ],
+   "b": [
+    4.49,
+    -0.32
+   ],
+   "baseY": -5.5,
+   "topY": -2.37,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "hang": false
+  },
+  {
+   "id": "c-2",
+   "name": "courtyard wall x6.84",
+   "level": "ground",
+   "a": [
+    6.84,
+    0.66
+   ],
+   "b": [
+    6.84,
+    4.94
+   ],
+   "baseY": -5.5,
+   "topY": -0.54,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "hang": false
+  },
+  {
+   "id": "c-3",
+   "name": "courtyard low wall z3.62",
+   "level": "ground",
+   "a": [
+    5.53,
+    3.62
+   ],
+   "b": [
+    -0.21,
+    3.62
+   ],
+   "baseY": -5.5,
+   "topY": -3.97,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "hang": false
+  },
+  {
+   "id": "c-4",
+   "name": "courtyard wall z-0.40",
+   "level": "ground",
+   "a": [
+    4.49,
+    -0.4
+   ],
+   "b": [
+    7.03,
+    -0.4
+   ],
+   "baseY": -5.5,
+   "topY": -1.16,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": false
+  },
+  {
+   "id": "c-5",
+   "name": "courtyard wall z-3.12",
+   "level": "ground",
+   "a": [
+    0.6,
+    -3.12
+   ],
+   "b": [
+    4.39,
+    -3.12
+   ],
+   "baseY": -5.5,
+   "topY": -2.3,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": false
+  },
+  {
+   "id": "f-west",
+   "name": "west",
+   "level": "first",
+   "a": [
+    -7.06,
+    2.72
+   ],
+   "b": [
+    -7.06,
+    -2.42
+   ],
+   "baseY": -2.14,
+   "topY": 0.84,
+   "thickness": 0.15,
+   "facing": "+x",
+   "openings": [
+    {
+     "kind": "window",
+     "u": 0.0,
+     "w": 3.32,
+     "bottom": 0,
+     "h": 2.98
+    }
+   ],
+   "noHang": [],
+   "hang": true,
+   "note": "scan shows no wall z -0.6..2.72: glass; check"
+  },
+  {
+   "id": "f-east",
+   "name": "east",
+   "level": "first",
+   "a": [
+    0.22,
+    -2.42
+   ],
+   "b": [
+    0.22,
+    2.72
+   ],
+   "baseY": -2.14,
+   "topY": 0.84,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [
+    {
+     "kind": "window",
+     "u": 0.0,
+     "w": 1.12,
+     "bottom": 0,
+     "h": 2.98
+    }
+   ],
+   "noHang": [],
+   "hang": true,
+   "note": "scan shows no wall z -2.42..-1.30: glass; check"
+  },
+  {
+   "id": "f-south",
+   "name": "south",
+   "level": "first",
+   "a": [
+    -7.06,
+    -2.42
+   ],
+   "b": [
+    0.22,
+    -2.42
+   ],
+   "baseY": -2.14,
+   "topY": 0.84,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": true,
+   "note": "scan gaps: x -5.9..-4.4 below 2.1 m, x -0.7..0.2 at 1.1..2.9 m; left solid, check"
+  },
+  {
+   "id": "f-north",
+   "name": "north",
+   "level": "first",
+   "a": [
+    0.22,
+    2.72
+   ],
+   "b": [
+    -7.06,
+    2.72
+   ],
+   "baseY": -2.14,
+   "topY": 0.84,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "hang": true
+  }
+ ],
+ "stairs": [
+  {
+   "id": "s1",
+   "level": "ground",
+   "to": "first",
+   "from": [
+    -6.475,
+    -1.9
+   ],
+   "dir": "+z",
+   "width": 1.17,
+   "run": 3.6,
+   "bottomY": -5.5,
+   "topY": -2.14,
+   "treads": 16,
+   "riser": 0.198,
+   "tread": 0.225
+  }
+ ],
+ "blockers": [],
+ "patches": [
+  {
+   "level": "first",
+   "name": "floor gap in scan",
+   "poly": [
+    [
+     -5.7,
+     0.8
+    ],
+    [
+     -2.5,
+     0.8
+    ],
+    [
+     -2.5,
+     -1.0
+    ],
+    [
+     -5.7,
+     -1.0
+    ]
+   ],
+   "note": "scan has no floor here (dark floor or the hole he saw); flat patch at floor height"
+  }
+ ],
+ "source": {
+  "made": "level/make_level.py 2026-09-02",
+  "from_": "scan/report.md + scan/measure.py + Polycam floorplan"
+ }
+}

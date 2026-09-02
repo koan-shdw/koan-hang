@@ -1,0 +1,393 @@
+{
+ "format": "koan-hang-level/1",
+ "scan": {
+  "file": "scan.glb",
+  "rotationDeg": -1.79,
+  "offset": [
+   0,
+   0,
+   0
+  ],
+  "bounds": [
+   [
+    -8.85,
+    -5.7,
+    -4.91
+   ],
+   [
+    7.63,
+    1.72,
+    5.08
+   ]
+  ]
+ },
+ "eyeHeight": 1.6,
+ "levels": [
+  {
+   "id": "ground",
+   "name": "ground",
+   "floorY": -5.5,
+   "ceilY": -2.29
+  },
+  {
+   "id": "first",
+   "name": "first",
+   "floorY": -2.14,
+   "ceilY": 0.84
+  }
+ ],
+ "floors": [
+  {
+   "level": "ground",
+   "poly": [
+    [
+     -7.66,
+     -2.93
+    ],
+    [
+     6.61,
+     -2.93
+    ],
+    [
+     6.61,
+     3.65
+    ],
+    [
+     -7.66,
+     3.65
+    ]
+   ],
+   "note": "draft: bounding rectangle of the floor plane"
+  },
+  {
+   "level": "first",
+   "poly": [
+    [
+     -7.06,
+     -2.47
+    ],
+    [
+     0.3,
+     -2.47
+    ],
+    [
+     0.3,
+     2.7
+    ],
+    [
+     -7.06,
+     2.7
+    ]
+   ],
+   "note": "draft: bounding rectangle of the floor plane"
+  }
+ ],
+ "walls": [
+  {
+   "id": "w1",
+   "name": "x-7.06",
+   "level": "both",
+   "a": [
+    -7.06,
+    -2.84
+   ],
+   "b": [
+    -7.06,
+    0.8
+   ],
+   "baseY": -5.11,
+   "topY": 1.28,
+   "thickness": 0.15,
+   "facing": "+x",
+   "openings": [],
+   "noHang": [],
+   "area": 5.37
+  },
+  {
+   "id": "w2",
+   "name": "x-5.89",
+   "level": "both",
+   "a": [
+    -5.89,
+    -2.87
+   ],
+   "b": [
+    -5.89,
+    2.41
+   ],
+   "baseY": -5.49,
+   "topY": 0.31,
+   "thickness": 0.15,
+   "facing": "+x",
+   "openings": [],
+   "noHang": [],
+   "area": 19.63
+  },
+  {
+   "id": "w3",
+   "name": "x+0.22",
+   "level": "both",
+   "a": [
+    0.22,
+    -2.31
+   ],
+   "b": [
+    0.22,
+    3.16
+   ],
+   "baseY": -5.4,
+   "topY": 0.78,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "area": 8.75
+  },
+  {
+   "id": "w4",
+   "name": "x+0.52",
+   "level": "both",
+   "a": [
+    0.52,
+    -2.66
+   ],
+   "b": [
+    0.52,
+    1.91
+   ],
+   "baseY": -5.28,
+   "topY": 0.68,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "area": 2.85
+  },
+  {
+   "id": "w5",
+   "name": "x+4.49",
+   "level": "ground",
+   "a": [
+    4.49,
+    -4.49
+   ],
+   "b": [
+    4.49,
+    -0.32
+   ],
+   "baseY": -5.6,
+   "topY": -2.37,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "area": 11.36
+  },
+  {
+   "id": "w6",
+   "name": "x+6.84",
+   "level": "both",
+   "a": [
+    6.84,
+    0.66
+   ],
+   "b": [
+    6.84,
+    4.94
+   ],
+   "baseY": -5.44,
+   "topY": -0.54,
+   "thickness": 0.15,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "area": 15.25
+  },
+  {
+   "id": "w7",
+   "name": "z-3.12",
+   "level": "both",
+   "a": [
+    -6.85,
+    -3.12
+   ],
+   "b": [
+    4.39,
+    -3.12
+   ],
+   "baseY": -5.44,
+   "topY": 0.15,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "area": 2.27
+  },
+  {
+   "id": "w8",
+   "name": "z-2.99",
+   "level": "both",
+   "a": [
+    -7.1,
+    -2.99
+   ],
+   "b": [
+    -6.0,
+    -2.99
+   ],
+   "baseY": -5.38,
+   "topY": 0.48,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "area": 1.57
+  },
+  {
+   "id": "w9",
+   "name": "z-2.42",
+   "level": "both",
+   "a": [
+    -6.84,
+    -2.42
+   ],
+   "b": [
+    0.57,
+    -2.42
+   ],
+   "baseY": -5.3,
+   "topY": 0.74,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "area": 43.66
+  },
+  {
+   "id": "w10",
+   "name": "z-1.46",
+   "level": "both",
+   "a": [
+    -6.67,
+    -1.46
+   ],
+   "b": [
+    0.75,
+    -1.46
+   ],
+   "baseY": -5.51,
+   "topY": 0.68,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "area": 1.29
+  },
+  {
+   "id": "w11",
+   "name": "z-0.40",
+   "level": "both",
+   "a": [
+    -6.62,
+    -0.4
+   ],
+   "b": [
+    7.03,
+    -0.4
+   ],
+   "baseY": -5.55,
+   "topY": -1.16,
+   "thickness": 0.15,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "area": 2.76
+  },
+  {
+   "id": "w12",
+   "name": "z+1.33",
+   "level": "ground",
+   "a": [
+    0.31,
+    1.33
+   ],
+   "b": [
+    1.15,
+    1.33
+   ],
+   "baseY": -5.4,
+   "topY": -2.42,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "area": 2.16
+  },
+  {
+   "id": "w13",
+   "name": "z+2.72",
+   "level": "both",
+   "a": [
+    -7.28,
+    2.72
+   ],
+   "b": [
+    0.13,
+    2.72
+   ],
+   "baseY": -5.4,
+   "topY": 0.77,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "area": 43.77
+  },
+  {
+   "id": "w14",
+   "name": "z+3.62",
+   "level": "ground",
+   "a": [
+    -0.21,
+    3.62
+   ],
+   "b": [
+    5.53,
+    3.62
+   ],
+   "baseY": -5.4,
+   "topY": -3.97,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "area": 6.38
+  },
+  {
+   "id": "w15",
+   "name": "z+4.25",
+   "level": "both",
+   "a": [
+    -0.56,
+    4.25
+   ],
+   "b": [
+    3.71,
+    4.25
+   ],
+   "baseY": -3.87,
+   "topY": -0.81,
+   "thickness": 0.15,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "area": 8.65
+  }
+ ],
+ "stairs": [],
+ "blockers": [],
+ "draft": {
+  "generated": "pipeline.py",
+  "note": "auto draft; openings, stairs, blockers are hand work (SPEC s5.7)"
+ }
+}
