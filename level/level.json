@@ -106,7 +106,7 @@
    "name": "second room",
    "poly": [
     [
-     -5.87,
+     -6.16,
      -2.44
     ],
     [
@@ -118,7 +118,7 @@
      2.69
     ],
     [
-     -5.87,
+     -6.16,
      2.69
     ]
    ],
@@ -133,11 +133,11 @@
      2.22
     ],
     [
-     -5.87,
+     -6.16,
      2.22
     ],
     [
-     -5.87,
+     -6.16,
      2.69
     ],
     [
@@ -156,11 +156,11 @@
      -2.44
     ],
     [
-     -5.87,
+     -6.16,
      -2.44
     ],
     [
-     -5.87,
+     -6.16,
      -1.55
     ],
     [
@@ -175,7 +175,7 @@
    "name": "third room",
    "poly": [
     [
-     -5.87,
+     -6.16,
      -2.44
     ],
     [
@@ -187,7 +187,7 @@
      2.69
     ],
     [
-     -5.87,
+     -6.16,
      2.69
     ]
    ],
@@ -202,11 +202,11 @@
      2.22
     ],
     [
-     -5.87,
+     -6.16,
      2.22
     ],
     [
-     -5.87,
+     -6.16,
      2.69
     ],
     [
@@ -696,7 +696,7 @@
   },
   {
    "id": "c-1",
-   "name": "courtyard fence south",
+   "name": "red rusted wall, facing the front door",
    "level": "ground",
    "a": [
     4.49,
@@ -707,13 +707,13 @@
     -0.32
    ],
    "baseY": -5.54,
-   "topY": -2.37,
+   "topY": -3.3,
    "thickness": 0.14,
    "facing": "-x",
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "corrugated"
+   "material": "corten"
   },
   {
    "id": "c-2",
@@ -738,7 +738,7 @@
   },
   {
    "id": "c-3",
-   "name": "red rusted wall",
+   "name": "courtyard low wall north",
    "level": "ground",
    "a": [
     5.53,
@@ -749,17 +749,17 @@
     3.62
    ],
    "baseY": -5.54,
-   "topY": -3.45,
+   "topY": -3.97,
    "thickness": 0.14,
    "facing": "-z",
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "corten"
+   "material": "concrete"
   },
   {
    "id": "c-4",
-   "name": "courtyard wall",
+   "name": "white corrugated building behind the red wall",
    "level": "ground",
    "a": [
     4.49,
@@ -770,13 +770,34 @@
     -0.4
    ],
    "baseY": -5.54,
-   "topY": -1.16,
+   "topY": -0.8,
    "thickness": 0.14,
    "facing": "+z",
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "concrete"
+   "material": "corrugated-white"
+  },
+  {
+   "id": "c-7",
+   "name": "white corrugated building, side",
+   "level": "ground",
+   "a": [
+    4.7,
+    -4.49
+   ],
+   "b": [
+    4.7,
+    -0.4
+   ],
+   "baseY": -5.54,
+   "topY": -0.8,
+   "thickness": 0.14,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "corrugated-white"
   },
   {
    "id": "c-5",
@@ -1051,53 +1072,18 @@
     {
      "kind": "window",
      "u": 0.05,
-     "w": 1.4,
+     "w": 5.03,
      "bottom": 0,
      "h": 2.9800000000000004,
      "frame": "steel-black",
      "grid": {
       "uprights": [
-       0.7
-      ],
-      "bars": [
-       1.0
-      ],
-      "cross": [],
-      "crossAll": true
-     }
-    },
-    {
-     "kind": "door",
-     "u": 2.05,
-     "w": 0.9,
-     "bottom": 0,
-     "h": 2.05,
-     "door": {
-      "type": "metal",
-      "open": false,
-      "toggle": false,
-      "leaf": true,
-      "face": "mesh",
-      "swingOut": false,
-      "frame": true,
-      "hinge": "a",
-      "jambW": 0.05,
-      "frameMaterial": null,
-      "panelAbove": 0.93,
-      "recess": 0.0,
-      "leafH": null
-     }
-    },
-    {
-     "kind": "window",
-     "u": 3.55,
-     "w": 1.4,
-     "bottom": 0,
-     "h": 2.9800000000000004,
-     "frame": "steel-black",
-     "grid": {
-      "uprights": [
-       0.7
+       0.719,
+       1.438,
+       2.157,
+       2.876,
+       3.595,
+       4.314
       ],
       "bars": [
        1.0
@@ -1110,7 +1096,7 @@
    "noHang": [],
    "hang": false,
    "material": "wall-white",
-   "note": "X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"
+   "note": "owner: third floor east = windows all the way across, no door"
   },
   {
    "id": "t-south",
@@ -1622,7 +1608,7 @@
    "skip": [
     [
      0.22,
-     0.05
+     -1.3
     ],
     [
      4.4,
@@ -1641,14 +1627,14 @@
    "name": "dirt strip",
    "box": [
     [
-     5.9,
+     1.0,
      -5.535,
-     -4.49
+     -1.3
     ],
     [
-     6.84,
+     4.4,
      -5.5200000000000005,
-     3.62
+     0.05
     ]
    ],
    "material": "dirt"
@@ -1658,15 +1644,15 @@
    "name": "plants over the red wall",
    "along": [
     [
-     0.0,
-     3.55
+     4.42,
+     -4.2
     ],
     [
-     5.3,
-     3.55
+     4.42,
+     -0.5
     ]
    ],
-   "y": -3.45,
+   "y": -3.3,
    "r": 0.45,
    "step": 0.55,
    "material": "foliage"
@@ -1676,51 +1662,17 @@
    "name": "stone figure",
    "box": [
     [
-     0.15,
+     4.05,
      -5.54,
-     3.05
+     -0.25
     ],
     [
-     0.55,
+     4.45,
      -4.79,
-     3.45
+     0.15
     ]
    ],
    "material": "stone"
-  },
-  {
-   "kind": "slab",
-   "name": "corridor over the courtyard",
-   "box": [
-    [
-     0.22,
-     -2.29,
-     0.0
-    ],
-    [
-     6.0,
-     -2.14,
-     2.0
-    ]
-   ],
-   "material": "concrete"
-  },
-  {
-   "kind": "slab",
-   "name": "courtyard roof edge",
-   "box": [
-    [
-     0.22,
-     0.84,
-     -4.49
-    ],
-    [
-     6.84,
-     0.99,
-     3.62
-    ]
-   ],
-   "material": "corrugated"
   }
  ],
  "sky": {

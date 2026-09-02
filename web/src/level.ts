@@ -298,7 +298,7 @@ export function buildLevel(lv: Level): Built {
     const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false })
     g.rotateX(Math.PI / 2) // (x, y, z) -> (x, -z, y): the extrusion goes down, shape y becomes world z
     g.translate(0, L.floorY, 0)
-    const m = new THREE.Mesh(g, mat(f.material ?? 'concrete-bare')); group.add(m); addWire(g, m)
+    const m = new THREE.Mesh(g, mat(f.material ?? 'concrete-bare')); m.userData = { kind: 'floor', level: f.level, name: f.name }; group.add(m); addWire(g, m)
   }
   for (const c of lv.ceilings) {
     if (c.draw === false) continue
@@ -310,52 +310,56 @@ export function buildLevel(lv: Level): Built {
     g.translate(0, L.ceilY, 0)
     group.add(new THREE.Mesh(g, mat(c.material ?? 'corrugated-ceiling')))
   }
-  // stairs
+  // stairs: one solid sawtooth body (extruded side profile), stringer plates outside it clipped flush at the top floor,
+  // checker plates 1 cm proud on every tread including the top one, which is flush with the landing. No shared faces.
   for (const s of lv.stairs) {
-    const r = stairRect(s), rise = s.topY - s.bottomY, along = s.dir === '+z' || s.dir === '-z'
-    const risers = s.treads + 1, stepRun = s.run / risers, riser = rise / risers, nos = s.nosing ?? 0
-    const width = along ? r.x1 - r.x0 : r.z1 - r.z0
-    const cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2
-    const sgn = s.dir === '+z' || s.dir === '+x' ? 1 : -1
-    const start = along ? (sgn > 0 ? r.z0 : r.z1) : (sgn > 0 ? r.x0 : r.x1)
-    const treadM = s.treadMaterial ?? s.material ?? 'stair-wood', riserM = s.riserMaterial ?? s.material ?? 'stair-wood'
-    // treads i = 0..treads-1, risers i = 0..treads (the last riser rises onto the landing)
-    for (let i = 0; i <= s.treads; i++) {
-      const topY = s.bottomY + riser * (i + 1)
-      const a0 = start + sgn * stepRun * i, a1 = start + sgn * stepRun * (i + 1)
-      const rm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : 0.03, riser, along ? 0.03 : riser), mat(riserM))
-      if (along) rm.position.set(cx, topY - riser / 2, a0 + sgn * 0.015); else rm.position.set(a0 + sgn * 0.015, topY - riser / 2, cz)
-      group.add(rm)
-      if (i === s.treads) break
-      const mid = (a0 + a1) / 2 - sgn * nos / 2
-      const tm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : stepRun + nos, 0.04, along ? stepRun + nos : width), mat(treadM))
-      if (along) tm.position.set(cx, topY - 0.02, mid); else tm.position.set(mid, topY - 0.02, cz)
-      group.add(tm)
-    }
-    // underside slab: top face on the line through the riser feet, 15 cm thick, ends inside the floor slabs
-    const len = Math.hypot(s.run, rise), ang = Math.atan2(rise, s.run)
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(along ? width : len, 0.15, along ? len : width), mat('concrete'))
-    slab.position.set(cx, s.bottomY + rise / 2 - 0.075 * Math.cos(ang), cz)
-    if (along) slab.rotation.x = -sgn * ang; else slab.rotation.z = sgn * ang
-    group.add(slab)
-    // stringers: plates on both edges, from 5 cm under the line to a set height above it, same length as the flight
-    if (s.stringers) {
-      const st = s.stringers, h = st.height + 0.05
-      for (const side of [-1, 1]) {
-        const pm = new THREE.Mesh(new THREE.BoxGeometry(along ? st.thickness : len, h, along ? len : st.thickness), mat(st.material ?? 'stringer-blue'))
-        const off = side * (width / 2 - st.thickness / 2)
-        pm.position.set(along ? cx + off : cx, s.bottomY + rise / 2 + (h / 2 - 0.05) * Math.cos(ang), along ? cz : cz + off)
-        if (along) pm.rotation.x = -sgn * ang; else pm.rotation.z = sgn * ang
-        group.add(pm)
+    const r = stairRect(s), rise = s.topY - s.bottomY
+    const risers = s.treads + 1, stepRun = s.run / risers, riser = rise / risers
+    const st = s.stringers ?? { height: 0.25, thickness: 0.03, material: 'stringer-blue' }
+    const fullW = s.width, bodyW = fullW - 2 * st.thickness
+    const along = s.dir === '+z' || s.dir === '-z'
+    // profile in (u along the flight, y above bottomY)
+    const prof = new THREE.Shape()
+    prof.moveTo(0, 0.003)
+    for (let i = 0; i < risers; i++) { prof.lineTo(i * stepRun, (i + 1) * riser); prof.lineTo((i + 1) * stepRun, (i + 1) * riser) }
+    const d = 0.18, xb = Math.min(s.run, (d * s.run) / rise)
+    prof.lineTo(s.run, rise - d); prof.lineTo(xb, 0.003); prof.closePath()
+    const body = new THREE.ExtrudeGeometry(prof, { depth: bodyW, bevelEnabled: false })
+    // stringer profile: 5 cm under the nosing line to st.height above it, clipped flush at the top floor
+    const sp = new THREE.Shape()
+    const xc = (s.run * (rise - st.height)) / rise
+    sp.moveTo(0, -0.05); sp.lineTo(s.run, rise - 0.05); sp.lineTo(s.run, rise); sp.lineTo(xc, rise); sp.lineTo(0, st.height); sp.closePath()
+    const plate = () => new THREE.ExtrudeGeometry(sp, { depth: st.thickness, bevelEnabled: false })
+    // place: shape x -> flight direction, shape y -> up, extrusion -> across the flight
+    const place = (g: THREE.BufferGeometry, across0: number) => {
+      // across0 = world coordinate where the extrusion starts (x for +z/-z flights, z for +x/-x)
+      switch (s.dir) {
+        case '+z': g.rotateY(-Math.PI / 2); g.scale(-1, 1, 1); g.translate(across0, s.bottomY, r.z0); break // sx->z, sz->x
+        case '-z': g.rotateY(Math.PI / 2); g.translate(across0, s.bottomY, r.z1); break
+        case '+x': g.translate(r.x0, s.bottomY, across0); break
+        case '-x': g.rotateY(Math.PI); g.scale(1, 1, -1); g.translate(r.x1, s.bottomY, across0); break
       }
+      return g
     }
-    if (s.sideWall) {
-      const sw = s.sideWall, th = sw.thickness ?? 0.15, wallH = sw.height + 0.3
-      const wm = new THREE.Mesh(new THREE.BoxGeometry(along ? th : len, wallH, along ? len : th), mat(sw.material ?? 'wall-white'))
-      const off = { '+x': [r.x1 + th / 2, cz], '-x': [r.x0 - th / 2, cz], '+z': [cx, r.z1 + th / 2], '-z': [cx, r.z0 - th / 2] }[sw.side]
-      wm.position.set(off[0], s.bottomY + rise / 2 + wallH / 2 - 0.3, off[1])
-      if (along) wm.rotation.x = -sgn * ang; else wm.rotation.z = sgn * ang
-      group.add(wm)
+    const a0 = along ? r.x0 : r.z0 // start of the width
+    const bodyMesh = new THREE.Mesh(place(body, a0 + st.thickness), mat(s.riserMaterial ?? 'plywood'))
+    bodyMesh.userData = { kind: 'stair-body', stair: s.id }; group.add(bodyMesh)
+    for (const off of [0, fullW - st.thickness]) {
+      const pm = new THREE.Mesh(place(plate(), a0 + off), mat(st.material ?? 'stringer-blue'))
+      pm.userData = { kind: 'stringer', stair: s.id }; group.add(pm)
+    }
+    // checker plates: 1 cm thick, 2 mm above each tread top, the body width
+    for (let i = 0; i < risers; i++) {
+      const top = s.bottomY + (i + 1) * riser + 0.002
+      const u0 = i * stepRun, u1 = (i + 1) * stepRun
+      const tm = new THREE.Mesh(new THREE.BoxGeometry(along ? bodyW : u1 - u0, 0.01, along ? u1 - u0 : bodyW), mat(s.treadMaterial ?? 'checker'))
+      const um = (u0 + u1) / 2
+      const cw = a0 + st.thickness + bodyW / 2
+      if (s.dir === '+z') tm.position.set(cw, top + 0.005, r.z0 + um)
+      else if (s.dir === '-z') tm.position.set(cw, top + 0.005, r.z1 - um)
+      else if (s.dir === '+x') tm.position.set(r.x0 + um, top + 0.005, cw)
+      else tm.position.set(r.x1 - um, top + 0.005, cw)
+      tm.userData = { kind: 'tread', stair: s.id, index: i }; group.add(tm)
     }
   }
   // objects
@@ -444,6 +448,48 @@ export function updateDoors(doors: DoorRuntime[], dt: number): void {
       d.pivot.rotation.y = base + sign * (Math.PI / 2) * ease
     }
   }
+}
+
+/** Mesh audit: measures the BUILT geometry against the level numbers. Returns PASS/FAIL lines. */
+export function meshAudit(lv: Level, group: THREE.Group): string[] {
+  const out: string[] = []
+  const ok = (c: boolean, m: string) => out.push((c ? 'PASS  ' : 'FAIL  ') + m)
+  const box = (o: THREE.Object3D) => new THREE.Box3().setFromObject(o)
+  const kids = group.children
+  for (const s of lv.stairs) {
+    const r = stairRect(s)
+    const body = kids.find((o) => o.userData.kind === 'stair-body' && o.userData.stair === s.id)
+    const plates = kids.filter((o) => o.userData.kind === 'stringer' && o.userData.stair === s.id)
+    const treads = kids.filter((o) => o.userData.kind === 'tread' && o.userData.stair === s.id)
+    if (!body) { ok(false, `stair ${s.id}: body missing`); continue }
+    const b = box(body)
+    const zEnd = s.dir === '+z' ? b.max.z : s.dir === '-z' ? b.min.z : s.dir === '+x' ? b.max.x : b.min.x
+    const zTarget = s.dir === '+z' ? r.z1 : s.dir === '-z' ? r.z0 : s.dir === '+x' ? r.x1 : r.x0
+    ok(Math.abs(b.max.y - s.topY) < 0.011, `stair ${s.id}: body top ${b.max.y.toFixed(3)} = landing floor ${s.topY}`)
+    ok(Math.abs(b.min.y - s.bottomY) < 0.011, `stair ${s.id}: body foot ${b.min.y.toFixed(3)} = floor ${s.bottomY}`)
+    ok(Math.abs(zEnd - zTarget) < 0.011, `stair ${s.id}: body reaches the landing edge ${zEnd.toFixed(3)} vs ${zTarget.toFixed(3)}`)
+    const whole = plates.reduce((acc, p) => acc.union(box(p)), b.clone())
+    ok(Math.abs((s.dir === '+z' || s.dir === '-z' ? whole.max.x - whole.min.x : whole.max.z - whole.min.z) - s.width) < 0.011, `stair ${s.id}: body + stringers width = ${s.width}`)
+    for (const p of plates) ok(box(p).max.y <= s.topY + 0.011, `stair ${s.id}: stringer top ${box(p).max.y.toFixed(3)} not above the landing floor ${s.topY}`)
+    ok(treads.length === s.treads + 1, `stair ${s.id}: ${treads.length} tread plates = ${s.treads + 1}`)
+    const topTread = treads.find((t) => t.userData.index === s.treads)
+    if (topTread) ok(Math.abs(box(topTread).min.y - s.topY) < 0.02, `stair ${s.id}: top tread flush with the landing (${box(topTread).min.y.toFixed(3)})`)
+    // the floors of the target level reach the flight's edge and the landing edge
+    if (s.to) {
+      const floors = kids.filter((o) => o.userData.kind === 'floor' && o.userData.level === s.to)
+      const edge = s.dir === '+z' || s.dir === '-z' ? r.x1 : r.z1
+      const reaches = floors.some((f) => { const fb = box(f); return Math.abs((s.dir === '+z' || s.dir === '-z' ? fb.min.x : fb.min.z) - edge) < 0.011 })
+      ok(reaches, `stair ${s.id}: a floor of ${s.to} starts at the flight edge ${edge.toFixed(3)}`)
+      const landing = floors.some((f) => { const fb = box(f); return Math.abs((s.dir === '+z' ? fb.min.z : s.dir === '-z' ? fb.max.z : s.dir === '+x' ? fb.min.x : fb.max.x) - zTarget) < 0.011 })
+      ok(landing, `stair ${s.id}: a floor of ${s.to} starts at the landing edge ${zTarget.toFixed(3)}`)
+    }
+  }
+  // slabs: every floor slab is as thick as the level says and its top is at floorY
+  for (const f of kids.filter((o) => o.userData.kind === 'floor')) {
+    const L = floorOf(lv, f.userData.level), fb = box(f)
+    ok(Math.abs(fb.max.y - L.floorY) < 0.011 && Math.abs(fb.max.y - fb.min.y - (L.slab ?? 0.2)) < 0.011, `floor '${f.userData.name}' (${L.id}): top ${fb.max.y.toFixed(3)} thick ${(fb.max.y - fb.min.y).toFixed(3)}`)
+  }
+  return out
 }
 
 export function doorCentre(d: DoorRuntime): THREE.Vector3 {

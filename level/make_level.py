@@ -21,6 +21,7 @@ GH, FH, TH = G1 - G0, F1 - F0, T1 - T0
 GAP = 0.15                # slider gap between the hallway face and the stringer
 STAIR_W = round(SWH - GAP - W, 2)          # 0.92
 STAIR_X = round(W + STAIR_W / 2, 3)        # centre
+STAIR_E = round(W + STAIR_W, 3)            # east edge of the flight: the upper floors run up to it
 PITCH = round((NG - SG) / 6, 3)            # six columns across the back window
 GREY, BLACK = "steel-grey", "steel-black"
 
@@ -80,33 +81,39 @@ walls = [
          openings=[panel(0.0, round(SW - W, 3), 0.0, GH, "corrugated")], note="hallway end wall: corrugated, gas meter, boxes, pipes"),
     wall("g-north", "north", "ground", [E, NG], [W, NG], "-z", G0, G1),
     # courtyard (plain for now, textures later)
-    wall("c-1", "courtyard fence south", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
+    wall("c-1", "red rusted wall, facing the front door", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -3.30, hang=False, material="corten"),
     wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
-    wall("c-3", "red rusted wall", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.45, hang=False, material="corten"),
-    wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
+    wall("c-3", "courtyard low wall north", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
+    wall("c-4", "white corrugated building behind the red wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -0.80, hang=False, material="corrugated-white"),
+    wall("c-7", "white corrugated building, side", "ground", [4.70, -4.49], [4.70, -0.40], "-x", G0, -0.80, hang=False, material="corrugated-white"),
     wall("c-5", "courtyard low wall south", "ground", [0.60, -3.12], [4.39, -3.12], "+z", G0, -2.30, hang=False, material="concrete"),
     wall("c-6", "white corrugated building behind", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="corrugated-white"),
 ]
 # ---------------- second + third (identical) ----------------
-def upper(level, base, top, tag):
+def upper(level, base, top, tag, with_door=True):
     H = top - base
+    if with_door:
+        east = [window(0.05, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0], crossAll=True),
+                door(2.05, 0.90, 2.05, "metal", False, toggle=False, face="mesh", panelAbove=round(H - 2.05, 3)),
+                window(3.55, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0])]
+        east_note = "X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"
+    else:
+        east = [window(0.05, round(NF - SF - 0.10, 3), 0, H, BLACK, uprights=[round(0.719 * k, 3) for k in range(1, 7)], bars=[1.0])]
+        east_note = "owner: third floor east = windows all the way across, no door"
     return [
         wall(f"{tag}-west", "back window wall", level, [W, NF], [W, SF], "+x", base, top, hang=False,
              openings=[back_window(base, top, 0.0, round(NF - SF, 3), round(NF - SG, 3))]),
-        wall(f"{tag}-east", "east glass", level, [E, SF], [E, NF], "-x", base, top, hang=False,
-             openings=[window(0.05, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0], crossAll=True),
-                       door(2.05, 0.90, 2.05, "metal", False, toggle=False, face="mesh", panelAbove=round(H - 2.05, 3)),
-                       window(3.55, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0])],
-             note="X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"),
+        wall(f"{tag}-east", "east glass", level, [E, SF], [E, NF], "-x", base, top, hang=False, openings=east, note=east_note),
         wall(f"{tag}-south", "south (stair side wall)", level, [W, SF], [E, SF], "+z", base, top),
         wall(f"{tag}-north", "north", level, [E, NF], [W, NF], "-z", base, top),
     ]
-walls += upper("first", F0, F1, "f") + upper("third", T0, T1, "t")
+walls += upper("first", F0, F1, "f") + upper("third", T0, T1, "t", with_door=False)
 
 def strip_polys(level, floor_name, room_s, room_n, has_foot, has_landing):
-    out = [dict(level=level, name=f"{floor_name} room", poly=[[SW, room_s], [E, room_s], [E, room_n], [SW, room_n]], material="concrete-bare")]
-    if has_landing: out.append(dict(level=level, name=f"{floor_name} landing", poly=[[W, STAIR_TOP], [SW, STAIR_TOP], [SW, room_n], [W, room_n]], material="concrete-bare"))
-    if has_foot: out.append(dict(level=level, name=f"{floor_name} stair foot", poly=[[W, room_s], [SW, room_s], [SW, STAIR_Z0], [W, STAIR_Z0]], material="concrete-bare"))
+    # the room floor runs right up to the flight's edge; landing and stair foot fill the flight strip at its ends
+    out = [dict(level=level, name=f"{floor_name} room", poly=[[STAIR_E, room_s], [E, room_s], [E, room_n], [STAIR_E, room_n]], material="concrete-bare")]
+    if has_landing: out.append(dict(level=level, name=f"{floor_name} landing", poly=[[W, STAIR_TOP], [STAIR_E, STAIR_TOP], [STAIR_E, room_n], [W, room_n]], material="concrete-bare"))
+    if has_foot: out.append(dict(level=level, name=f"{floor_name} stair foot", poly=[[W, room_s], [STAIR_E, room_s], [STAIR_E, STAIR_Z0], [W, STAIR_Z0]], material="concrete-bare"))
     return out
 
 level = dict(
@@ -159,12 +166,11 @@ level = dict(
         dict(kind="pipe", wall="g-south", u=0.62, y0=0.05, y1=1.85, r=0.012, d=0.04, material="pipe-white"),
         dict(kind="pipe", wall="g-south", u=0.30, y0=0.05, y1=2.60, r=0.010, d=0.04, material="pipe-white"),
         dict(kind="slab", name="concrete path", box=[[E, G0, 0.05], [4.4, G0 + 0.03, 1.75]], material="concrete-path"),
-        dict(kind="pavegrid", name="gravel squares", area=[[E, -4.49], [6.84, 3.62]], skip=[[E, 0.05], [4.4, 1.75]], cell=0.95, edge=0.10, lift=0.03, tileEvery=3, material="concrete", tileMaterial="red-tile"),
-        dict(kind="slab", name="dirt strip", box=[[5.9, G0 + 0.005, -4.49], [6.84, G0 + 0.02, 3.62]], material="dirt"),
-        dict(kind="hedge", name="plants over the red wall", along=[[0.0, 3.55], [5.3, 3.55]], y=-3.45, r=0.45, step=0.55, material="foliage"),
-        dict(kind="slab", name="stone figure", box=[[0.15, G0, 3.05], [0.55, G0 + 0.75, 3.45]], material="stone"),
-        dict(kind="slab", name="corridor over the courtyard", box=[[E, F0 - 0.15, 0.0], [6.0, F0, 2.0]], material="concrete"),
-        dict(kind="slab", name="courtyard roof edge", box=[[E, F1, -4.49], [6.84, F1 + 0.15, 3.62]], material="corrugated"),
+        dict(kind="pavegrid", name="gravel squares", area=[[E, -4.49], [6.84, 3.62]], skip=[[E, -1.30], [4.4, 1.75]], cell=0.95, edge=0.10, lift=0.03, tileEvery=3, material="concrete", tileMaterial="red-tile"),
+        dict(kind="slab", name="dirt strip", box=[[1.0, G0 + 0.005, -1.30], [4.4, G0 + 0.02, 0.05]], material="dirt"),
+        dict(kind="hedge", name="plants over the red wall", along=[[4.42, -4.2], [4.42, -0.5]], y=-3.30, r=0.45, step=0.55, material="foliage"),
+        dict(kind="slab", name="stone figure", box=[[4.05, G0, -0.25], [4.45, G0 + 0.75, 0.15]], material="stone"),
+
     ],
     sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),
     source=dict(made="level/make_level.py v3 2026-09-02", from_="docs/CHECK-SHEET.md + owner answers"),

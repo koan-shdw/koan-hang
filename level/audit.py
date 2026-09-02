@@ -86,6 +86,13 @@ for f in floors:
         if any(poly_edge_near(g["poly"], p[0], p[1]) for g in others) or any(seg_dist(p, w["a"], w["b"]) < 0.16 for w in wl): touching = True
     ok(touching, f"floor '{f.get('name')}' ({f['level']}) touches walls or other floors")
 
+# 5b. upper room floors run to the flight edge
+for s_ in stairs:
+    if not s_["to"]: continue
+    edge = round(s_["from"][0] + s_["width"]/2, 3)
+    rooms = [f for f in floors if f["level"] == s_["to"] and "room" in (f.get("name") or "")]
+    ok(any(abs(min(p[0] for p in f["poly"]) - edge) < TOL for f in rooms), f"room floor of {s_['to']} starts at the flight edge {edge}")
+
 # 6. reachability: spawn level -> every level via stairs with matching floors
 reach = {lv["spawn"]["level"]}; changed = True
 while changed:

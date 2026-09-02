@@ -2,7 +2,7 @@
 import './styles.css'
 import * as THREE from 'three'
 import { applyTheme, currentTheme, accentColor } from './themes'
-import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, type Level } from './level'
+import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, meshAudit, type Level } from './level'
 import { Walker, isTyping } from './walk'
 import { Minimap } from './minimap'
 import { Shell, chips, el, emptyState, row, type Mode } from './ui'
@@ -178,7 +178,7 @@ async function main(): Promise<void> {
   const view = (lvl: string, x: number, z: number, yawDeg: number, pitchDeg = 0): void => {
     walker.teleport(lvl, x, z); walker.state.yaw = THREE.MathUtils.degToRad(yawDeg); walker.state.pitch = THREE.MathUtils.degToRad(pitchDeg); walker.update(0.016)
   }
-  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, view, THREE, built, toggleDoor }
+  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, view, THREE, built, toggleDoor, meshAudit: () => meshAudit(level, built.group) }
 }
 
 main().catch((e) => { console.error(e); alert(`KOAN.hang failed: ${(e as Error).message}`) })
