@@ -1,323 +1,206 @@
-# KOAN.hang — SPEC v1 (2026-09-02)
+# KOAN.hang — SPEC v2 (2026-09-02)
 
-**KOAN.hang** (decided). Repo `C:\Claude\gallery-hang` → github.com/koan-shdw/koan-hang.
-Status 2026-09-02: P0 pipeline DONE. `level/level.json` written from scan + floorplan (`level/make_level.py`). P1 walk BUILT: `web/` (Vite + TS + three.js), pointer-lock walk, clean-layer collision, stair up/down, doorway pass-through, plan teleport, three themes, floating cards. Tests run in the dev browser by script (wall stop, glass stop, door pass, stair climb + descend, void edge). NOT yet walked by the user. Repo public at github.com/koan-shdw/koan-hang, Pages via Actions.
+**KOAN.hang**. Repo `C:\Claude\gallery-hang` → github.com/koan-shdw/koan-hang → live at
+https://koan-shdw.github.io/koan-hang/. v1 kept as `docs/SPEC-v1.md`.
 
-The brief (user, 2026-09-02): a 3D game-style walk through his LiDAR scan of the gallery.
-An inventory of his artworks at true size. Place a work on a wall, walk round, look at it.
-An in-game widget sets the top-height snap. Clean the scan up. Browser app. GitHub hosts
-the site and the data. Save, load, some exports.
+The brief (user, 2026-09-02): a 3D game-style walk through his gallery. An inventory of his
+artworks at true size. Place a work on a wall, walk round, look at it. An in-game widget sets
+the top-height snap. Browser app. GitHub hosts the site and the data. Save, load, exports,
+flythrough.
 
-Every claim below is marked **PROVEN** (I ran it) or **OPEN** (untested, or his call).
+**v2 change (user, 2026-09-02, after walking P1):** the scan mesh is NOT the level. The level
+is rebuilt as our own clean geometry. The scan is an offline reference: measurements for the
+geometry, photos for the textures. Every object in the scan (stairs, window frames, doors,
+ceiling, lights, the courtyard's tiles, red wall, plants, neighbour walls) gets looked at and
+recreated. Textures are baked from the scan and completed by generative fill on his ComfyUI.
+Reason: the scan has holes, floating junk, patches of missing texture. Patching it is the
+wrong fight. This is the cleanest approach.
+
+Every claim below is **PROVEN** (I ran it), **BUILT** (code exists, his run pending),
+or **OPEN** (untested, or his call).
 
 ---
 
 ## 1. What it is
 
-Three layers, one screen:
-
-| layer | what | who makes it |
+| layer | what | made by |
 |---|---|---|
-| **scan** | his Polycam mesh, cleaned, compressed. Looks like the real place. | `scan/pipeline.py` |
-| **clean** | exact flat walls, floors, stairs, openings. Art snaps to these. Walk collides with these. Invisible by default, or shown as a white-box gallery. | pipeline auto-detect + hand-fix in the app |
-| **art** | canvases at true cm size, on the clean walls | him, in the app |
+| **level** | clean geometry: walls, floors, ceilings, stairs with steps, openings, and every ticked object. Textured. The only thing the app renders. | `level/build_level.py` from `level/level.json` + `level/objects.json`; textures from `textures/` |
+| **art** | canvases at true cm size, hung on the level's hang walls | him, in the app |
+| **scan** | Polycam LiDAR mesh, cleaned. Offline reference only. Never shipped to the browser. | `scan/pipeline.py` (P0, PROVEN) |
 
-Two files drive it: `level.json` (clean layer) and `layouts/<name>.json` (which art where).
+Files that drive it: `level/level.json` (shell: walls, floors, stairs, openings, hang zones),
+`level/objects.json` (the object catalogue with sizes and positions), `textures/*` (baked +
+filled), `level/level.glb` (the built level the app loads), `art/index.json`,
+`layouts/<name>.json`.
 
 ---
 
 ## 2. Stack and hosting
 
-- **Vite + TypeScript + three.js**, one page, no framework. Same shape as `koan-ansi/web`
-  (PROVEN pattern: Pages workflow `.github/workflows/pages.yml`, `base` switch on `CI`).
-- **GitHub Pages** on the public repo `koan-shdw/koan-hang` (created 2026-09-02). Auto-deploys on push to main touching web/, level/, art/, layouts/.
-- **@koan/shared** inclusions proposed (user decides every one, per koan-shared law):
-  `styles/koan.css`, `renderer/tokens.ts`, `Dropdown.tsx`, `ContextMenu.tsx`, `confirm.tsx`.
-  Not the LoRA shelf, not the bridge. OPEN: koan-shared is `file:../koan-shared`; on GitHub
-  CI it must resolve. Either vendor the five files into `web/vendor/koan/` with `drift.mjs`
-  watching, or publish koan-shared. Recommend vendor + drift for now.
-- **Themes**: the KOAN var contract, DECK default, WINTERMUTE and FUCKUP shipped (same as koan-ansi web).
-- **Scan pipeline**: Python 3.12, `trimesh` + `numpy` + `scipy` + `pillow` (PROVEN installed
-  and run today), `@gltf-transform/cli` 4.5.0 for Draco + texture resize (PROVEN present via npx).
-  Runs on his PC, outputs are committed. Never runs in the browser.
-
-Public repo means the art images are public on the web. OPEN: fine, or private repo
-(GitHub Pages on private needs a paid plan).
+- **Vite + TypeScript + three.js**, one page. GitHub Pages on `koan-shdw/koan-hang` (PROVEN live).
+- **Themes** DECK / WINTERMUTE / FUCKUP on the KOAN var contract (BUILT).
+- **@koan/shared**: vendor `koan.css`, `tokens.ts`, `Dropdown.tsx`, `ContextMenu.tsx`,
+  `confirm.tsx` into `web/vendor/koan/` with `drift.mjs` watching. OPEN (his call, unchanged).
+- **Offline tools** (his PC, outputs committed): Python 3.12 `trimesh`/`numpy`/`scipy`/`pillow`
+  (PROVEN), `@gltf-transform/cli` (PROVEN), **ComfyUI on his 4090** through the comfyui MCP
+  (connected; the fill workflow itself OPEN until run).
+- Data folders (`level/`, `art/`, `layouts/`, `textures/`) are served at `/data/` in dev and
+  copied into `dist/data/` at build (PROVEN, `web/vite.config.ts`).
 
 Repo layout:
 
 ```
 gallery-hang/
-  docs/SPEC.md  docs/SCAN-REPORT.md
-  scan/raw/9_2_2026.glb          the Polycam export, untouched
-  scan/pipeline.py               raw → cleaned scan.glb + level.json (draft)
-  scan/*.py                      the report scripts
-  level/level.json               clean layer (hand-fixed in app, committed)
-  level/scan.clean.glb           cleaned, full res (12.8 MB, input to compress.ps1)
-  level/scan.glb                 cleaned, Draco, 2048 textures (2.3 MB, PROVEN)
-  art/index.json                 the inventory
-  art/<id>.jpg|png|webp          the images
-  layouts/<name>.json            saved hangs
-  web/                           the app (Vite)
-  .github/workflows/pages.yml
+  docs/SPEC.md  docs/SPEC-v1.md  docs/SCAN-REPORT.md  docs/OBJECT-SHEET.md  docs/sheet/*.jpg
+  scan/raw/9_2_2026.glb        the Polycam export, untouched
+  scan/pipeline.py             raw → level/scan.clean.glb (reference), planes report
+  scan/*.py                    measure scripts (report, planes, measure, plan views)
+  level/level.json             the shell (from measurements, make_level.py)
+  level/objects.json           the object catalogue (from the ticked sheet)
+  level/build_level.py         level.json + objects.json + textures → level/level.glb
+  level/level.glb              what the app loads
+  textures/<surface>.jpg       baked + filled textures, one per surface
+  textures/bake/               raw bakes before fill (kept for redo)
+  art/  layouts/  web/  .github/workflows/pages.yml
 ```
 
 ---
 
-## 3. Scan pipeline (`scan/pipeline.py`)
+## 3. The object sheet (`docs/OBJECT-SHEET.md`)
 
-Input: `scan/raw/*.glb`. Output: `level/scan.glb`, `level/level.draft.json`, `scan/report.md`.
-Steps, in order:
+Made from the scan, before any geometry. One row per object: a picture shot inside the scan,
+where it is, its size from the scan where measured, and a tick box. He ticks what gets
+rebuilt and writes what I got wrong. Rows cover:
 
-1. **Load**, merge 8 chunks, keep per-chunk textures. PROVEN.
-2. **De-rotate** 1.79° so walls align with x/z. Angle measured from the wall-normal histogram.
-   PROVEN (`planes.py` found the four room walls axis-aligned after this).
-3. **Cut junk**: drop connected pieces under 200 triangles (3,661 pieces, 59 m²), drop faces
-   whose texture is near-black (21 m²), drop everything outside a hand-set keep box
-   (default: the building box, courtyard included). PROVEN 2026-09-02: 76,015 + 9,216 faces cut, room walls clean (`scan/clean_walls.png`).
-4. **Fill holes** smaller than 0.3 m across (the first-floor floor hole). trimesh
-   `fill_holes` only closes triangle-sized gaps; bigger holes get a flat patch from the clean
-   layer (the clean floor plane shows through). OPEN.
-5. **Planes**: horizontal planes → floors and ceilings; vertical planes with |normal| on x or z
-   → walls. Bin by position, keep planes over 1 m². PROVEN: found 3 levels and the 5 room
-   walls plus 5 courtyard walls with correct positions (SCAN-REPORT tables).
-6. **Wall extent**: for each wall plane, raster its faces onto a 5 cm grid on the plane.
-   The filled rectangle = the wall. Empty rectangles inside it larger than 60 × 60 cm =
-   openings. Opening from floor to under 2.3 m = door; opening off the floor = window. OPEN.
-7. **Stairs**: in the stair zone (x −7.1 … −5.9), horizontal strips at regular y steps →
-   treads; write them as steps (tread depth, riser height, count). OPEN.
-8. **Write `level.draft.json`** in the format of §4. He hand-fixes in the app, saves
-   `level/level.json`.
-9. **Compress**: decimate to ~150k triangles, textures to 2048², Draco, write `level/scan.glb`.
-   gltf-transform commands: `resize --width 2048 --height 2048`, `draco`, `dedup`, `prune`.
-   PROVEN 2026-09-02: 2.3 MB, 137k triangles, 4 textures at 2048 (`scan/compress.ps1`).
+- **shell**: each wall, floor, ceiling, the stair, every opening
+- **inside**: doors (leaf, frame, handle), window frames, the ceiling ribs and lights, the
+  aircon, sockets and switches, the sign, anything else on the walls
+- **outside**: the glass front and its frames, courtyard tiles, the red wall, plants, the
+  low walls, the neighbour walls, the gate
 
-The pipeline is rerunnable. Rerun never overwrites `level/level.json`, only the draft.
+Shots come from the P1 app itself: a `shot()` hook renders the scan from a set camera and the
+dev server writes `docs/sheet/<name>.jpg` (BUILT, dev only).
 
 ---
 
-## 4. `level.json` — the clean layer
+## 4. Geometry
 
-Units: metres in the file, cm in the UI. Y up. Origin = de-rotated scan origin.
+### 4.1 Shell — `level/level.json` (format `koan-hang-level/1`, unchanged from v1)
+
+Metres, y up, the de-rotated scan frame. `levels` (floorY, ceilY), `floors` (polys), `walls`
+(`a→b` left→right as seen from the room, `facing`, `openings` door/window, `noHang`, `hang`),
+`stairs`, `blockers`, `patches`, `spawn`. Current values: PROVEN against the scan and the
+Polycam floorplan within 7 cm (SCAN-REPORT). Known fixes owed: the second stair-wall door
+(south, opens onto the bottom of the stair; user 2026-09-02), the white door's exact position.
+
+### 4.2 Objects — `level/objects.json`
 
 ```json
-{
-  "format": "koan-hang-level/1",
-  "scan": { "file": "scan.glb", "rotationDeg": -1.79, "offset": [0,0,0] },
-  "eyeHeight": 1.60,
-  "levels": [
-    { "id": "ground", "name": "ground", "floorY": -5.50, "ceilY": -2.42 },
-    { "id": "first",  "name": "first",  "floorY": -2.22, "ceilY": 0.84 }
-  ],
-  "floors": [ { "level": "ground", "poly": [[x,z],...] } ],
-  "walls": [
-    { "id": "w-north", "name": "north", "level": "both",
-      "a": [-7.33, 2.72], "b": [0.21, 2.72], "baseY": -5.50, "topY": 0.84,
-      "thickness": 0.15, "facing": "-z",
-      "openings": [ { "kind": "door", "u": 1.20, "w": 0.90, "bottom": 0, "h": 2.10 } ],
-      "noHang": [ { "u": 0, "w": 0.40 } ] }
-  ],
-  "stairs": [ { "level": "ground", "from": [x,z], "dir": "+z", "width": 1.0,
-                "treads": 18, "tread": 0.27, "riser": 0.182, "bottomY": -5.50 } ],
-  "blockers": [ { "poly": [[x,z],...], "baseY": 0, "topY": 0 } ]
-}
+{ "format": "koan-hang-objects/1",
+  "objects": [
+    { "id": "stair-1", "kind": "stair", "level": "ground", "from": [-6.475, -1.9], "dir": "+z",
+      "width": 1.17, "treads": 16, "riser": 0.198, "tread": 0.225, "nosing": 0.02,
+      "rail": { "side": "east", "height": 0.9, "posts": 0.9 }, "material": "stair-wood" },
+    { "id": "door-stair-south", "kind": "door", "wall": "g-stair-room", "u": 4.32, "w": 0.80, "h": 2.00,
+      "leaf": true, "swing": "in", "frame": 0.05, "material": "door-white" },
+    { "id": "win-first-west", "kind": "window", "wall": "f-west", "u": 0, "w": 3.32, "bottom": 0, "h": 2.98,
+      "mullions": [1.1, 2.2], "transom": 2.1, "frame": 0.06, "material": "frame-alu" },
+    { "id": "ceiling-ribs-ground", "kind": "ribs", "level": "ground", "pitch": 0.15, "depth": 0.08, "dir": "+x" },
+    { "id": "light-1", "kind": "light", "level": "ground", "at": [-3.0, 0.5], "size": [0.6, 0.1], "warm": true },
+    { "id": "aircon-1", "kind": "box", "level": "ground", "at": [-2.5, 0.8], "size": [0.95, 0.25, 0.95], "y": "ceiling", "material": "aircon" },
+    { "id": "tiles-courtyard", "kind": "floor-material", "floor": "courtyard", "material": "stone-tiles" }
+  ] }
 ```
 
-- A wall is a segment `a→b` in plan plus a height range. `facing` = the side art hangs on.
-  A double-sided wall is two entries.
-- `u` = distance in metres from `a` along the wall. `openings` block hanging and are holes
-  for collision (doors) or just holes for hanging (windows).
-- `noHang` = keep-out strips (corners, light switches, the stair edge).
-- `blockers` = furniture-sized boxes the walker cannot pass (the desk, the stair void).
+Kinds and what `build_level.py` makes of them:
 
----
-
-## 5. The app
-
-### 5.1 Shell
-
-Full-screen 3D viewport. Cards float over it, KOAN.live NODE-shell style in floating mode
-(canon shell 3, ch. 08): each card has a title bar, drag to move, fold, position remembered.
-Cards: **INVENTORY**, **HANG**, **LEVEL**, **FILE**. One top strip: logo, mode chips
-(`walk` · `hang` · `level`), theme, `?`. OPEN: shell choice is his call.
-
-### 5.2 Walk (mode `walk`)
-
-- Pointer-lock first person. WASD move, mouse look, Shift run.
-  Eye height 160 cm (`eyeHeight`, editable in LEVEL card).
-- Collision against the clean layer only: walls, blockers, floors, stairs. Never the scan mesh.
-  Capsule radius 25 cm. Stairs = walkable ramp with step snapping.
-- Gravity: stand on the level's floor. Walk up the stair, arrive on the first floor.
-- `M` = plan view: top-down map of the current level, walls drawn, art as rectangles, click
-  = teleport. Minimap corner, 120 px, always on (law 1: you always know where you are).
-- Esc leaves pointer lock (law: Esc backs out one layer).
-
-### 5.3 Render
-
-- Scan layer: unlit, textures as baked. Draco decoded in a worker.
-- Clean layer: three looks, chip in LEVEL card: `hidden` (default; scan shows, clean only
-  snaps and collides), `white box` (scan hidden, matte white walls, grey floor), `both`
-  (clean layer as 1 px wireframe over the scan, for fixing).
-- Art: box mesh at true size, image on the front (sRGB, mipmapped, anisotropy 8), edge
-  finish per §5.4. Lit: hemisphere + one soft directional. Art casts a soft contact shadow
-  on the wall (a baked gradient quad behind it, no shadow maps).
-- Highest quality is the default (product law). Quality chip `full` · `light` only if a phone
-  cannot hold 60 fps. `light` = scan at half texture res. OPEN whether needed at all.
-
-### 5.4 Inventory (INVENTORY card)
-
-Source: `art/index.json`.
-
-```json
-{ "format": "koan-hang-art/1",
-  "items": [ { "id": "tengu-01", "title": "Tengu", "file": "tengu-01.jpg",
-               "w": 120, "h": 90, "d": 3.8, "edge": "wrap",
-               "year": 2025, "medium": "acrylic on canvas", "notes": "" } ] }
-```
-
-Sizes in cm: `w` width, `h` height, `d` canvas depth (the edge). `edge`: `wrap` (image
-stretched over the edge, gallery-wrap), `white`, or a hex colour. Default `wrap`. OPEN.
-
-Card: search field, grid of thumbnails with title and `120 × 90` under each. Sort: title,
-size, recent. Placed works show a small `on wall` chip; unplaced float (law 9 amendment,
-FloatPick behaviour when the room is empty). Drag a thumbnail into the viewport, or click it
-= it becomes the held work.
-
-Adding art: drop image files on the card. A row opens under the thumbnail: title, w, h, d,
-edge. Enter commits. This writes `art/index.json` and the image via the save path (§7).
-Without a token it downloads a zip with the new files and the updated index for him to drop
-into the repo (law 10: the card says exactly that).
-
-### 5.5 Hang (mode `hang`)
-
-- Held work follows the cursor. Raycast against clean walls only. On a wall it shows at true
-  size, ghosted 60%, snapped. Over an opening or a `noHang` strip: red tint, click does nothing,
-  tooltip says why (law 7).
-- Click = place. Placed work = selected. Drag = slide along the wall. Snaps apply live.
-- Arrow keys nudge 1 cm, Shift+arrows 10 cm, `[` `]` move to the previous/next wall,
-  `Delete` removes, `Ctrl+D` duplicates, `Ctrl+Z` undo, `Ctrl+Shift+Z` redo (law 15).
-- Right-click on a placed work: `remove` · `duplicate` · `flip to facing wall` · `centre on
-  wall` · `swap with…` · `open in inventory` (law 14).
-- Right-click on a wall: `centre all on this wall` · `space evenly` · `clear wall`.
-- Every placement writes the layout (autosave, law 12).
-
-### 5.6 The HANG widget (his ask: top-height snap)
-
-The card, top to bottom:
-
-| row | control |
+| kind | geometry |
 |---|---|
-| snap line | three chips `top` · `centre` · `bottom`, one active |
-| height | number field in cm + slider 0 … ceiling, readout paired (ch. 03 slider rule). Default: top 200, centre 150, bottom 100 |
-| apply | `snap all on wall` · `snap all` buttons |
-| gap | number field cm, default 10; `space evenly` uses it |
-| show guide | toggle, on by default |
+| `stair` | treads as boxes with nosing, risers, stringers, optional rail (posts + handrail) |
+| `door` | frame (jambs + head) in the opening, leaf as a box, handle as a cylinder, swing angle |
+| `window` | frame + mullions + transom as bars, glass as a thin transparent plane |
+| `ribs` | repeated bars under a ceiling (the corrugated ceiling) |
+| `light` | emissive box under the ceiling + a point light |
+| `box` | any box object (aircon, socket, sign) at a position on a wall, floor or ceiling |
+| `wall-material` / `floor-material` | binds a surface to a texture |
+| `mesh` | a hand-made GLB in `level/parts/` for anything the kinds above cannot say (plants, gate) |
 
-- The active snap line is drawn on every wall at that height, dashed, accent colour, in `hang`
-  mode (law 1). Held and dragged works snap their top / centre / bottom to it.
-- Change the height: the line moves; works already snapped to it move with it (they carry
-  `snap: "top"`). Works placed free carry `snap: null` and stay put.
-- Gap snap: while sliding, a work snaps its edge to `gap` cm from a neighbour on the same
-  wall, and to the wall's centre. Ghost tick marks show where it will land.
-- Wall-height display: the wall's clear height in cm sits on the widget when a wall is under
-  the cursor.
+Sizes come from the scan (measure scripts on the cleaned mesh), positions from the shell.
+Every object in the sheet becomes one row here after his ticks. OPEN: the kind list grows with
+what he ticks.
 
-### 5.7 Level fix (mode `level`)
+### 4.3 Build — `level/build_level.py`
 
-For the parts auto-detection gets wrong. Clean layer draws as wireframe over the scan.
-
-- Click a wall = select. Handles at `a` and `b` drag along the plan. Fields: base, top,
-  thickness, facing. `Delete` removes. `＋ wall` = click two points on the floor.
-- On a selected wall: `＋ opening` = drag a rectangle on the wall face. Fields: kind
-  (`door` / `window`), u, w, bottom, h. `＋ no-hang` = drag a strip.
-- `＋ blocker` = drag a box on the floor, set height.
-- Stairs: fields only (from, dir, width, treads, tread, riser). OPEN if a drag handle is needed.
-- Floor hole: `＋ patch` = drag a rectangle on the floor plane. Written as a floor poly; the
-  render draws it in the floor's average colour.
-- Saves `level/level.json` via the save path. Undo/redo.
+Reads the shell + objects, writes `level/level.glb`: one mesh per surface with its own UV
+set (planar, 1 unit = 1 m, so textures at 512 px/m), materials referencing `textures/`,
+Draco. Also writes `level/level.nav.json`: the collision set the app uses (walls, floors,
+stairs, blockers), so the app never touches the render mesh for physics. PROVEN pattern
+(trimesh + gltf-transform); the builder itself OPEN.
 
 ---
 
-## 6. `layouts/<name>.json`
+## 5. Textures
 
-```json
-{ "format": "koan-hang-layout/1", "name": "sept show", "level": "level.json",
-  "guides": { "snap": "top", "top": 200, "centre": 150, "bottom": 100, "gap": 10 },
-  "items": [ { "art": "tengu-01", "wall": "w-north", "u": 1.42, "topY": 2.00,
-               "snap": "top", "flip": false } ],
-  "camera": { "level": "first", "pos": [x,y,z], "yaw": 0, "pitch": 0 } }
-```
+Per surface (each wall face, each floor, each ceiling, the stair, the courtyard tiles, the red wall):
 
-`u` = metres from wall start to the work's left edge. `topY` = metres above that level's floor.
+1. **Bake.** Project the cleaned scan onto the surface's plane: for each texel, the nearest
+   scan face within 12 cm of the plane, sample its texture. Output `textures/bake/<surface>.png`
+   at 512 px/m plus a mask of texels the scan did not cover (holes, black patches, glass). OPEN.
+2. **Fill.** ComfyUI on his 4090: an inpaint pass over the mask with a prompt per material
+   ("white painted gallery wall, matte, even light", "polished concrete floor", "grey stone
+   tiles with red brick inserts"), reference = the bake itself. Where a surface is mostly
+   missing (glass sides, under the stair), generate from the reference of a sibling surface.
+   Output `textures/<surface>.jpg`. Everything keeps its real marks (the sign, the sockets,
+   the light pools) where the scan had them. OPEN: workflow to be built and shown to him on
+   one wall first.
+3. **Tileables.** Materials that repeat (ribs, tiles, wood) get one tileable texture each,
+   generated once, reused by UV repeat.
 
----
-
-## 7. Save / load
-
-Three paths. The FILE card shows which one is live (law 1).
-
-| path | who | how |
-|---|---|---|
-| **browser** | always | autosave to localStorage on every change. Survives reload. Shown as `draft`. |
-| **file** | anyone | `save file` downloads `<name>.json`. Drop a `.json` on the viewport or FILE card = load. |
-| **github** | him | paste a fine-grained token (contents: write, this repo only) once, stored in localStorage. `save to repo` commits `layouts/<name>.json` (or `level/level.json`, `art/*`) through the GitHub contents API. The commit message is the action. Pages redeploys in ~1 min. |
-
-Load: FILE card lists `layouts/*.json` from the repo (fetched from the site itself) plus the
-local draft. `?layout=<name>` in the URL opens one. That is the share link.
-
-Conflicts: the repo copy is truth. Loading a repo layout replaces the draft after a confirm
-with counts ("replace draft, 14 works — undoable").
+Highest quality is the default: 512 px/m, no half-res tier unless a phone proves it needs one.
 
 ---
 
-## 8. Exports (FILE card)
+## 6. The app
 
-| export | what |
-|---|---|
-| **screenshot** | PNG of the viewport, UI hidden, 2× pixel ratio. `P` key. |
-| **hang list** | CSV + printable HTML: work, wall, level, left edge cm, top cm, centre cm, size. For the real install day. |
-| **room GLB** | scan layer + art boxes, three.js GLTFExporter. Opens in any viewer. |
-| **plan PNG** | top-down plan per level, walls and art rectangles, labelled. |
-| **flythrough** | a video. He drops camera keyframes while walking (`K` = add keyframe here, list in the FILE card, drag to reorder, seconds per leg). The camera flies a smooth curve through them. Render off-screen at 1080p or 4K, 30 or 60 fps, UI hidden, art lit, encoded in-browser to WebM (MediaRecorder) with an MP4 option through a WASM encoder (OPEN which one; mp4-muxer + WebCodecs is the candidate). Progress bar is honest (law 16): frames done / frames total. Also `play` in-app without recording. Phase P3. |
+Everything from v1 stays, with the scan removed:
 
-User added flythrough 2026-09-02.
-
----
-
-## 9. UI grammar
-
-KOAN.design 00 + 01 apply: one var contract, mono chrome, radius 4/6/8, spacing 2…16, 1 px
-rest / 2 px emphasis, lowercase buttons, tooltips on everything (gesture + consequence +
-shortcut), disabled = dim + reason, right-click everywhere, undo everywhere, one EmptyState.
-House Dropdown from @koan/shared for any select. Copy the sibling: cards copy KOAN.live's
-floating card chrome; the inventory grid copies vi-dancer's Library thumbnails.
+- **Shell** (BUILT): full-screen viewport, floating cards INVENTORY / HANG / LEVEL / FILE,
+  top strip with mode chips `walk` · `hang` · `level`, themes, `?`.
+- **Walk** (BUILT, script-tested, his walk pending): pointer lock, WASD, Shift run, eye
+  height 160 cm, collision on the nav set only, stairs walkable up and down, doors passable,
+  `M` plan + click teleport, minimap always on.
+- **Render**: `level.glb` lit by the level's own lights (§4.2 `light`) + hemisphere fill.
+  Art gets a soft contact shadow. LEVEL card look chip becomes `textured` · `white box` · `wire`.
+- **Inventory, hang, HANG widget, level fix, layouts, save paths, exports, flythrough**: as
+  v1 §5.4–5.7, §6, §7, §8 (text kept in `docs/SPEC-v1.md`). Level fix mode now edits
+  `level.json` and `objects.json` and triggers a rebuild request (the build runs offline;
+  the app shows "rebuild pending" until the new glb lands, law 1).
 
 ---
 
-## 10. Build plan
+## 7. Build plan
 
 | phase | delivers | proof |
 |---|---|---|
-| **P0 pipeline** | `pipeline.py` steps 1–5, 9. `level.draft.json` with floors + walls. `scan.glb` under 6 MB. | file sizes, plane table matches SCAN-REPORT |
-| **P1 walk** | app shell, load scan + level, walk mode, stairs, minimap, themes, Pages live | BUILT 2026-09-02, script-tested; his browser walk = the proof, pending |
-| **P2 hang** | inventory, hang mode, HANG widget, autosave, file save/load, undo | he hangs a show |
-| **P3 fix + share** | level mode, openings/stairs/blockers/patch, GitHub token save, exports incl. flythrough | he fixes the doors, saves to repo, prints the hang list |
-| **P4 auto-detect** | pipeline steps 6–7 (openings, stairs) | reduces P3 hand work; OPEN if worth it |
+| P0 pipeline | scan cleaned, planes, compress | PROVEN 2026-09-02 |
+| P1 walk | shell, walk, stairs, minimap, themes, Pages | BUILT 2026-09-02; live; his walk found the missing south stair door |
+| **P1.5 object sheet** | `docs/OBJECT-SHEET.md` with shots and sizes | he ticks it |
+| **P2 geometry** | `objects.json` from his ticks, `build_level.py`, `level.glb` white (untextured), app loads it, scan gone | he walks the white level |
+| **P3 textures** | bake + ComfyUI fill, one wall shown first, then all | he judges the wall, then the room |
+| P4 hang | inventory, hang mode, HANG widget, autosave, file save/load, undo | he hangs a show |
+| P5 fix + share | level mode, GitHub token save, exports, flythrough | he saves to the repo, prints the hang list, renders a flythrough |
 
-Each phase = one GO. Each ends with his run in his browser. Nothing is "done" until he says so.
+Each phase = one GO. Each ends with his run in his browser.
 
 ---
 
-## 11. Decisions (user, 2026-09-02)
+## 8. Decisions of record (user, 2026-09-02)
 
-1. Name: **KOAN.hang**. Decided.
-2. Courtyard: **keep**, scan-only, no hanging. Decided.
-3. Repo: **public**. Art images are public on the web. Decided.
-4. Shell: **floating cards** over the viewport. Decided.
-5. Edge default: **wrap** (image stretched over the canvas edge). Decided.
-6. Room measurements: **trust the scan**. Decided.
-7. Exports: all four kept, plus **flythrough** (§8). Decided.
+1. Name KOAN.hang. 2. Courtyard kept, and now rebuilt too (v2). 3. Public repo. 4. Floating
+cards. 5. Canvas edge = image wrapped. 6. Trust the scan for measurements. 7. All exports +
+flythrough. 8. **v2: rebuild the level as our own geometry, scan = reference only.**
+9. **Textures baked from the scan, completed by generative fill.** 10. **Generation on his
+ComfyUI.** 11. **Walls plus every object, inside and out, recreated from the scan's details.**
 
-Still OPEN:
-- koan-shared: vendor five files, or publish the package (recommend vendor + drift).
-- The first-floor floor hole: he marks it in `level` mode, or tells me where.
+Still OPEN: koan-shared vendor vs publish; the exact fill workflow; which objects (his ticks).

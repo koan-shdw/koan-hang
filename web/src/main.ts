@@ -149,7 +149,17 @@ async function main(): Promise<void> {
   hang.body.append(emptyState('nothing to snap', 'P2 brings the hang widget: top / centre / bottom line, height in cm, gap.'))
   const file = shell.card('file', 'file', { x: 12, y: 200, anchor: 'right' })
   file.body.append(emptyState('no layouts', 'P2 brings save and load. P3 brings exports and the repo save.'))
-  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene } // debug handle
+  // debug handle + shot(): renders and posts a JPEG to the dev server (object sheet)
+  const shot = async (name: string): Promise<string> => {
+    renderer.render(scene, camera)
+    const url = renderer.domElement.toDataURL('image/jpeg', 0.92)
+    const r = await fetch(`${BASE}__shot?name=${encodeURIComponent(name)}`, { method: 'POST', body: url })
+    return r.text()
+  }
+  const view = (lvl: string, x: number, z: number, yawDeg: number, pitchDeg = 0): void => {
+    walker.teleport(lvl, x, z); walker.state.yaw = THREE.MathUtils.degToRad(yawDeg); walker.state.pitch = THREE.MathUtils.degToRad(pitchDeg); walker.update(0.016)
+  }
+  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, view }
 
   // ---- keys ------------------------------------------------------------------------
   window.addEventListener('keydown', (e) => {

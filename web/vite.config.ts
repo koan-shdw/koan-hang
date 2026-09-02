@@ -1,5 +1,5 @@
 import { defineConfig, type Plugin } from 'vite'
-import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, createReadStream } from 'node:fs'
+import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, createReadStream, writeFileSync } from 'node:fs'
 import { join, resolve, extname } from 'node:path'
 
 // The repo's data folders (level/, art/, layouts/) are served under /data/ in dev
@@ -28,6 +28,19 @@ function dataDirs(): Plugin {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = (req.url ?? '').split('?')[0]
+        // dev only: POST /__shot?name=x with a data-URL body writes docs/sheet/x.jpg (object sheet screenshots)
+        if (url === '/__shot' && req.method === 'POST') {
+          const name = (new URL(req.url ?? '', 'http://x').searchParams.get('name') ?? 'shot').replace(/[^a-z0-9_-]/gi, '')
+          let body = ''
+          req.on('data', (c: Buffer) => { body += c.toString() })
+          req.on('end', () => {
+            const b64 = body.replace(/^data:image\/\w+;base64,/, '')
+            const dir = join(ROOT, 'docs', 'sheet'); mkdirSync(dir, { recursive: true })
+            writeFileSync(join(dir, `${name}.jpg`), Buffer.from(b64, 'base64'))
+            res.setHeader('Content-Type', 'text/plain'); res.end(`ok ${name}`)
+          })
+          return
+        }
         const m = url.match(/^\/data\/([a-z]+)\/(.+)$/)
         if (!m || !DATA_DIRS.includes(m[1]) || m[2].includes('..')) return next()
         const file = join(ROOT, m[1], decodeURIComponent(m[2]))
