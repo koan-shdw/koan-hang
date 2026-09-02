@@ -1,7 +1,7 @@
 # KOAN.hang — SPEC v1 (2026-09-02)
 
-Working name **KOAN.hang** (name OPEN, user decides). Repo `C:\Claude\gallery-hang`.
-Status: P0 pipeline BUILT and run 2026-09-02 (`level/scan.glb` 2.3 MB, `level/level.draft.json`). No app code. See `docs/SCAN-REPORT.md`.
+**KOAN.hang** (decided). Repo `C:\Claude\gallery-hang` → github.com/koan-shdw/koan-hang.
+Status 2026-09-02: P0 pipeline DONE. `level/level.json` written from scan + floorplan (`level/make_level.py`). P1 walk BUILT: `web/` (Vite + TS + three.js), pointer-lock walk, clean-layer collision, stair up/down, doorway pass-through, plan teleport, three themes, floating cards. Tests run in the dev browser by script (wall stop, glass stop, door pass, stair climb + descend, void edge). NOT yet walked by the user. Repo public at github.com/koan-shdw/koan-hang, Pages via Actions.
 
 The brief (user, 2026-09-02): a 3D game-style walk through his LiDAR scan of the gallery.
 An inventory of his artworks at true size. Place a work on a wall, walk round, look at it.
@@ -30,7 +30,7 @@ Two files drive it: `level.json` (clean layer) and `layouts/<name>.json` (which 
 
 - **Vite + TypeScript + three.js**, one page, no framework. Same shape as `koan-ansi/web`
   (PROVEN pattern: Pages workflow `.github/workflows/pages.yml`, `base` switch on `CI`).
-- **GitHub Pages** on a new public repo `koan-shdw/koan-hang` (name OPEN). Auto-deploys on push.
+- **GitHub Pages** on the public repo `koan-shdw/koan-hang` (created 2026-09-02). Auto-deploys on push to main touching web/, level/, art/, layouts/.
 - **@koan/shared** inclusions proposed (user decides every one, per koan-shared law):
   `styles/koan.css`, `renderer/tokens.ts`, `Dropdown.tsx`, `ContextMenu.tsx`, `confirm.tsx`.
   Not the LoRA shelf, not the bridge. OPEN: koan-shared is `file:../koan-shared`; on GitHub
@@ -299,7 +299,7 @@ floating card chrome; the inventory grid copies vi-dancer's Library thumbnails.
 | phase | delivers | proof |
 |---|---|---|
 | **P0 pipeline** | `pipeline.py` steps 1–5, 9. `level.draft.json` with floors + walls. `scan.glb` under 6 MB. | file sizes, plane table matches SCAN-REPORT |
-| **P1 walk** | app shell, load scan + level, walk mode, stairs, minimap, themes, Pages live | he walks the gallery in his browser |
+| **P1 walk** | app shell, load scan + level, walk mode, stairs, minimap, themes, Pages live | BUILT 2026-09-02, script-tested; his browser walk = the proof, pending |
 | **P2 hang** | inventory, hang mode, HANG widget, autosave, file save/load, undo | he hangs a show |
 | **P3 fix + share** | level mode, openings/stairs/blockers/patch, GitHub token save, exports incl. flythrough | he fixes the doors, saves to repo, prints the hang list |
 | **P4 auto-detect** | pipeline steps 6–7 (openings, stairs) | reduces P3 hand work; OPEN if worth it |
