@@ -341,7 +341,9 @@
       "toggle": false,
       "leaf": true,
       "face": "steel",
-      "swingOut": false
+      "swingOut": false,
+      "frame": true,
+      "hinge": "a"
      }
     },
     {
@@ -392,7 +394,9 @@
       "toggle": true,
       "leaf": false,
       "face": "steel",
-      "swingOut": false
+      "swingOut": false,
+      "frame": false,
+      "hinge": "a"
      }
     },
     {
@@ -407,7 +411,9 @@
       "toggle": true,
       "leaf": false,
       "face": "steel",
-      "swingOut": false
+      "swingOut": false,
+      "frame": false,
+      "hinge": "a"
      }
     }
    ],
@@ -445,7 +451,9 @@
       "toggle": true,
       "leaf": true,
       "face": "steel",
-      "swingOut": false
+      "swingOut": false,
+      "frame": false,
+      "hinge": "a"
      }
     },
     {
@@ -460,7 +468,9 @@
       "toggle": true,
       "leaf": true,
       "face": "steel",
-      "swingOut": false
+      "swingOut": false,
+      "frame": false,
+      "hinge": "a"
      }
     }
    ],
@@ -507,14 +517,16 @@
      "u": 2.32,
      "w": 1.15,
      "bottom": 0,
-     "h": 2.3,
+     "h": 3.09,
      "door": {
       "type": "swing",
       "open": true,
       "toggle": true,
       "leaf": true,
       "face": "steel",
-      "swingOut": true
+      "swingOut": true,
+      "frame": true,
+      "hinge": "b"
      }
     },
     {
@@ -567,7 +579,9 @@
       "toggle": false,
       "leaf": true,
       "face": "steel",
-      "swingOut": false
+      "swingOut": false,
+      "frame": true,
+      "hinge": "a"
      }
     }
    ],
@@ -809,7 +823,9 @@
       "toggle": false,
       "leaf": true,
       "face": "mesh",
-      "swingOut": false
+      "swingOut": false,
+      "frame": true,
+      "hinge": "a"
      }
     },
     {
@@ -1086,6 +1102,44 @@
     1.2,
     0.08
    ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -6.55,
+    -2.15
+   ],
+   "size": [
+    0.8,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -6.55,
+    0.6
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "y": -3.4
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -6.55,
+    2.3
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "y": -2.6
   },
   {
    "kind": "aircon",

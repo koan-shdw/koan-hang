@@ -25,8 +25,8 @@ def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), han
              openings=list(openings), noHang=list(noHang), hang=hang, material=material)
     if note: d["note"] = note
     return d
-def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False):
-    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf, face=face, swingOut=swingOut))
+def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False, frame=True, hinge="a"):
+    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf, face=face, swingOut=swingOut, frame=frame, hinge=hinge))
 def window(u, w, bottom, h, cols, bars, frame, cross=()):
     return dict(kind="window", u=u, w=w, bottom=bottom, h=h, grid=dict(cols=cols, bars=list(bars), cross=list(cross)), frame=frame)
 
@@ -38,13 +38,13 @@ walls = [
                    window(4.22, 0.80, 2.15, GH - 2.20, 1, [], GREY)],
          note="owner: one big grey-framed window from the north corner to the steel street door opposite the south doorway, pane over the door"),
     wall("g-stair-room", "back wall (stair wall), room side", "ground", [SW, N], [SW, S], "+x", G0, G1,
-         openings=[door(0.12, 0.80, 2.00, "slide", True, leaf=False), door(4.34, 0.80, 2.00, "slide", True, leaf=False)],
+         openings=[door(0.12, 0.80, 2.00, "slide", True, leaf=False, frame=False), door(4.34, 0.80, 2.00, "slide", True, leaf=False, frame=False)],
          note="two same-size doors: left (north) slides, goes under the stairs; right (south) at the bottom of the stairs; leaves live on the hallway side (g-stair-hall)"),
     wall("g-stair-hall", "back wall, hallway side", "ground", [SWH, S], [SWH, N], "-x", G0, G1, hang=False, material="wall-blue",
-         openings=[door(0.00, 0.80, 2.00, "slide", True), door(4.22, 0.80, 2.00, "slide", True)]),
+         openings=[door(0.00, 0.80, 2.00, "slide", True, frame=False), door(4.22, 0.80, 2.00, "slide", True, frame=False)]),
     wall("g-east", "glass front", "ground", [E, S], [E, N], "-x", G0, G1, hang=False,
          openings=[window(0.10, 2.17, 0, GH, 3, [1.0], GREY, cross=[1]),
-                   door(2.32, 1.15, 2.30, "swing", True, toggle=True, face="steel", swingOut=True),
+                   door(2.32, 1.15, GH - 0.12, "swing", True, toggle=True, face="steel", swingOut=True, hinge="b"),
                    window(3.52, 1.57, 0, GH, 3, [1.0], GREY)],
          note="owner: cross-bar window | grey steel door standing open into the courtyard | three frames; one grey steel grid, bar at ~1 m"),
     wall("g-south", "south", "ground", [WG, S], [E, S], "+z", G0, G1,
@@ -112,6 +112,9 @@ level = dict(
         dict(kind="light", level="first", at=[-4.6, -1.2], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-2.6, -1.2], size=[1.2, 0.08]),
         dict(kind="light", level="first", at=[-0.8, -1.2], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-4.6, 1.4], size=[1.2, 0.08]),
         dict(kind="light", level="first", at=[-2.6, 1.4], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-0.8, 1.4], size=[1.2, 0.08]),
+        dict(kind="light", level="ground", at=[-6.55, -2.15], size=[0.8, 0.08]),
+        dict(kind="light", level="ground", at=[-6.55, 0.6], size=[0.0, 0.0], y=-3.4),
+        dict(kind="light", level="ground", at=[-6.55, 2.3], size=[0.0, 0.0], y=-2.6),
         dict(kind="aircon", level="ground", at=[-2.4, 0.4], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="first", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
         dict(kind="slab", name="corridor over the courtyard", box=[[E, F0 - 0.15, 0.0], [6.0, F0, 2.0]], material="concrete"),

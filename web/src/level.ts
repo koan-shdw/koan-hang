@@ -5,7 +5,7 @@ import * as THREE from 'three'
 
 export type Facing = '+x' | '-x' | '+z' | '-z'
 export type Dir = Facing
-export interface DoorSpec { type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean; face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean }
+export interface DoorSpec { type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean; face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean; frame?: boolean; hinge?: 'a' | 'b' }
 export interface GridSpec { cols: number; bars: number[]; cross: number[] }
 export interface Opening { kind: 'door' | 'window'; u: number; w: number; bottom: number; h: number; door?: DoorSpec; grid?: GridSpec; frame?: string }
 export interface Wall {
@@ -24,7 +24,7 @@ export interface Stair {
 export interface Blocker { level: string; poly: [number, number][] }
 export type LevelObject =
   | { kind: 'ribs'; level: string; dir: Dir; pitch: number; depth: number; width: number }
-  | { kind: 'light'; level: string; at: [number, number]; size: [number, number] }
+  | { kind: 'light'; level: string; at: [number, number]; size: [number, number]; y?: number }
   | { kind: 'aircon'; level: string; at: [number, number]; size: [number, number, number] }
   | { kind: 'slab'; name?: string; box: [[number, number, number], [number, number, number]]; material?: string }
 export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number }
@@ -225,10 +225,12 @@ export function buildLevel(lv: Level): Built {
         group.add(wallBox(w, o.w - bar, o.h - bar, 0.01, uc, yc, -t / 2, 'glass'))
       } else if (o.door) {
         const frame = o.door.type === 'metal' ? 'steel-grey' : w.material === 'wall-blue' || w.level === 'ground' ? 'steel-grey' : 'steel-black'
-        const jamb = 0.05
-        group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + jamb / 2, yc, -t / 2, frame))
-        group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + o.w - jamb / 2, yc, -t / 2, frame))
-        group.add(wallBox(w, o.w, jamb, t + 0.04, uc, w.baseY + o.bottom + o.h - jamb / 2, -t / 2, frame))
+        const jamb = o.door.frame === false ? 0.005 : 0.05
+        if (o.door.frame !== false) {
+          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + jamb / 2, yc, -t / 2, frame))
+          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + o.w - jamb / 2, yc, -t / 2, frame))
+          group.add(wallBox(w, o.w, jamb, t + 0.04, uc, w.baseY + o.bottom + o.h - jamb / 2, -t / 2, frame))
+        }
         if (o.door.leaf) {
           const pivot = new THREE.Object3D()
           const leafW = o.w - jamb * 2, leafH = o.h - jamb
@@ -239,17 +241,19 @@ export function buildLevel(lv: Level): Built {
             pivot.add(leaf)
           } else if (o.door.type === 'swing') {
             // hinge at the u side; leaf rotates about the hinge into the room (glass door: frame + glass)
-            const hinge = wallPoint(w, o.u + jamb, w.baseY + o.bottom, 0)
+            const hb = o.door.hinge === 'b' ? -1 : 1
+            const hinge = wallPoint(w, hb > 0 ? o.u + jamb : o.u + o.w - jamb, w.baseY + o.bottom, 0)
             pivot.position.copy(hinge)
             const [dx, dz] = wallDir(w)
             pivot.rotation.y = Math.atan2(-dz, dx)
+            const lx = hb * leafW / 2 // leaf runs from the hinge toward the other jamb
             if (o.door.face === 'glass') {
-              const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.04), mat('steel-grey')); fr.position.set(leafW / 2, leafH / 2, 0)
-              const gl = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.16, leafH - 0.16, 0.01), mat('glass')); gl.position.set(leafW / 2, leafH / 2, 0)
+              const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.04), mat('steel-grey')); fr.position.set(lx, leafH / 2, 0)
+              const gl = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.16, leafH - 0.16, 0.01), mat('glass')); gl.position.set(lx, leafH / 2, 0)
               pivot.add(fr, gl); leaf = fr
             } else {
-              leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.05), mat('door-metal')); leaf.position.set(leafW / 2, leafH / 2, 0)
-              const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.12, 10), mat('steel-grey')); handle.rotation.z = Math.PI / 2; handle.position.set(leafW - 0.1, 1.0, 0.05)
+              leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.05), mat('door-metal')); leaf.position.set(lx, leafH / 2, 0)
+              const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.12, 10), mat('steel-grey')); handle.rotation.z = Math.PI / 2; handle.position.set(hb * (leafW - 0.1), 1.0, 0.05)
               pivot.add(leaf, handle)
             }
           } else {
@@ -333,9 +337,11 @@ export function buildLevel(lv: Level): Built {
         group.add(im)
       }
     } else if (o.kind === 'light') {
-      const cy = floorOf(lv, o.level).ceilY
-      const m = new THREE.Mesh(new THREE.BoxGeometry(o.size[0], 0.06, o.size[1]), mat('light'))
-      m.position.set(o.at[0], cy - 0.09, o.at[1]); group.add(m)
+      const cy = o.y ?? floorOf(lv, o.level).ceilY
+      if (o.size[0] > 0) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(o.size[0], 0.06, o.size[1]), mat('light'))
+        m.position.set(o.at[0], cy - 0.09, o.at[1]); group.add(m)
+      }
       const pl = new THREE.PointLight(0xfff0d0, 14, 9, 2); pl.position.set(o.at[0], cy - 0.25, o.at[1]); group.add(pl); lights.push(pl)
     } else if (o.kind === 'aircon') {
       const cy = floorOf(lv, o.level).ceilY
@@ -364,7 +370,8 @@ export function updateDoors(doors: DoorRuntime[], dt: number): void {
       const [dx, dz] = wallDir(d.wall), [nx, nz] = facingNormal(d.wall.facing)
       const base = Math.atan2(-dz, dx)
       // rotating the leaf by +90 deg about y sends its free end along (dz, -dx); pick the sign that points into the room, or out
-      const dot = dz * nx - dx * nz
+      const hb = d.opening.door?.hinge === 'b' ? -1 : 1
+      const dot = hb * (dz * nx - dx * nz)
       const sign = (d.opening.door?.swingOut ? -1 : 1) * (dot > 0 ? 1 : -1)
       d.pivot.rotation.y = base + sign * (Math.PI / 2) * ease
     }
