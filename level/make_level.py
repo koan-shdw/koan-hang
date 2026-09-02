@@ -1,126 +1,165 @@
-"""Writes level/level.json (format koan-hang-level/2) from the scan measurements and the owner's walk-through
-answers of 2026-09-02. Metres, y up, the de-rotated scan frame.
-Wall a->b runs left->right as seen from the room. Openings: u from a, w width, bottom/h from the wall base.
- door: {type: slide|swing|metal, open: bool, toggle: bool}   window: {grid: {cols, bars:[heights], cross:[col..]}, frame}
-Owner facts (2026-09-02): back wall ground = two same-size doors, left slides (under the stairs), right at the bottom
-of the stairs, both open in the game, slide function. Glass fronts: ground = cross-bar window | door | three frames;
-second floor = cross-bar window | closed metal door | two windows. West window second floor = one grid six across,
-Tokyo street outside. South wall second floor: the glass carries on at the window end. Second floor: no rail, the same
-flight again up to an unused third floor. Plinth + desk removed."""
+"""Writes level/level.json (format koan-hang-level/3) from docs/CHECK-SHEET.md + the owner's answers (2026-09-02).
+Metres, y up, de-rotated scan frame. z south(-) to north(+), x west(-) to east(+).
+Wall a->b runs left->right as seen from the room. Opening u from a, w width, bottom/h from the wall base.
+Owner answers folded in: both back doors 85x200, open, sliders on the stair side sliding under the flight in the 15 cm gap
+between wall and stringer; the whole back (west) wall is ONE window grid on every floor, six columns, a bar a metre up;
+ground floor south end of that wall = steel street door (recessed, metal panel above) + corrugated panel with the gas meter;
+front glass: 4 panes | door 85 hinged north open | fixed pane | 2 panes, X in pane 2, bars 0.9 and 1.65;
+second floor east: X window 2 panes | wall | steel door + panel | wall | 2-pane window; side walls plain;
+third floor = copy of the second, no stairs up; stairs: checker-plate treads, plywood risers, blue stringers."""
 import json
 
-G0, G1 = -5.50, -2.29   # ground floor, ground ceiling
-F0, F1 = -2.14, 0.84    # second floor (id "first"), its ceiling
-T0 = 0.99               # third floor level (unused): F1 + 0.15 slab
-E, S, N, SW = 0.22, -2.42, 2.72, -5.89
-W = -7.06               # west face, both floors (scan)
-WG = W
-SWH = -6.04             # hallway face of the stair wall (0.15 thick); on the second floor the same slab carries on as flight 2's side wall
-STAIR_X = round((W + SWH) / 2, 3); STAIR_W = round(SWH - W - 0.02, 2)
-GH, FH = G1 - G0, F1 - F0
+G0, G1 = -5.54, -2.30
+F0, F1 = -2.14, 0.84
+T0, T1 = 0.99, 3.97
+W = -7.08                 # back wall of the building (the big window), all floors
+SW, SWH = -5.87, -6.01    # gallery back wall: room face, hallway face
+E = 0.22
+SG, NG = -2.37, 2.72      # ground floor south / north
+SF, NF = -2.44, 2.69      # second + third floor south / north
+GH, FH, TH = G1 - G0, F1 - F0, T1 - T0
+GAP = 0.15                # slider gap between the hallway face and the stringer
+STAIR_W = round(SWH - GAP - W, 2)          # 0.92
+STAIR_X = round(W + STAIR_W / 2, 3)        # centre
+PITCH = round((NG - SG) / 6, 3)            # six columns across the back window
 GREY, BLACK = "steel-grey", "steel-black"
 
 def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), hang=True, material="wall-white", note=None):
-    d = dict(id=id, name=name, level=level, a=a, b=b, baseY=baseY, topY=topY, thickness=0.15, facing=facing,
+    d = dict(id=id, name=name, level=level, a=a, b=b, baseY=baseY, topY=topY, thickness=0.14, facing=facing,
              openings=list(openings), noHang=list(noHang), hang=hang, material=material)
     if note: d["note"] = note
     return d
-def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False, frame=True, hinge="a"):
-    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf, face=face, swingOut=swingOut, frame=frame, hinge=hinge))
-def window(u, w, bottom, h, cols, bars, frame, cross=()):
-    return dict(kind="window", u=u, w=w, bottom=bottom, h=h, grid=dict(cols=cols, bars=list(bars), cross=list(cross)), frame=frame)
+def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False, frame=True, hinge="a",
+         jambW=0.05, frameMaterial=None, panelAbove=0.0, recess=0.0, leafH=None):
+    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf, face=face,
+                swingOut=swingOut, frame=frame, hinge=hinge, jambW=jambW, frameMaterial=frameMaterial, panelAbove=panelAbove,
+                recess=recess, leafH=leafH))
+def window(u, w, bottom, h, frame, uprights=(), bars=(), cross=(), crossAll=False):
+    return dict(kind="window", u=u, w=w, bottom=bottom, h=h, frame=frame,
+                grid=dict(uprights=list(uprights), bars=list(bars), cross=list(cross), crossAll=crossAll))
+def panel(u, w, bottom, h, material):
+    return dict(kind="panel", u=u, w=w, bottom=bottom, h=h, material=material)
 
+def back_window(base, top, u0, u1, origin_u):
+    """the big back window: uprights on the shared pitch measured from the south corner (origin_u = u of the ground south corner)"""
+    ups = []
+    k = 1
+    while origin_u - k * PITCH > u0 + 0.05 or origin_u + k * PITCH < u1 - 0.05:
+        for u in (origin_u - k * PITCH, origin_u + k * PITCH):
+            if u0 + 0.05 < u < u1 - 0.05: ups.append(round(u - u0, 3))
+        k += 1
+        if k > 12: break
+    return window(u0, round(u1 - u0, 3), 0.10, round(top - base - 0.20, 3), BLACK, uprights=sorted(ups), bars=[1.0])
+
+# ---------------- ground ----------------
+# back wall of the building (west), hallway side. a at NG (north) so u = NG - z. Column origin = the south corner (u = NG - SG).
+g_west_openings = [
+    back_window(G0, G1, 0.0, round(NG - (-1.15), 3), round(NG - SG, 3)),                  # window from the north corner to the door
+    door(round(NG - (-1.15), 3), 0.80, 2.05, "metal", False, toggle=False, face="steel", recess=0.10, panelAbove=round(GH - 2.05, 3)),
+    panel(round(NG - (-1.95), 3), round(-1.95 - SG, 3), 0.0, GH, "corrugated"),            # corrugated panel with the gas meter, south of the door
+]
 walls = [
-    # ---------------- ground ----------------
-    wall("g-west", "hallway west, windows behind the stair", "ground", [WG, N], [WG, S], "+x", G0, G1, hang=False, material="wall-blue",
-         openings=[window(0.10, 4.12, 0.30, GH - 0.45, 5, [1.0, 2.1], GREY),
-                   door(4.22, 0.80, 2.10, "metal", False, toggle=False),
-                   window(4.22, 0.80, 2.15, GH - 2.20, 1, [], GREY)],
-         note="owner: one big grey-framed window from the north corner to the steel street door opposite the south doorway, pane over the door"),
-    wall("g-stair-room", "back wall (stair wall), room side", "ground", [SW, N], [SW, S], "+x", G0, G1,
-         openings=[door(0.12, 0.80, 2.00, "slide", True, leaf=False, frame=False), door(4.34, 0.80, 2.00, "slide", True, leaf=False, frame=False)],
-         note="two same-size doors: left (north) slides, goes under the stairs; right (south) at the bottom of the stairs; leaves live on the hallway side (g-stair-hall)"),
-    wall("g-stair-hall", "back wall, hallway side", "ground", [SWH, S], [SWH, N], "-x", G0, G1, hang=False, material="wall-blue",
-         openings=[door(0.00, 0.80, 2.00, "slide", True, frame=False), door(4.22, 0.80, 2.00, "slide", True, frame=False)]),
-    wall("g-east", "glass front", "ground", [E, S], [E, N], "-x", G0, G1, hang=False,
-         openings=[window(0.10, 2.17, 0, GH, 3, [1.0], GREY, cross=[1]),
-                   door(2.32, 1.15, GH - 0.12, "swing", True, toggle=True, face="steel", swingOut=True, hinge="b"),
-                   window(3.52, 1.57, 0, GH, 3, [1.0], GREY)],
-         note="owner: cross-bar window | grey steel door standing open into the courtyard | three frames; one grey steel grid, bar at ~1 m"),
-    wall("g-south", "south", "ground", [WG, S], [E, S], "+z", G0, G1,
-         openings=[door(0.00, 1.17, 2.10, "swing", False, toggle=False)], note="hallway end = street door, closed"),
-    wall("g-north", "north", "ground", [E, N], [WG, N], "-z", G0, G1),
-    # courtyard: scan-only in v1, rebuilt plain in v2; no hanging
+    wall("g-west", "back wall of the building, ground (window, street door, meter panel)", "ground", [W, NG], [W, SG], "+x", G0, G1,
+         hang=False, openings=g_west_openings),
+    wall("g-stair-room", "gallery back wall, room side", "ground", [SW, NG], [SW, SG], "+x", G0, G1,
+         openings=[door(round(NG - 2.60, 3), 0.85, 2.00, "slide", True, leaf=False, frame=False),
+                   door(round(NG - (-1.52), 3), 0.85, 2.00, "slide", True, leaf=False, frame=False)],
+         note="two identical doors 85x200: left (north) and right (south, at the stair foot); leaves live on the hallway face"),
+    wall("g-stair-hall", "gallery back wall, hallway side", "ground", [SWH, SG], [SWH, NG], "-x", G0, G1, hang=False,
+         openings=[door(round(-1.52 - SG - 0.85, 3), 0.85, 2.00, "slide", True, frame=False),   # south door, leaf slides north
+                   door(round(1.75 - SG, 3), 0.85, 2.00, "slide", True, frame=False)]),          # north door, leaf slides south
+    wall("g-east", "glass front", "ground", [E, SG], [E, NG], "-x", G0, G1, hang=False,
+         openings=[window(0.07, round(0.25 - SG - 0.07, 3), 0, GH, GREY, uprights=[round(-1.55 - SG - 0.07, 3), round(-0.87 - SG - 0.07, 3), round(-0.15 - SG - 0.07, 3)], bars=[0.9], cross=[1]),
+                   door(round(0.40 - SG, 3), 0.85, round(GH - 0.05, 3), "swing", True, toggle=True, face="steel", swingOut=True, hinge="b",
+                        jambW=0.10, frameMaterial="wood-dark", leafH=round(GH - 0.05, 3)),
+                   window(round(1.35 - SG, 3), round(NG - 1.35, 3), 0, GH, GREY, uprights=[round(1.85 - 1.35, 3), round(2.40 - 1.35, 3)], bars=[0.9, 1.65])],
+         note="4 panes | jamb post | door 85 hinged north, open, full height | fixed pane | 2 panes; X in pane 2"),
+    wall("g-south", "south", "ground", [W, SG], [E, SG], "+z", G0, G1),
+    wall("g-north", "north", "ground", [E, NG], [W, NG], "-z", G0, G1),
+    # courtyard (plain for now, textures later)
     wall("c-1", "courtyard fence south", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
     wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
     wall("c-3", "courtyard low wall north", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
     wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
     wall("c-5", "courtyard low wall south", "ground", [0.60, -3.12], [4.39, -3.12], "+z", G0, -2.30, hang=False, material="concrete"),
     wall("c-6", "neighbour wall north", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
-    # ---------------- second floor (id "first") ----------------
-    wall("f-west", "west, big window", "first", [W, N], [W, S], "+x", F0, F1, hang=False,
-         openings=[window(0.17, 4.80, 0.25, 2.45, 6, [1.0, 2.1], BLACK)],
-         note="one black grid six across, Tokyo street outside"),
-    wall("f-east", "east glass", "first", [E, S], [E, N], "-x", F0, F1, hang=False,
-         openings=[window(0.10, 1.20, 0, FH, 1, [1.0, 2.1], BLACK, cross=[0]),
-                   door(2.00, 0.90, 2.10, "metal", False, toggle=False, face="mesh"),
-                   window(3.35, 1.69, 0, FH, 2, [1.0, 2.1], BLACK)],
-         note="owner: cross-bar window | closed metal door | two windows"),
-    wall("f-south", "south", "first", [W, S], [E, S], "+z", F0, F1),
-    wall("f-north", "north", "first", [E, N], [W, N], "-z", F0, F1),
 ]
+# ---------------- second + third (identical) ----------------
+def upper(level, base, top, tag):
+    H = top - base
+    return [
+        wall(f"{tag}-west", "back window wall", level, [W, NF], [W, SF], "+x", base, top, hang=False,
+             openings=[back_window(base, top, 0.0, round(NF - SF, 3), round(NF - SG, 3))]),
+        wall(f"{tag}-east", "east glass", level, [E, SF], [E, NF], "-x", base, top, hang=False,
+             openings=[window(0.05, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0], crossAll=True),
+                       door(2.05, 0.90, 2.05, "metal", False, toggle=False, face="mesh", panelAbove=round(H - 2.05, 3)),
+                       window(3.55, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0])],
+             note="X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"),
+        wall(f"{tag}-south", "south (stair side wall)", level, [W, SF], [E, SF], "+z", base, top),
+        wall(f"{tag}-north", "north", level, [E, NF], [W, NF], "-z", base, top),
+    ]
+walls += upper("first", F0, F1, "f") + upper("third", T0, T1, "t")
+
+def strip_polys(level, floor_name, room_s, room_n, has_foot, has_landing):
+    out = [dict(level=level, name=f"{floor_name} room", poly=[[SW, room_s], [E, room_s], [E, room_n], [SW, room_n]], material="concrete-bare")]
+    if has_landing: out.append(dict(level=level, name=f"{floor_name} landing", poly=[[W, 1.90], [SW, 1.90], [SW, room_n], [W, room_n]], material="concrete-bare"))
+    if has_foot: out.append(dict(level=level, name=f"{floor_name} stair foot", poly=[[W, room_s], [SW, room_s], [SW, -1.87], [W, -1.87]], material="concrete-bare"))
+    return out
 
 level = dict(
-    format="koan-hang-level/2",
+    format="koan-hang-level/3",
     eyeHeight=1.60,
     spawn=dict(level="ground", x=-2.8, z=0.1, yawDeg=90),
     levels=[dict(id="ground", name="ground", floorY=G0, ceilY=G1),
-            dict(id="first", name="second", floorY=F0, ceilY=F1)],
+            dict(id="first", name="second", floorY=F0, ceilY=F1),
+            dict(id="third", name="third", floorY=T0, ceilY=T1)],
     floors=[
-        dict(level="ground", name="room", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="concrete-polished"),
-        dict(level="ground", name="hallway", poly=[[WG, S], [SW, S], [SW, N], [WG, N]], material="concrete-polished"),  # runs to the room face so the doorways have floor
+        dict(level="ground", name="gallery", poly=[[SW, SG], [E, SG], [E, NG], [SW, NG]], material="concrete-polished"),
+        dict(level="ground", name="hallway", poly=[[W, SG], [SW, SG], [SW, NG], [W, NG]], material="concrete-grey"),
         dict(level="ground", name="courtyard", poly=[[E, -4.49], [6.84, -4.49], [6.84, 3.62], [E, 3.62]], material="stone-tiles"),
-        dict(level="first", name="room", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="concrete-bare"),
-        dict(level="first", name="landing", poly=[[W, 1.7], [SW, 1.7], [SW, N], [W, N]], material="concrete-bare"),
-        dict(level="first", name="stair foot", poly=[[W, S], [SW, S], [SW, -1.9], [W, -1.9]], material="concrete-bare"),
-    ],
+    ] + strip_polys("first", "second", SF, NF, True, True) + strip_polys("third", "third", SF, NF, False, True),
     ceilings=[
-        dict(level="ground", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="corrugated-ceiling"),
-        dict(level="ground", poly=[[WG, S], [SWH, S], [SWH, -1.9], [WG, -1.9]], material="corrugated-ceiling"),  # only over the stair foot; the flight's underside is the ceiling beyond
-        dict(level="first", poly=[[SW, S], [E, S], [E, N], [SW, N]], material="corrugated-ceiling"),
-        dict(level="first", poly=[[W, S], [SW, S], [SW, -1.9], [W, -1.9]], material="corrugated-ceiling"),
-        dict(level="first", poly=[[W, 1.2], [SW, 1.2], [SW, 1.7], [W, 1.7]], material="corrugated-ceiling"),  # third-floor slab over the blocked top of flight 2
-        dict(level="first", poly=[[W, 1.7], [SW, 1.7], [SW, N], [W, N]], material="corrugated-ceiling"),
+        dict(level="ground", poly=[[SW, SG], [E, SG], [E, NG], [SW, NG]], material="corrugated-ceiling"),
+        dict(level="ground", poly=[[W, SG], [SW, SG], [SW, -1.87], [W, -1.87]], material="corrugated-ceiling"),
+        dict(level="first", poly=[[SW, SF], [E, SF], [E, NF], [SW, NF]], material="corrugated-ceiling"),
+        dict(level="first", poly=[[W, SF], [SW, SF], [SW, -1.87], [W, -1.87]], material="corrugated-ceiling"),
+        dict(level="first", poly=[[W, 1.90], [SW, 1.90], [SW, NF], [W, NF]], material="corrugated-ceiling"),
+        dict(level="third", poly=[[W, SF], [E, SF], [E, NF], [W, NF]], material="corrugated-ceiling"),
     ],
     walls=walls,
     stairs=[
-        dict(id="s1", level="ground", to="first", **{"from": [STAIR_X, -1.9]}, dir="+z", width=STAIR_W, run=3.6,
-             bottomY=G0, topY=F0, treads=16, riser=round((F0 - G0) / 17, 3), tread=0.225, nosing=0.03,
-             material="stair-wood"),
-        dict(id="s2", level="first", to=None, topBlocked=0.9, **{"from": [STAIR_X, -1.9]}, dir="+z", width=STAIR_W, run=3.6,
-             bottomY=F0, topY=T0, treads=16, riser=round((T0 - F0) / 17, 3), tread=0.225, nosing=0.03,
-             material="stair-wood", sideWall=dict(side="+x", height=0.9, thickness=0.15, material="wall-white"),
-             note="same flight again, up to the unused third floor; blocked near the top; the blue side wall is the diagonal band in the west window photo"),
+        dict(id="s1", level="ground", to="first", **{"from": [STAIR_X, -1.87]}, dir="+z", width=STAIR_W, run=3.77,
+             bottomY=G0, topY=F0, treads=16, riser=round((F0 - G0) / 17, 3), tread=0.222, nosing=0.0,
+             treadMaterial="checker", riserMaterial="plywood", stringers=dict(height=0.25, thickness=0.03, material="stringer-blue")),
+        dict(id="s2", level="first", to="third", **{"from": [STAIR_X, -1.87]}, dir="+z", width=STAIR_W, run=3.77,
+             bottomY=F0, topY=T0, treads=16, riser=round((T0 - F0) / 17, 3), tread=0.222, nosing=0.0,
+             treadMaterial="checker", riserMaterial="plywood", stringers=dict(height=0.25, thickness=0.03, material="stringer-blue"),
+             sideWall=dict(side="+x", height=0.9, thickness=0.14, material="wall-white")),
     ],
     blockers=[],
     objects=[
         dict(kind="ribs", level="ground", dir="+x", pitch=0.15, depth=0.05, width=0.06),
         dict(kind="ribs", level="first", dir="+x", pitch=0.15, depth=0.05, width=0.06),
-        dict(kind="light", level="ground", at=[-4.6, -1.2], size=[1.2, 0.08]), dict(kind="light", level="ground", at=[-2.6, -1.2], size=[1.2, 0.08]),
-        dict(kind="light", level="ground", at=[-0.8, -1.2], size=[1.2, 0.08]), dict(kind="light", level="ground", at=[-4.6, 1.4], size=[1.2, 0.08]),
-        dict(kind="light", level="ground", at=[-2.6, 1.4], size=[1.2, 0.08]), dict(kind="light", level="ground", at=[-0.8, 1.4], size=[1.2, 0.08]),
-        dict(kind="light", level="first", at=[-4.6, -1.2], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-2.6, -1.2], size=[1.2, 0.08]),
-        dict(kind="light", level="first", at=[-0.8, -1.2], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-4.6, 1.4], size=[1.2, 0.08]),
-        dict(kind="light", level="first", at=[-2.6, 1.4], size=[1.2, 0.08]), dict(kind="light", level="first", at=[-0.8, 1.4], size=[1.2, 0.08]),
-        dict(kind="light", level="ground", at=[-6.55, -2.15], size=[0.8, 0.08]),
-        dict(kind="light", level="ground", at=[-6.55, 0.6], size=[0.0, 0.0], y=-3.4),
-        dict(kind="light", level="ground", at=[-6.55, 2.3], size=[0.0, 0.0], y=-2.6),
+        dict(kind="ribs", level="third", dir="+x", pitch=0.15, depth=0.05, width=0.06),
+    ] + [dict(kind="light", level=lv, at=[x, z], size=[1.2, 0.08]) for lv in ("ground", "first", "third") for x in (-4.6, -2.6, -0.8) for z in (-1.2, 1.4)] + [
+        dict(kind="light", level="ground", at=[STAIR_X, -2.1], size=[0.6, 0.08]),
+        dict(kind="light", level="ground", at=[STAIR_X, 0.6], size=[0, 0], y=-3.4),
+        dict(kind="light", level="ground", at=[STAIR_X, 2.3], size=[0, 0], y=-2.6),
+        dict(kind="light", level="first", at=[STAIR_X, 0.6], size=[0, 0], y=-0.1),
         dict(kind="aircon", level="ground", at=[-2.4, 0.4], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="first", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
+        dict(kind="aircon", level="third", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
+        # gas meter, boxes, pipes on the corrugated panel (wall g-west, u from the north corner)
+        dict(kind="wallbox", wall="g-west", u=round(NG - (-2.16), 3), y=2.05, w=0.30, h=0.40, d=0.18, material="meter-box"),
+        dict(kind="wallbox", wall="g-west", u=round(NG - (-2.05), 3), y=1.55, w=0.22, h=0.18, d=0.10, material="junction-box"),
+        dict(kind="wallbox", wall="g-west", u=round(NG - (-2.25), 3), y=1.40, w=0.10, h=0.14, d=0.06, material="junction-box"),
+        dict(kind="pipe", wall="g-west", u=round(NG - (-2.10), 3), y0=0.05, y1=1.85, r=0.02, d=0.05, material="pipe-white"),
+        dict(kind="pipe", wall="g-west", u=round(NG - (-2.28), 3), y0=0.05, y1=2.60, r=0.015, d=0.05, material="pipe-white"),
         dict(kind="slab", name="corridor over the courtyard", box=[[E, F0 - 0.15, 0.0], [6.0, F0, 2.0]], material="concrete"),
         dict(kind="slab", name="courtyard roof edge", box=[[E, F1, -4.49], [6.84, F1 + 0.15, 3.62]], material="corrugated"),
     ],
-    source=dict(made="level/make_level.py 2026-09-02 v2", from_="scan measurements + owner walk-through answers"),
+    sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),
+    source=dict(made="level/make_level.py v3 2026-09-02", from_="docs/CHECK-SHEET.md + owner answers"),
 )
 json.dump(level, open("level/level.json", "w"), indent=1)
-print("wrote level/level.json:", len(walls), "walls,", len(level["objects"]), "objects")
+print("wrote level/level.json:", len(walls), "walls,", len(level["objects"]), "objects; stair width", STAIR_W, "centre", STAIR_X, "pitch", PITCH)

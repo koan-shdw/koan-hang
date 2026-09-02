@@ -5,7 +5,7 @@ import { join, resolve, extname } from 'node:path'
 // The repo's data folders (level/, art/, layouts/) are served under /data/ in dev
 // and copied into dist/data/ at build. scan.clean.glb (the 12 MB compress input) is skipped.
 const ROOT = resolve(__dirname, '..')
-const DATA_DIRS = ['level', 'art', 'layouts']
+const DATA_DIRS = ['level', 'art', 'layouts', 'textures']
 const SKIP = new Set(['scan.clean.glb', 'make_level.py'])
 const MIME: Record<string, string> = { '.json': 'application/json', '.glb': 'model/gltf-binary', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' }
 

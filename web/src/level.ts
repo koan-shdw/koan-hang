@@ -1,13 +1,17 @@
-// The level: level.json v2 types, loading, and the clean geometry built from it at runtime (SPEC v2 s4).
-// Walls with openings, window grids, doors (slide / swing / metal) with runtime state, floors, ceilings,
-// stairs with treads + nosings + underside, ribs, lights, aircon, slabs. No scan.
+// The level: level.json v3 types, loading, and the clean geometry built from it at runtime (SPEC v2 s4).
+// Walls with openings (windows with grids, doors with leaves and runtime state, panels), floors, ceilings, stairs with
+// checker treads / plywood risers / blue stringers, ribs, lights, aircon, wall boxes, pipes, slabs. No scan.
 import * as THREE from 'three'
 
 export type Facing = '+x' | '-x' | '+z' | '-z'
 export type Dir = Facing
-export interface DoorSpec { type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean; face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean; frame?: boolean; hinge?: 'a' | 'b' }
-export interface GridSpec { cols: number; bars: number[]; cross: number[] }
-export interface Opening { kind: 'door' | 'window'; u: number; w: number; bottom: number; h: number; door?: DoorSpec; grid?: GridSpec; frame?: string }
+export interface DoorSpec {
+  type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean
+  face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean; frame?: boolean; hinge?: 'a' | 'b'
+  jambW?: number; frameMaterial?: string | null; panelAbove?: number; recess?: number; leafH?: number | null
+}
+export interface GridSpec { uprights?: number[]; cols?: number; bars: number[]; cross: number[]; crossAll?: boolean }
+export interface Opening { kind: 'door' | 'window' | 'panel'; u: number; w: number; bottom: number; h: number; door?: DoorSpec; grid?: GridSpec; frame?: string; material?: string }
 export interface Wall {
   id: string; name: string; level: string
   a: [number, number]; b: [number, number]
@@ -18,7 +22,9 @@ export interface Wall {
 export interface Surface { level: string; name?: string; poly: [number, number][]; material?: string }
 export interface Stair {
   id: string; level: string; to: string | null; topBlocked?: number; from: [number, number]; dir: Dir
-  width: number; run: number; bottomY: number; topY: number; treads: number; riser: number; tread: number; nosing?: number; material?: string
+  width: number; run: number; bottomY: number; topY: number; treads: number; riser: number; tread: number; nosing?: number
+  material?: string; treadMaterial?: string; riserMaterial?: string
+  stringers?: { height: number; thickness: number; material?: string }
   sideWall?: { side: Facing; height: number; thickness?: number; material?: string }
 }
 export interface Blocker { level: string; poly: [number, number][] }
@@ -27,6 +33,8 @@ export type LevelObject =
   | { kind: 'light'; level: string; at: [number, number]; size: [number, number]; y?: number }
   | { kind: 'aircon'; level: string; at: [number, number]; size: [number, number, number] }
   | { kind: 'slab'; name?: string; box: [[number, number, number], [number, number, number]]; material?: string }
+  | { kind: 'wallbox'; wall: string; u: number; y: number; w: number; h: number; d: number; material?: string }
+  | { kind: 'pipe'; wall: string; u: number; y0: number; y1: number; r: number; d: number; material?: string }
 export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number }
 export interface Level {
   format: string
@@ -39,13 +47,14 @@ export interface Level {
   stairs: Stair[]
   blockers: Blocker[]
   objects: LevelObject[]
+  sky?: { file?: string; fallback?: string }
 }
 
 export async function loadLevel(url: string): Promise<Level> {
   const r = await fetch(url)
   if (!r.ok) throw new Error(`level.json: ${r.status} ${r.statusText}`)
   const lv = (await r.json()) as Level
-  if (lv.format !== 'koan-hang-level/2') throw new Error(`level.json: unknown format ${lv.format}`)
+  if (lv.format !== 'koan-hang-level/3') throw new Error(`level.json: unknown format ${lv.format}`)
   lv.ceilings ??= []; lv.blockers ??= []; lv.objects ??= []
   for (const w of lv.walls) for (const o of w.openings) if (o.kind === 'door' && !o.door) o.door = { type: 'swing', open: true, toggle: false, leaf: false }
   return lv
@@ -106,24 +115,32 @@ export function wallPoint(w: Wall, u: number, y: number, d = 0): THREE.Vector3 {
   return new THREE.Vector3(w.a[0] + dx * u + nx * d, y, w.a[1] + dz * u + nz * d)
 }
 
-// ---- materials (P2: plain tints; P3 swaps these for baked textures by name) -----------
+// ---- materials (plain tints now; P3 swaps these for baked textures by name) -----------
 const PALETTE: Record<string, { color: number; rough?: number; metal?: number; opacity?: number; emissive?: number }> = {
   'wall-white': { color: 0xf2f2ee, rough: 0.95 },
   'wall-blue': { color: 0x8d9ab5, rough: 0.9 },
   'concrete-polished': { color: 0xb8b3a8, rough: 0.6 },
   'concrete-bare': { color: 0xa9a6a0, rough: 0.95 },
+  'concrete-grey': { color: 0x8e8f8d, rough: 0.8 },
   'stone-tiles': { color: 0x9c9a94, rough: 0.95 },
   'corrugated-ceiling': { color: 0xd9d7d2, rough: 0.7, metal: 0.2 },
   'corrugated': { color: 0xc9c8c4, rough: 0.6, metal: 0.4 },
   'concrete': { color: 0xa0a0a0, rough: 0.95 },
   'render': { color: 0xb5aaa0, rough: 0.95 },
   'stair-wood': { color: 0xc49a5a, rough: 0.7 },
+  'plywood': { color: 0x9c6a3c, rough: 0.8 },
+  'checker': { color: 0x8f9296, rough: 0.45, metal: 0.7 },
+  'stringer-blue': { color: 0x2f4f8f, rough: 0.6, metal: 0.3 },
   'stair-nosing': { color: 0x8f9296, rough: 0.5, metal: 0.6 },
   'steel-grey': { color: 0x6e7076, rough: 0.5, metal: 0.6 },
   'steel-black': { color: 0x1c1c1e, rough: 0.5, metal: 0.5 },
+  'wood-dark': { color: 0x6b4a2b, rough: 0.8 },
   'glass': { color: 0xa8c8e8, rough: 0.1, metal: 0.1, opacity: 0.18 },
   'door-slide': { color: 0xe8e8e4, rough: 0.8 },
   'door-metal': { color: 0x8a8c8f, rough: 0.5, metal: 0.5 },
+  'meter-box': { color: 0xf0f0ec, rough: 0.6 },
+  'junction-box': { color: 0x9a9c9e, rough: 0.6, metal: 0.3 },
+  'pipe-white': { color: 0xe6e6e2, rough: 0.6 },
   'light': { color: 0xffffff, emissive: 0xfff2d8 },
   'aircon': { color: 0xf4f4f2, rough: 0.6, emissive: 0x3a3a38 },
   'rib': { color: 0xc8c6c0, rough: 0.6, metal: 0.3 },
@@ -152,21 +169,19 @@ function bbox(poly: [number, number][]): { x0: number; x1: number; z0: number; z
   for (const [x, z] of poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z) }
   return { x0, x1, z0, z1 }
 }
-/** a box of size (alongWall, height, depth) placed on a wall at u (centre), y (centre), d (centre offset from the face, + = into the room) */
+/** a box of size (alongWall, height, depth) on a wall at u (centre), y (centre), d (centre offset from the face, + = into the room) */
 function wallBox(w: Wall, len: number, h: number, depth: number, u: number, y: number, d: number, material: string): THREE.Mesh {
   const [dx, dz] = wallDir(w)
-  const g = new THREE.BoxGeometry(len, h, depth)
-  const m = new THREE.Mesh(g, mat(material))
+  const m = new THREE.Mesh(new THREE.BoxGeometry(len, h, depth), mat(material))
   m.rotation.y = Math.atan2(-dz, dx)
-  const p = wallPoint(w, u, y, d); m.position.copy(p)
+  m.position.copy(wallPoint(w, u, y, d))
   return m
 }
 
 export interface DoorRuntime {
-  id: string; wall: Wall; opening: Opening; open: boolean; t: number // t: 0 closed .. 1 open
+  id: string; wall: Wall; opening: Opening; open: boolean; t: number
   pivot: THREE.Object3D; type: DoorSpec['type']; slideDir: 1 | -1
 }
-
 export interface Built { group: THREE.Group; wire: THREE.Group; doors: DoorRuntime[]; lights: THREE.PointLight[] }
 
 export function buildLevel(lv: Level): Built {
@@ -175,12 +190,13 @@ export function buildLevel(lv: Level): Built {
   const wireMat = new THREE.LineBasicMaterial({ color: 0x00ff9f, transparent: true, opacity: 0.6 })
   const doors: DoorRuntime[] = []
   const lights: THREE.PointLight[] = []
+  const wallById = new Map(lv.walls.map((w) => [w.id, w]))
   const addWire = (g: THREE.BufferGeometry, m: THREE.Mesh) => { const l = new THREE.LineSegments(new THREE.EdgesGeometry(g, 30), wireMat); l.position.copy(m.position); l.rotation.copy(m.rotation); wire.add(l) }
 
-  // walls: columns between openings, boxes below/above each opening
   for (const w of lv.walls) {
     const L = wallLength(w), H = w.topY - w.baseY, t = w.thickness
     const material = w.material ?? 'wall-white'
+    // wall columns between openings; boxes below / above each opening
     const cuts = [0, L]
     for (const o of w.openings) cuts.push(Math.max(0, o.u), Math.min(L, o.u + o.w))
     cuts.sort((p, q) => p - q)
@@ -197,73 +213,75 @@ export function buildLevel(lv: Level): Built {
         m.userData.wall = w.id; group.add(m); addWire(m.geometry, m)
       }
     }
-    // openings: window grids, door frames + leaves
     for (const o of w.openings) {
       const uc = o.u + o.w / 2, yc = w.baseY + o.bottom + o.h / 2
-      if (o.kind === 'window') {
+      if (o.kind === 'panel') {
+        group.add(wallBox(w, o.w, o.h, t, uc, yc, -t / 2, o.material ?? 'corrugated'))
+      } else if (o.kind === 'window') {
         const frame = o.frame ?? 'steel-grey', bar = 0.05, deep = 0.08
-        // outer frame
         group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + bar / 2, -t / 2, frame))
         group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + o.h - bar / 2, -t / 2, frame))
         group.add(wallBox(w, bar, o.h, deep, o.u + bar / 2, yc, -t / 2, frame))
         group.add(wallBox(w, bar, o.h, deep, o.u + o.w - bar / 2, yc, -t / 2, frame))
-        const g = o.grid ?? { cols: 1, bars: [], cross: [] }
-        for (let c = 1; c < g.cols; c++) group.add(wallBox(w, bar, o.h, deep, o.u + (o.w * c) / g.cols, yc, -t / 2, frame))
+        const g = o.grid ?? { bars: [], cross: [] }
+        const ups: number[] = g.uprights ? g.uprights.slice() : []
+        if (!g.uprights && g.cols) for (let c = 1; c < g.cols; c++) ups.push((o.w * c) / g.cols)
+        for (const uu of ups) group.add(wallBox(w, bar, o.h, deep, o.u + uu, yc, -t / 2, frame))
         for (const hb of g.bars) if (hb > o.bottom && hb < o.bottom + o.h) group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + hb, -t / 2, frame))
-        // cross bars: an X in the listed columns, from the first bar (or bottom) to the top
-        const cw = o.w / g.cols
+        // cross bars: an X over a pane (index into the pane list) or over the whole opening
+        const edges = [0, ...ups.sort((p, q) => p - q), o.w]
         const lowest = g.bars.length ? Math.max(o.bottom, Math.min(...g.bars.filter((b) => b > o.bottom))) : o.bottom
-        for (const c of g.cross) {
-          const cu = o.u + cw * (c + 0.5), h = o.bottom + o.h - lowest, yy = w.baseY + lowest + h / 2
+        const crosses: [number, number][] = g.crossAll ? [[0, o.w]] : (g.cross ?? []).map((c) => [edges[c] ?? 0, edges[c + 1] ?? o.w])
+        for (const [c0, c1] of crosses) {
+          const cw = c1 - c0, cu = o.u + c0 + cw / 2, h = o.bottom + o.h - lowest, yy = w.baseY + lowest + h / 2
           const len = Math.hypot(cw, h), ang = Math.atan2(h, cw)
-          for (const sgn of [1, -1]) {
-            const m = wallBox(w, len, 0.03, 0.03, cu, yy, -t / 2 + 0.06, frame)
-            m.rotateZ(sgn * ang); group.add(m)
-          }
+          for (const sgn of [1, -1]) { const m = wallBox(w, len, 0.03, 0.03, cu, yy, -t / 2 + 0.06, frame); m.rotateZ(sgn * ang); group.add(m) }
         }
-        // glass
         group.add(wallBox(w, o.w - bar, o.h - bar, 0.01, uc, yc, -t / 2, 'glass'))
       } else if (o.door) {
-        const frame = o.door.type === 'metal' ? 'steel-grey' : w.material === 'wall-blue' || w.level === 'ground' ? 'steel-grey' : 'steel-black'
-        const jamb = o.door.frame === false ? 0.005 : 0.05
-        if (o.door.frame !== false) {
-          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + jamb / 2, yc, -t / 2, frame))
-          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + o.w - jamb / 2, yc, -t / 2, frame))
-          group.add(wallBox(w, o.w, jamb, t + 0.04, uc, w.baseY + o.bottom + o.h - jamb / 2, -t / 2, frame))
+        const d = o.door
+        const frameM = d.frameMaterial ?? (d.type === 'metal' || w.level === 'ground' ? 'steel-grey' : 'steel-black')
+        const jamb = d.frame === false ? 0.005 : (d.jambW ?? 0.05)
+        const leafH = d.leafH ?? Math.min(o.h, 2.05)
+        if (d.frame !== false) {
+          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + jamb / 2, yc, -t / 2, frameM))
+          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + o.w - jamb / 2, yc, -t / 2, frameM))
+          group.add(wallBox(w, o.w, 0.05, t + 0.04, uc, w.baseY + o.bottom + o.h - 0.025, -t / 2, frameM))
         }
-        if (o.door.leaf) {
+        if (d.panelAbove && d.panelAbove > 0.01) {
+          // a metal panel filling the opening above the leaf
+          const ph = Math.min(d.panelAbove, o.h - leafH)
+          group.add(wallBox(w, o.w - jamb * 2, ph, 0.05, uc, w.baseY + o.bottom + leafH + ph / 2, -t / 2 - (d.recess ?? 0), 'door-metal'))
+        }
+        if (d.leaf) {
           const pivot = new THREE.Object3D()
-          const leafW = o.w - jamb * 2, leafH = o.h - jamb
-          let leaf: THREE.Mesh
-          if (o.door.type === 'slide') {
-            // leaf sits just in front of the wall face and slides along it, away from the nearer wall end
-            leaf = wallBox(w, leafW, leafH, 0.04, uc, w.baseY + o.bottom + leafH / 2, 0.05, 'door-slide')
-            pivot.add(leaf)
-          } else if (o.door.type === 'swing') {
-            // hinge at the u side; leaf rotates about the hinge into the room (glass door: frame + glass)
-            const hb = o.door.hinge === 'b' ? -1 : 1
-            const hinge = wallPoint(w, hb > 0 ? o.u + jamb : o.u + o.w - jamb, w.baseY + o.bottom, 0)
-            pivot.position.copy(hinge)
+          const leafW = o.w - jamb * 2
+          if (d.type === 'slide') {
+            pivot.add(wallBox(w, leafW, leafH - 0.01, 0.04, uc, w.baseY + o.bottom + (leafH - 0.01) / 2, 0.05, 'door-slide'))
+          } else if (d.type === 'swing') {
+            const hb = d.hinge === 'b' ? -1 : 1
+            pivot.position.copy(wallPoint(w, hb > 0 ? o.u + jamb : o.u + o.w - jamb, w.baseY + o.bottom, 0))
             const [dx, dz] = wallDir(w)
             pivot.rotation.y = Math.atan2(-dz, dx)
-            const lx = hb * leafW / 2 // leaf runs from the hinge toward the other jamb
-            if (o.door.face === 'glass') {
+            const lx = hb * leafW / 2
+            if (d.face === 'glass') {
               const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.04), mat('steel-grey')); fr.position.set(lx, leafH / 2, 0)
               const gl = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.16, leafH - 0.16, 0.01), mat('glass')); gl.position.set(lx, leafH / 2, 0)
-              pivot.add(fr, gl); leaf = fr
+              pivot.add(fr, gl)
             } else {
-              leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.05), mat('door-metal')); leaf.position.set(lx, leafH / 2, 0)
+              const leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.05), mat('door-metal')); leaf.position.set(lx, leafH / 2, 0)
               const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.12, 10), mat('steel-grey')); handle.rotation.z = Math.PI / 2; handle.position.set(hb * (leafW - 0.1), 1.0, 0.05)
               pivot.add(leaf, handle)
             }
           } else {
-            leaf = wallBox(w, leafW, leafH, 0.05, uc, w.baseY + o.bottom + leafH / 2, -t / 2, 'door-metal')
-            pivot.add(leaf)
-            if (o.door.face === 'mesh') pivot.add(wallBox(w, 0.18, leafH * 0.55, 0.06, uc, w.baseY + o.bottom + leafH * 0.55, -t / 2, 'steel-black')) // mesh window strip
+            pivot.add(wallBox(w, leafW, leafH, 0.05, uc, w.baseY + o.bottom + leafH / 2, -t / 2 - (d.recess ?? 0), 'door-metal'))
+            if (d.face === 'mesh') pivot.add(wallBox(w, 0.18, leafH * 0.55, 0.06, uc, w.baseY + o.bottom + leafH * 0.55, -t / 2 - (d.recess ?? 0), 'steel-black'))
+            const lock = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.03, 10), mat('steel-grey'))
+            lock.rotation.x = Math.PI / 2; lock.position.copy(wallPoint(w, o.u + o.w - 0.12, w.baseY + o.bottom + 1.0, -t / 2 - (d.recess ?? 0) + 0.04)); pivot.add(lock)
           }
           group.add(pivot)
           const slideDir: 1 | -1 = o.u + o.w / 2 < L / 2 ? 1 : -1
-          doors.push({ id: `${w.id}:${o.u.toFixed(2)}`, wall: w, opening: o, open: o.door.open, t: o.door.open ? 1 : 0, pivot, type: o.door.type, slideDir })
+          doors.push({ id: `${w.id}:${o.u.toFixed(2)}`, wall: w, opening: o, open: d.open, t: d.open ? 1 : 0, pivot, type: d.type, slideDir })
         }
       }
     }
@@ -277,40 +295,45 @@ export function buildLevel(lv: Level): Built {
     const g = polyShape(c.poly); g.translate(0, floorOf(lv, c.level).ceilY, 0)
     group.add(new THREE.Mesh(g, mat(c.material ?? 'corrugated-ceiling')))
   }
-  // stairs: treads with nosing, risers, a sloped underside slab
+  // stairs
   for (const s of lv.stairs) {
-    const r = stairRect(s), n = s.treads, rise = s.topY - s.bottomY, along = s.dir === '+z' || s.dir === '-z'
-    const stepRun = s.run / (n + 1), riser = rise / (n + 1), nos = s.nosing ?? 0.02
+    const r = stairRect(s), rise = s.topY - s.bottomY, along = s.dir === '+z' || s.dir === '-z'
+    const risers = s.treads + 1, stepRun = s.run / risers, riser = rise / risers, nos = s.nosing ?? 0
     const width = along ? r.x1 - r.x0 : r.z1 - r.z0
     const cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2
     const sgn = s.dir === '+z' || s.dir === '+x' ? 1 : -1
     const start = along ? (sgn > 0 ? r.z0 : r.z1) : (sgn > 0 ? r.x0 : r.x1)
-    for (let i = 0; i < n; i++) {
+    const treadM = s.treadMaterial ?? s.material ?? 'stair-wood', riserM = s.riserMaterial ?? s.material ?? 'stair-wood'
+    for (let i = 0; i < s.treads; i++) {
       const topY = s.bottomY + riser * (i + 1)
       const a0 = start + sgn * stepRun * i, a1 = start + sgn * stepRun * (i + 1)
-      const tread = new THREE.BoxGeometry(along ? width : stepRun + nos, 0.05, along ? stepRun + nos : width)
-      const nosing = new THREE.BoxGeometry(along ? width : 0.06, 0.02, along ? 0.06 : width)
-      const rz = new THREE.BoxGeometry(along ? width : 0.03, riser, along ? 0.03 : riser)
       const mid = (a0 + a1) / 2 - sgn * nos / 2
-      const tm = new THREE.Mesh(tread, mat(s.material ?? 'stair-wood'))
-      const nm = new THREE.Mesh(nosing, mat('stair-nosing'))
-      const rm = new THREE.Mesh(rz, mat(s.material ?? 'stair-wood'))
-      if (along) { tm.position.set(cx, topY - 0.025, mid); nm.position.set(cx, topY + 0.005, a1 + sgn * nos - sgn * 0.03); rm.position.set(cx, topY - riser / 2, a0) }
-      else { tm.position.set(mid, topY - 0.025, cz); nm.position.set(a1 + sgn * nos - sgn * 0.03, topY + 0.005, cz); rm.position.set(a0, topY - riser / 2, cz) }
-      group.add(tm, nm, rm)
+      const tm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : stepRun + nos, 0.04, along ? stepRun + nos : width), mat(treadM))
+      const rm = new THREE.Mesh(new THREE.BoxGeometry(along ? width : 0.03, riser, along ? 0.03 : riser), mat(riserM))
+      if (along) { tm.position.set(cx, topY - 0.02, mid); rm.position.set(cx, topY - riser / 2, a0) }
+      else { tm.position.set(mid, topY - 0.02, cz); rm.position.set(a0, topY - riser / 2, cz) }
+      group.add(tm, rm)
     }
-    // underside slab
+    // underside slab: top face on the tread line so the steps sit in it, no gaps
     const len = Math.hypot(s.run, rise), ang = Math.atan2(rise, s.run)
     const slab = new THREE.Mesh(new THREE.BoxGeometry(along ? width : len, 0.3, along ? len : width), mat('concrete'))
-    slab.position.set(cx, s.bottomY + rise / 2 - 0.15, cz) // top face on the tread line: the steps sit in it, no gaps
+    slab.position.set(cx, s.bottomY + rise / 2 - 0.15, cz)
     if (along) slab.rotation.x = -sgn * ang; else slab.rotation.z = sgn * ang
     group.add(slab)
-    // side wall (stringer wall): a sloped slab standing on the flight's edge, its top a set height above the tread line
+    // stringers: plates on both edges, standing a set height above the tread line
+    if (s.stringers) {
+      const st = s.stringers
+      for (const side of [-1, 1]) {
+        const pm = new THREE.Mesh(new THREE.BoxGeometry(along ? st.thickness : len, st.height + 0.3, along ? len : st.thickness), mat(st.material ?? 'stringer-blue'))
+        const off = side * (width / 2 - st.thickness / 2)
+        pm.position.set(along ? cx + off : cx, s.bottomY + rise / 2 + (st.height + 0.3) / 2 - 0.3, along ? cz : cz + off)
+        if (along) pm.rotation.x = -sgn * ang; else pm.rotation.z = sgn * ang
+        group.add(pm)
+      }
+    }
     if (s.sideWall) {
-      const sw = s.sideWall, th = sw.thickness ?? 0.15
-      const wallH = sw.height + 0.3
-      const wm = new THREE.Mesh(new THREE.BoxGeometry(along ? th : len, wallH, along ? len : th), mat(sw.material ?? 'wall-blue'))
-      // stands just outside the flight's edge, its top a set height above the tread line
+      const sw = s.sideWall, th = sw.thickness ?? 0.15, wallH = sw.height + 0.3
+      const wm = new THREE.Mesh(new THREE.BoxGeometry(along ? th : len, wallH, along ? len : th), mat(sw.material ?? 'wall-white'))
       const off = { '+x': [r.x1 + th / 2, cz], '-x': [r.x0 - th / 2, cz], '+z': [cx, r.z1 + th / 2], '-z': [cx, r.z0 - th / 2] }[sw.side]
       wm.position.set(off[0], s.bottomY + rise / 2 + wallH / 2 - 0.3, off[1])
       if (along) wm.rotation.x = -sgn * ang; else wm.rotation.z = sgn * ang
@@ -351,6 +374,13 @@ export function buildLevel(lv: Level): Built {
       const [p0, p1] = o.box
       const m = new THREE.Mesh(new THREE.BoxGeometry(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]), mat(o.material ?? 'concrete'))
       m.position.set((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, (p0[2] + p1[2]) / 2); group.add(m)
+    } else if (o.kind === 'wallbox') {
+      const w = wallById.get(o.wall); if (!w) continue
+      group.add(wallBox(w, o.w, o.h, o.d, o.u, w.baseY + o.y, o.d / 2, o.material ?? 'junction-box'))
+    } else if (o.kind === 'pipe') {
+      const w = wallById.get(o.wall); if (!w) continue
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(o.r, o.r, o.y1 - o.y0, 10), mat(o.material ?? 'pipe-white'))
+      m.position.copy(wallPoint(w, o.u, w.baseY + (o.y0 + o.y1) / 2, o.d)); group.add(m)
     }
   }
   return { group, wire, doors, lights }
@@ -369,7 +399,6 @@ export function updateDoors(doors: DoorRuntime[], dt: number): void {
     } else if (d.type === 'swing') {
       const [dx, dz] = wallDir(d.wall), [nx, nz] = facingNormal(d.wall.facing)
       const base = Math.atan2(-dz, dx)
-      // rotating the leaf by +90 deg about y sends its free end along (dz, -dx); pick the sign that points into the room, or out
       const hb = d.opening.door?.hinge === 'b' ? -1 : 1
       const dot = hb * (dz * nx - dx * nz)
       const sign = (d.opening.door?.swingOut ? -1 : 1) * (dot > 0 ? 1 : -1)

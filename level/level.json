@@ -1,5 +1,5 @@
 {
- "format": "koan-hang-level/2",
+ "format": "koan-hang-level/3",
  "eyeHeight": 1.6,
  "spawn": {
   "level": "ground",
@@ -11,35 +11,41 @@
   {
    "id": "ground",
    "name": "ground",
-   "floorY": -5.5,
-   "ceilY": -2.29
+   "floorY": -5.54,
+   "ceilY": -2.3
   },
   {
    "id": "first",
    "name": "second",
    "floorY": -2.14,
    "ceilY": 0.84
+  },
+  {
+   "id": "third",
+   "name": "third",
+   "floorY": 0.99,
+   "ceilY": 3.97
   }
  ],
  "floors": [
   {
    "level": "ground",
-   "name": "room",
+   "name": "gallery",
    "poly": [
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.37
     ],
     [
      0.22,
-     -2.42
+     -2.37
     ],
     [
      0.22,
      2.72
     ],
     [
-     -5.89,
+     -5.87,
      2.72
     ]
    ],
@@ -50,23 +56,23 @@
    "name": "hallway",
    "poly": [
     [
-     -7.06,
-     -2.42
+     -7.08,
+     -2.37
     ],
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.37
     ],
     [
-     -5.89,
+     -5.87,
      2.72
     ],
     [
-     -7.06,
+     -7.08,
      2.72
     ]
    ],
-   "material": "concrete-polished"
+   "material": "concrete-grey"
   },
   {
    "level": "ground",
@@ -93,69 +99,115 @@
   },
   {
    "level": "first",
-   "name": "room",
+   "name": "second room",
    "poly": [
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.44
     ],
     [
      0.22,
-     -2.42
+     -2.44
     ],
     [
      0.22,
-     2.72
+     2.69
     ],
     [
-     -5.89,
-     2.72
+     -5.87,
+     2.69
     ]
    ],
    "material": "concrete-bare"
   },
   {
    "level": "first",
-   "name": "landing",
+   "name": "second landing",
    "poly": [
     [
-     -7.06,
-     1.7
+     -7.08,
+     1.9
     ],
     [
-     -5.89,
-     1.7
+     -5.87,
+     1.9
     ],
     [
-     -5.89,
-     2.72
+     -5.87,
+     2.69
     ],
     [
-     -7.06,
-     2.72
+     -7.08,
+     2.69
     ]
    ],
    "material": "concrete-bare"
   },
   {
    "level": "first",
-   "name": "stair foot",
+   "name": "second stair foot",
    "poly": [
     [
-     -7.06,
-     -2.42
+     -7.08,
+     -2.44
     ],
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.44
     ],
     [
-     -5.89,
-     -1.9
+     -5.87,
+     -1.87
     ],
     [
-     -7.06,
-     -1.9
+     -7.08,
+     -1.87
+    ]
+   ],
+   "material": "concrete-bare"
+  },
+  {
+   "level": "third",
+   "name": "third room",
+   "poly": [
+    [
+     -5.87,
+     -2.44
+    ],
+    [
+     0.22,
+     -2.44
+    ],
+    [
+     0.22,
+     2.69
+    ],
+    [
+     -5.87,
+     2.69
+    ]
+   ],
+   "material": "concrete-bare"
+  },
+  {
+   "level": "third",
+   "name": "third landing",
+   "poly": [
+    [
+     -7.08,
+     1.9
+    ],
+    [
+     -5.87,
+     1.9
+    ],
+    [
+     -5.87,
+     2.69
+    ],
+    [
+     -7.08,
+     2.69
     ]
    ],
    "material": "concrete-bare"
@@ -166,19 +218,19 @@
    "level": "ground",
    "poly": [
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.37
     ],
     [
      0.22,
-     -2.42
+     -2.37
     ],
     [
      0.22,
      2.72
     ],
     [
-     -5.89,
+     -5.87,
      2.72
     ]
    ],
@@ -188,20 +240,20 @@
    "level": "ground",
    "poly": [
     [
-     -7.06,
-     -2.42
+     -7.08,
+     -2.37
     ],
     [
-     -6.04,
-     -2.42
+     -5.87,
+     -2.37
     ],
     [
-     -6.04,
-     -1.9
+     -5.87,
+     -1.87
     ],
     [
-     -7.06,
-     -1.9
+     -7.08,
+     -1.87
     ]
    ],
    "material": "corrugated-ceiling"
@@ -210,20 +262,20 @@
    "level": "first",
    "poly": [
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.44
     ],
     [
      0.22,
-     -2.42
+     -2.44
     ],
     [
      0.22,
-     2.72
+     2.69
     ],
     [
-     -5.89,
-     2.72
+     -5.87,
+     2.69
     ]
    ],
    "material": "corrugated-ceiling"
@@ -232,20 +284,20 @@
    "level": "first",
    "poly": [
     [
-     -7.06,
-     -2.42
+     -7.08,
+     -2.44
     ],
     [
-     -5.89,
-     -2.42
+     -5.87,
+     -2.44
     ],
     [
-     -5.89,
-     -1.9
+     -5.87,
+     -1.87
     ],
     [
-     -7.06,
-     -1.9
+     -7.08,
+     -1.87
     ]
    ],
    "material": "corrugated-ceiling"
@@ -254,42 +306,42 @@
    "level": "first",
    "poly": [
     [
-     -7.06,
-     1.2
+     -7.08,
+     1.9
     ],
     [
-     -5.89,
-     1.2
+     -5.87,
+     1.9
     ],
     [
-     -5.89,
-     1.7
+     -5.87,
+     2.69
     ],
     [
-     -7.06,
-     1.7
+     -7.08,
+     2.69
     ]
    ],
    "material": "corrugated-ceiling"
   },
   {
-   "level": "first",
+   "level": "third",
    "poly": [
     [
-     -7.06,
-     1.7
+     -7.08,
+     -2.44
     ],
     [
-     -5.89,
-     1.7
+     0.22,
+     -2.44
     ],
     [
-     -5.89,
-     2.72
+     0.22,
+     2.69
     ],
     [
-     -7.06,
-     2.72
+     -7.08,
+     2.69
     ]
    ],
    "material": "corrugated-ceiling"
@@ -298,43 +350,48 @@
  "walls": [
   {
    "id": "g-west",
-   "name": "hallway west, windows behind the stair",
+   "name": "back wall of the building, ground (window, street door, meter panel)",
    "level": "ground",
    "a": [
-    -7.06,
+    -7.08,
     2.72
    ],
    "b": [
-    -7.06,
-    -2.42
+    -7.08,
+    -2.37
    ],
-   "baseY": -5.5,
-   "topY": -2.29,
-   "thickness": 0.15,
+   "baseY": -5.54,
+   "topY": -2.3,
+   "thickness": 0.14,
    "facing": "+x",
    "openings": [
     {
      "kind": "window",
-     "u": 0.1,
-     "w": 4.12,
-     "bottom": 0.3,
-     "h": 2.76,
+     "u": 0.0,
+     "w": 3.87,
+     "bottom": 0.1,
+     "h": 3.04,
+     "frame": "steel-black",
      "grid": {
-      "cols": 5,
-      "bars": [
-       1.0,
-       2.1
+      "uprights": [
+       0.85,
+       1.698,
+       2.546,
+       3.394
       ],
-      "cross": []
-     },
-     "frame": "steel-grey"
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": false
+     }
     },
     {
      "kind": "door",
-     "u": 4.22,
+     "u": 3.87,
      "w": 0.8,
      "bottom": 0,
-     "h": 2.1,
+     "h": 2.05,
      "door": {
       "type": "metal",
       "open": false,
@@ -343,49 +400,48 @@
       "face": "steel",
       "swingOut": false,
       "frame": true,
-      "hinge": "a"
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 1.19,
+      "recess": 0.1,
+      "leafH": null
      }
     },
     {
-     "kind": "window",
-     "u": 4.22,
-     "w": 0.8,
-     "bottom": 2.15,
-     "h": 1.0099999999999998,
-     "grid": {
-      "cols": 1,
-      "bars": [],
-      "cross": []
-     },
-     "frame": "steel-grey"
+     "kind": "panel",
+     "u": 4.67,
+     "w": 0.42,
+     "bottom": 0.0,
+     "h": 3.24,
+     "material": "corrugated"
     }
    ],
    "noHang": [],
    "hang": false,
-   "material": "wall-blue",
-   "note": "owner: one big grey-framed window from the north corner to the steel street door opposite the south doorway, pane over the door"
+   "material": "wall-white"
   },
   {
    "id": "g-stair-room",
-   "name": "back wall (stair wall), room side",
+   "name": "gallery back wall, room side",
    "level": "ground",
    "a": [
-    -5.89,
+    -5.87,
     2.72
    ],
    "b": [
-    -5.89,
-    -2.42
+    -5.87,
+    -2.37
    ],
-   "baseY": -5.5,
-   "topY": -2.29,
-   "thickness": 0.15,
+   "baseY": -5.54,
+   "topY": -2.3,
+   "thickness": 0.14,
    "facing": "+x",
    "openings": [
     {
      "kind": "door",
      "u": 0.12,
-     "w": 0.8,
+     "w": 0.85,
      "bottom": 0,
      "h": 2.0,
      "door": {
@@ -396,13 +452,18 @@
       "face": "steel",
       "swingOut": false,
       "frame": false,
-      "hinge": "a"
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 0.0,
+      "recess": 0.0,
+      "leafH": null
      }
     },
     {
      "kind": "door",
-     "u": 4.34,
-     "w": 0.8,
+     "u": 4.24,
+     "w": 0.85,
      "bottom": 0,
      "h": 2.0,
      "door": {
@@ -413,36 +474,41 @@
       "face": "steel",
       "swingOut": false,
       "frame": false,
-      "hinge": "a"
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 0.0,
+      "recess": 0.0,
+      "leafH": null
      }
     }
    ],
    "noHang": [],
    "hang": true,
    "material": "wall-white",
-   "note": "two same-size doors: left (north) slides, goes under the stairs; right (south) at the bottom of the stairs; leaves live on the hallway side (g-stair-hall)"
+   "note": "two identical doors 85x200: left (north) and right (south, at the stair foot); leaves live on the hallway face"
   },
   {
    "id": "g-stair-hall",
-   "name": "back wall, hallway side",
+   "name": "gallery back wall, hallway side",
    "level": "ground",
    "a": [
-    -6.04,
-    -2.42
+    -6.01,
+    -2.37
    ],
    "b": [
-    -6.04,
+    -6.01,
     2.72
    ],
-   "baseY": -5.5,
-   "topY": -2.29,
-   "thickness": 0.15,
+   "baseY": -5.54,
+   "topY": -2.3,
+   "thickness": 0.14,
    "facing": "-x",
    "openings": [
     {
      "kind": "door",
      "u": 0.0,
-     "w": 0.8,
+     "w": 0.85,
      "bottom": 0,
      "h": 2.0,
      "door": {
@@ -453,13 +519,18 @@
       "face": "steel",
       "swingOut": false,
       "frame": false,
-      "hinge": "a"
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 0.0,
+      "recess": 0.0,
+      "leafH": null
      }
     },
     {
      "kind": "door",
-     "u": 4.22,
-     "w": 0.8,
+     "u": 4.12,
+     "w": 0.85,
      "bottom": 0,
      "h": 2.0,
      "door": {
@@ -470,13 +541,18 @@
       "face": "steel",
       "swingOut": false,
       "frame": false,
-      "hinge": "a"
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 0.0,
+      "recess": 0.0,
+      "leafH": null
      }
     }
    ],
    "noHang": [],
    "hang": false,
-   "material": "wall-blue"
+   "material": "wall-white"
   },
   {
    "id": "g-east",
@@ -484,40 +560,45 @@
    "level": "ground",
    "a": [
     0.22,
-    -2.42
+    -2.37
    ],
    "b": [
     0.22,
     2.72
    ],
-   "baseY": -5.5,
-   "topY": -2.29,
-   "thickness": 0.15,
+   "baseY": -5.54,
+   "topY": -2.3,
+   "thickness": 0.14,
    "facing": "-x",
    "openings": [
     {
      "kind": "window",
-     "u": 0.1,
-     "w": 2.17,
+     "u": 0.07,
+     "w": 2.55,
      "bottom": 0,
-     "h": 3.21,
+     "h": 3.24,
+     "frame": "steel-grey",
      "grid": {
-      "cols": 3,
+      "uprights": [
+       0.75,
+       1.43,
+       2.15
+      ],
       "bars": [
-       1.0
+       0.9
       ],
       "cross": [
        1
-      ]
-     },
-     "frame": "steel-grey"
+      ],
+      "crossAll": false
+     }
     },
     {
      "kind": "door",
-     "u": 2.32,
-     "w": 1.15,
+     "u": 2.77,
+     "w": 0.85,
      "bottom": 0,
-     "h": 3.09,
+     "h": 3.19,
      "door": {
       "type": "swing",
       "open": true,
@@ -526,69 +607,60 @@
       "face": "steel",
       "swingOut": true,
       "frame": true,
-      "hinge": "b"
+      "hinge": "b",
+      "jambW": 0.1,
+      "frameMaterial": "wood-dark",
+      "panelAbove": 0.0,
+      "recess": 0.0,
+      "leafH": 3.19
      }
     },
     {
      "kind": "window",
-     "u": 3.52,
-     "w": 1.57,
+     "u": 3.72,
+     "w": 1.37,
      "bottom": 0,
-     "h": 3.21,
+     "h": 3.24,
+     "frame": "steel-grey",
      "grid": {
-      "cols": 3,
-      "bars": [
-       1.0
+      "uprights": [
+       0.5,
+       1.05
       ],
-      "cross": []
-     },
-     "frame": "steel-grey"
+      "bars": [
+       0.9,
+       1.65
+      ],
+      "cross": [],
+      "crossAll": false
+     }
     }
    ],
    "noHang": [],
    "hang": false,
    "material": "wall-white",
-   "note": "owner: cross-bar window | grey steel door standing open into the courtyard | three frames; one grey steel grid, bar at ~1 m"
+   "note": "4 panes | jamb post | door 85 hinged north, open, full height | fixed pane | 2 panes; X in pane 2"
   },
   {
    "id": "g-south",
    "name": "south",
    "level": "ground",
    "a": [
-    -7.06,
-    -2.42
+    -7.08,
+    -2.37
    ],
    "b": [
     0.22,
-    -2.42
+    -2.37
    ],
-   "baseY": -5.5,
-   "topY": -2.29,
-   "thickness": 0.15,
+   "baseY": -5.54,
+   "topY": -2.3,
+   "thickness": 0.14,
    "facing": "+z",
-   "openings": [
-    {
-     "kind": "door",
-     "u": 0.0,
-     "w": 1.17,
-     "bottom": 0,
-     "h": 2.1,
-     "door": {
-      "type": "swing",
-      "open": false,
-      "toggle": false,
-      "leaf": true,
-      "face": "steel",
-      "swingOut": false,
-      "frame": true,
-      "hinge": "a"
-     }
-    }
-   ],
+   "openings": [],
    "noHang": [],
    "hang": true,
-   "material": "wall-white",
-   "note": "hallway end = street door, closed"
+   "material": "wall-white"
   },
   {
    "id": "g-north",
@@ -599,12 +671,12 @@
     2.72
    ],
    "b": [
-    -7.06,
+    -7.08,
     2.72
    ],
-   "baseY": -5.5,
-   "topY": -2.29,
-   "thickness": 0.15,
+   "baseY": -5.54,
+   "topY": -2.3,
+   "thickness": 0.14,
    "facing": "-z",
    "openings": [],
    "noHang": [],
@@ -623,9 +695,9 @@
     4.49,
     -0.32
    ],
-   "baseY": -5.5,
+   "baseY": -5.54,
    "topY": -2.37,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "-x",
    "openings": [],
    "noHang": [],
@@ -644,9 +716,9 @@
     6.84,
     4.94
    ],
-   "baseY": -5.5,
+   "baseY": -5.54,
    "topY": -0.54,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "-x",
    "openings": [],
    "noHang": [],
@@ -665,9 +737,9 @@
     -0.21,
     3.62
    ],
-   "baseY": -5.5,
+   "baseY": -5.54,
    "topY": -3.97,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "-z",
    "openings": [],
    "noHang": [],
@@ -686,9 +758,9 @@
     7.03,
     -0.4
    ],
-   "baseY": -5.5,
+   "baseY": -5.54,
    "topY": -1.16,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "+z",
    "openings": [],
    "noHang": [],
@@ -707,9 +779,9 @@
     4.39,
     -3.12
    ],
-   "baseY": -5.5,
+   "baseY": -5.54,
    "topY": -2.3,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "+z",
    "openings": [],
    "noHang": [],
@@ -730,7 +802,7 @@
    ],
    "baseY": -3.87,
    "topY": -0.81,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "-z",
    "openings": [],
    "noHang": [],
@@ -739,42 +811,47 @@
   },
   {
    "id": "f-west",
-   "name": "west, big window",
+   "name": "back window wall",
    "level": "first",
    "a": [
-    -7.06,
-    2.72
+    -7.08,
+    2.69
    ],
    "b": [
-    -7.06,
-    -2.42
+    -7.08,
+    -2.44
    ],
    "baseY": -2.14,
    "topY": 0.84,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "+x",
    "openings": [
     {
      "kind": "window",
-     "u": 0.17,
-     "w": 4.8,
-     "bottom": 0.25,
-     "h": 2.45,
+     "u": 0.0,
+     "w": 5.13,
+     "bottom": 0.1,
+     "h": 2.78,
+     "frame": "steel-black",
      "grid": {
-      "cols": 6,
-      "bars": [
-       1.0,
-       2.1
+      "uprights": [
+       0.82,
+       1.668,
+       2.516,
+       3.364,
+       4.212
       ],
-      "cross": []
-     },
-     "frame": "steel-black"
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": false
+     }
     }
    ],
    "noHang": [],
    "hang": false,
-   "material": "wall-white",
-   "note": "one black grid six across, Tokyo street outside"
+   "material": "wall-white"
   },
   {
    "id": "f-east",
@@ -782,41 +859,41 @@
    "level": "first",
    "a": [
     0.22,
-    -2.42
+    -2.44
    ],
    "b": [
     0.22,
-    2.72
+    2.69
    ],
    "baseY": -2.14,
    "topY": 0.84,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "-x",
    "openings": [
     {
      "kind": "window",
-     "u": 0.1,
-     "w": 1.2,
+     "u": 0.05,
+     "w": 1.4,
      "bottom": 0,
      "h": 2.98,
+     "frame": "steel-black",
      "grid": {
-      "cols": 1,
-      "bars": [
-       1.0,
-       2.1
+      "uprights": [
+       0.7
       ],
-      "cross": [
-       0
-      ]
-     },
-     "frame": "steel-black"
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": true
+     }
     },
     {
      "kind": "door",
-     "u": 2.0,
+     "u": 2.05,
      "w": 0.9,
      "bottom": 0,
-     "h": 2.1,
+     "h": 2.05,
      "door": {
       "type": "metal",
       "open": false,
@@ -825,46 +902,53 @@
       "face": "mesh",
       "swingOut": false,
       "frame": true,
-      "hinge": "a"
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 0.93,
+      "recess": 0.0,
+      "leafH": null
      }
     },
     {
      "kind": "window",
-     "u": 3.35,
-     "w": 1.69,
+     "u": 3.55,
+     "w": 1.4,
      "bottom": 0,
      "h": 2.98,
+     "frame": "steel-black",
      "grid": {
-      "cols": 2,
-      "bars": [
-       1.0,
-       2.1
+      "uprights": [
+       0.7
       ],
-      "cross": []
-     },
-     "frame": "steel-black"
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": false
+     }
     }
    ],
    "noHang": [],
    "hang": false,
    "material": "wall-white",
-   "note": "owner: cross-bar window | closed metal door | two windows"
+   "note": "X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"
   },
   {
    "id": "f-south",
-   "name": "south",
+   "name": "south (stair side wall)",
    "level": "first",
    "a": [
-    -7.06,
-    -2.42
+    -7.08,
+    -2.44
    ],
    "b": [
     0.22,
-    -2.42
+    -2.44
    ],
    "baseY": -2.14,
    "topY": 0.84,
-   "thickness": 0.15,
+   "thickness": 0.14,
    "facing": "+z",
    "openings": [],
    "noHang": [],
@@ -877,15 +961,182 @@
    "level": "first",
    "a": [
     0.22,
-    2.72
+    2.69
    ],
    "b": [
-    -7.06,
-    2.72
+    -7.08,
+    2.69
    ],
    "baseY": -2.14,
    "topY": 0.84,
-   "thickness": 0.15,
+   "thickness": 0.14,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "hang": true,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-west",
+   "name": "back window wall",
+   "level": "third",
+   "a": [
+    -7.08,
+    2.69
+   ],
+   "b": [
+    -7.08,
+    -2.44
+   ],
+   "baseY": 0.99,
+   "topY": 3.97,
+   "thickness": 0.14,
+   "facing": "+x",
+   "openings": [
+    {
+     "kind": "window",
+     "u": 0.0,
+     "w": 5.13,
+     "bottom": 0.1,
+     "h": 2.78,
+     "frame": "steel-black",
+     "grid": {
+      "uprights": [
+       0.82,
+       1.668,
+       2.516,
+       3.364,
+       4.212
+      ],
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": false
+     }
+    }
+   ],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-east",
+   "name": "east glass",
+   "level": "third",
+   "a": [
+    0.22,
+    -2.44
+   ],
+   "b": [
+    0.22,
+    2.69
+   ],
+   "baseY": 0.99,
+   "topY": 3.97,
+   "thickness": 0.14,
+   "facing": "-x",
+   "openings": [
+    {
+     "kind": "window",
+     "u": 0.05,
+     "w": 1.4,
+     "bottom": 0,
+     "h": 2.9800000000000004,
+     "frame": "steel-black",
+     "grid": {
+      "uprights": [
+       0.7
+      ],
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": true
+     }
+    },
+    {
+     "kind": "door",
+     "u": 2.05,
+     "w": 0.9,
+     "bottom": 0,
+     "h": 2.05,
+     "door": {
+      "type": "metal",
+      "open": false,
+      "toggle": false,
+      "leaf": true,
+      "face": "mesh",
+      "swingOut": false,
+      "frame": true,
+      "hinge": "a",
+      "jambW": 0.05,
+      "frameMaterial": null,
+      "panelAbove": 0.93,
+      "recess": 0.0,
+      "leafH": null
+     }
+    },
+    {
+     "kind": "window",
+     "u": 3.55,
+     "w": 1.4,
+     "bottom": 0,
+     "h": 2.9800000000000004,
+     "frame": "steel-black",
+     "grid": {
+      "uprights": [
+       0.7
+      ],
+      "bars": [
+       1.0
+      ],
+      "cross": [],
+      "crossAll": false
+     }
+    }
+   ],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white",
+   "note": "X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"
+  },
+  {
+   "id": "t-south",
+   "name": "south (stair side wall)",
+   "level": "third",
+   "a": [
+    -7.08,
+    -2.44
+   ],
+   "b": [
+    0.22,
+    -2.44
+   ],
+   "baseY": 0.99,
+   "topY": 3.97,
+   "thickness": 0.14,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": true,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-north",
+   "name": "north",
+   "level": "third",
+   "a": [
+    0.22,
+    2.69
+   ],
+   "b": [
+    -7.08,
+    2.69
+   ],
+   "baseY": 0.99,
+   "topY": 3.97,
+   "thickness": 0.14,
    "facing": "-z",
    "openings": [],
    "noHang": [],
@@ -899,46 +1150,56 @@
    "level": "ground",
    "to": "first",
    "from": [
-    -6.55,
-    -1.9
+    -6.62,
+    -1.87
    ],
    "dir": "+z",
-   "width": 1.0,
-   "run": 3.6,
-   "bottomY": -5.5,
+   "width": 0.92,
+   "run": 3.77,
+   "bottomY": -5.54,
    "topY": -2.14,
    "treads": 16,
-   "riser": 0.198,
-   "tread": 0.225,
-   "nosing": 0.03,
-   "material": "stair-wood"
+   "riser": 0.2,
+   "tread": 0.222,
+   "nosing": 0.0,
+   "treadMaterial": "checker",
+   "riserMaterial": "plywood",
+   "stringers": {
+    "height": 0.25,
+    "thickness": 0.03,
+    "material": "stringer-blue"
+   }
   },
   {
    "id": "s2",
    "level": "first",
-   "to": null,
-   "topBlocked": 0.9,
+   "to": "third",
    "from": [
-    -6.55,
-    -1.9
+    -6.62,
+    -1.87
    ],
    "dir": "+z",
-   "width": 1.0,
-   "run": 3.6,
+   "width": 0.92,
+   "run": 3.77,
    "bottomY": -2.14,
    "topY": 0.99,
    "treads": 16,
    "riser": 0.184,
-   "tread": 0.225,
-   "nosing": 0.03,
-   "material": "stair-wood",
+   "tread": 0.222,
+   "nosing": 0.0,
+   "treadMaterial": "checker",
+   "riserMaterial": "plywood",
+   "stringers": {
+    "height": 0.25,
+    "thickness": 0.03,
+    "material": "stringer-blue"
+   },
    "sideWall": {
     "side": "+x",
     "height": 0.9,
-    "thickness": 0.15,
+    "thickness": 0.14,
     "material": "wall-white"
-   },
-   "note": "same flight again, up to the unused third floor; blocked near the top; the blue side wall is the diagonal band in the west window photo"
+   }
   }
  ],
  "blockers": [],
@@ -960,34 +1221,18 @@
    "width": 0.06
   },
   {
+   "kind": "ribs",
+   "level": "third",
+   "dir": "+x",
+   "pitch": 0.15,
+   "depth": 0.05,
+   "width": 0.06
+  },
+  {
    "kind": "light",
    "level": "ground",
    "at": [
     -4.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "ground",
-   "at": [
-    -2.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "ground",
-   "at": [
-    -0.8,
     -1.2
    ],
    "size": [
@@ -1012,7 +1257,31 @@
    "level": "ground",
    "at": [
     -2.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -2.6,
     1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -0.8,
+    -1.2
    ],
    "size": [
     1.2,
@@ -1047,30 +1316,6 @@
    "kind": "light",
    "level": "first",
    "at": [
-    -2.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "first",
-   "at": [
-    -0.8,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "first",
-   "at": [
     -4.6,
     1.4
    ],
@@ -1084,7 +1329,31 @@
    "level": "first",
    "at": [
     -2.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -2.6,
     1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -0.8,
+    -1.2
    ],
    "size": [
     1.2,
@@ -1105,13 +1374,73 @@
   },
   {
    "kind": "light",
-   "level": "ground",
+   "level": "third",
    "at": [
-    -6.55,
-    -2.15
+    -4.6,
+    -1.2
    ],
    "size": [
-    0.8,
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "third",
+   "at": [
+    -4.6,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "third",
+   "at": [
+    -2.6,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "third",
+   "at": [
+    -2.6,
+    1.4
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "third",
+   "at": [
+    -0.8,
+    -1.2
+   ],
+   "size": [
+    1.2,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "third",
+   "at": [
+    -0.8,
+    1.4
+   ],
+   "size": [
+    1.2,
     0.08
    ]
   },
@@ -1119,12 +1448,24 @@
    "kind": "light",
    "level": "ground",
    "at": [
-    -6.55,
+    -6.62,
+    -2.1
+   ],
+   "size": [
+    0.6,
+    0.08
+   ]
+  },
+  {
+   "kind": "light",
+   "level": "ground",
+   "at": [
+    -6.62,
     0.6
    ],
    "size": [
-    0.0,
-    0.0
+    0,
+    0
    ],
    "y": -3.4
   },
@@ -1132,14 +1473,27 @@
    "kind": "light",
    "level": "ground",
    "at": [
-    -6.55,
+    -6.62,
     2.3
    ],
    "size": [
-    0.0,
-    0.0
+    0,
+    0
    ],
    "y": -2.6
+  },
+  {
+   "kind": "light",
+   "level": "first",
+   "at": [
+    -6.62,
+    0.6
+   ],
+   "size": [
+    0,
+    0
+   ],
+   "y": -0.1
   },
   {
    "kind": "aircon",
@@ -1166,6 +1520,69 @@
     0.25,
     0.95
    ]
+  },
+  {
+   "kind": "aircon",
+   "level": "third",
+   "at": [
+    -3.2,
+    0.2
+   ],
+   "size": [
+    0.95,
+    0.25,
+    0.95
+   ]
+  },
+  {
+   "kind": "wallbox",
+   "wall": "g-west",
+   "u": 4.88,
+   "y": 2.05,
+   "w": 0.3,
+   "h": 0.4,
+   "d": 0.18,
+   "material": "meter-box"
+  },
+  {
+   "kind": "wallbox",
+   "wall": "g-west",
+   "u": 4.77,
+   "y": 1.55,
+   "w": 0.22,
+   "h": 0.18,
+   "d": 0.1,
+   "material": "junction-box"
+  },
+  {
+   "kind": "wallbox",
+   "wall": "g-west",
+   "u": 4.97,
+   "y": 1.4,
+   "w": 0.1,
+   "h": 0.14,
+   "d": 0.06,
+   "material": "junction-box"
+  },
+  {
+   "kind": "pipe",
+   "wall": "g-west",
+   "u": 4.82,
+   "y0": 0.05,
+   "y1": 1.85,
+   "r": 0.02,
+   "d": 0.05,
+   "material": "pipe-white"
+  },
+  {
+   "kind": "pipe",
+   "wall": "g-west",
+   "u": 5.0,
+   "y0": 0.05,
+   "y1": 2.6,
+   "r": 0.015,
+   "d": 0.05,
+   "material": "pipe-white"
   },
   {
    "kind": "slab",
@@ -1202,8 +1619,12 @@
    "material": "corrugated"
   }
  ],
+ "sky": {
+  "file": "sky-tokyo.jpg",
+  "fallback": "#bfd9f2"
+ },
  "source": {
-  "made": "level/make_level.py 2026-09-02 v2",
-  "from_": "scan measurements + owner walk-through answers"
+  "made": "level/make_level.py v3 2026-09-02",
+  "from_": "docs/CHECK-SHEET.md + owner answers"
  }
 }

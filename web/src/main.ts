@@ -62,6 +62,14 @@ async function main(): Promise<void> {
   scene.add(built.group, built.wire)
   setWireColor(built.wire, accentColor())
   loading.remove()
+  // sky: an equirectangular panorama from the repo (textures/sky-tokyo.jpg) when present, else the flat fallback colour
+  if (level.sky?.fallback) scene.background = new THREE.Color(level.sky.fallback)
+  if (level.sky?.file) {
+    new THREE.TextureLoader().load(`${DATA}textures/${level.sky.file}`, (tex) => {
+      tex.mapping = THREE.EquirectangularReflectionMapping; tex.colorSpace = THREE.SRGBColorSpace
+      scene.background = tex
+    }, undefined, () => { /* no panorama yet: keep the flat sky */ })
+  }
 
   let look: Look = 'clean'
   try { look = (localStorage.getItem(LOOK_KEY) as Look) || 'clean' } catch { /* private */ }
