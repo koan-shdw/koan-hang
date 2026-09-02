@@ -337,20 +337,20 @@
    "level": "third",
    "poly": [
     [
-     -7.08,
-     -2.44
+     -7.22,
+     -2.58
     ],
     [
-     0.22,
-     -2.44
+     0.36,
+     -2.58
     ],
     [
-     0.22,
-     2.69
+     0.36,
+     2.83
     ],
     [
-     -7.08,
-     2.69
+     -7.22,
+     2.83
     ]
    ],
    "material": "corrugated-ceiling"
@@ -696,7 +696,7 @@
   },
   {
    "id": "c-1",
-   "name": "red rusted wall, facing the front door",
+   "name": "courtyard fence, straight ahead of the door",
    "level": "ground",
    "a": [
     4.49,
@@ -707,13 +707,13 @@
     -0.32
    ],
    "baseY": -5.54,
-   "topY": -3.3,
+   "topY": -2.37,
    "thickness": 0.14,
    "facing": "-x",
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "corten"
+   "material": "corrugated"
   },
   {
    "id": "c-2",
@@ -738,7 +738,7 @@
   },
   {
    "id": "c-3",
-   "name": "courtyard low wall north",
+   "name": "courtyard low wall, far end",
    "level": "ground",
    "a": [
     5.53,
@@ -759,7 +759,7 @@
   },
   {
    "id": "c-4",
-   "name": "white corrugated building behind the red wall",
+   "name": "courtyard wall",
    "level": "ground",
    "a": [
     4.49,
@@ -770,49 +770,7 @@
     -0.4
    ],
    "baseY": -5.54,
-   "topY": -0.8,
-   "thickness": 0.14,
-   "facing": "+z",
-   "openings": [],
-   "noHang": [],
-   "hang": false,
-   "material": "corrugated-white"
-  },
-  {
-   "id": "c-7",
-   "name": "white corrugated building, side",
-   "level": "ground",
-   "a": [
-    4.7,
-    -4.49
-   ],
-   "b": [
-    4.7,
-    -0.4
-   ],
-   "baseY": -5.54,
-   "topY": -0.8,
-   "thickness": 0.14,
-   "facing": "-x",
-   "openings": [],
-   "noHang": [],
-   "hang": false,
-   "material": "corrugated-white"
-  },
-  {
-   "id": "c-5",
-   "name": "courtyard low wall south",
-   "level": "ground",
-   "a": [
-    0.6,
-    -3.12
-   ],
-   "b": [
-    4.39,
-    -3.12
-   ],
-   "baseY": -5.54,
-   "topY": -2.3,
+   "topY": -1.16,
    "thickness": 0.14,
    "facing": "+z",
    "openings": [],
@@ -821,8 +779,50 @@
    "material": "concrete"
   },
   {
+   "id": "c-5",
+   "name": "red rusted wall: step out the door, on your immediate left, from the glass corner away from the building",
+   "level": "ground",
+   "a": [
+    0.22,
+    -3.12
+   ],
+   "b": [
+    4.39,
+    -3.12
+   ],
+   "baseY": -5.54,
+   "topY": -3.14,
+   "thickness": 0.14,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "corten"
+  },
+  {
+   "id": "c-8",
+   "name": "white corrugated building behind the red wall",
+   "level": "ground",
+   "a": [
+    0.22,
+    -3.6
+   ],
+   "b": [
+    4.6,
+    -3.6
+   ],
+   "baseY": -5.54,
+   "topY": -0.6,
+   "thickness": 0.14,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "corrugated-white"
+  },
+  {
    "id": "c-6",
-   "name": "white corrugated building behind",
+   "name": "neighbour wall, far end",
    "level": "ground",
    "a": [
     3.71,
@@ -839,7 +839,7 @@
    "openings": [],
    "noHang": [],
    "hang": false,
-   "material": "corrugated-white"
+   "material": "render"
   },
   {
    "id": "f-west",
@@ -1138,6 +1138,174 @@
    "openings": [],
    "noHang": [],
    "hang": true,
+   "material": "wall-white"
+  },
+  {
+   "id": "f-west-band",
+   "name": "back window wall (slab band)",
+   "level": "first",
+   "a": [
+    -7.08,
+    2.69
+   ],
+   "b": [
+    -7.08,
+    -2.44
+   ],
+   "baseY": -2.3,
+   "topY": -2.14,
+   "thickness": 0.14,
+   "facing": "+x",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "f-east-band",
+   "name": "east glass (slab band)",
+   "level": "first",
+   "a": [
+    0.22,
+    -2.44
+   ],
+   "b": [
+    0.22,
+    2.69
+   ],
+   "baseY": -2.3,
+   "topY": -2.14,
+   "thickness": 0.14,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "f-south-band",
+   "name": "south (stair side wall) (slab band)",
+   "level": "first",
+   "a": [
+    -7.08,
+    -2.44
+   ],
+   "b": [
+    0.22,
+    -2.44
+   ],
+   "baseY": -2.3,
+   "topY": -2.14,
+   "thickness": 0.14,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "f-north-band",
+   "name": "north (slab band)",
+   "level": "first",
+   "a": [
+    0.22,
+    2.69
+   ],
+   "b": [
+    -7.08,
+    2.69
+   ],
+   "baseY": -2.3,
+   "topY": -2.14,
+   "thickness": 0.14,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-west-band",
+   "name": "back window wall (slab band)",
+   "level": "third",
+   "a": [
+    -7.08,
+    2.69
+   ],
+   "b": [
+    -7.08,
+    -2.44
+   ],
+   "baseY": 0.84,
+   "topY": 0.99,
+   "thickness": 0.14,
+   "facing": "+x",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-east-band",
+   "name": "east glass (slab band)",
+   "level": "third",
+   "a": [
+    0.22,
+    -2.44
+   ],
+   "b": [
+    0.22,
+    2.69
+   ],
+   "baseY": 0.84,
+   "topY": 0.99,
+   "thickness": 0.14,
+   "facing": "-x",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-south-band",
+   "name": "south (stair side wall) (slab band)",
+   "level": "third",
+   "a": [
+    -7.08,
+    -2.44
+   ],
+   "b": [
+    0.22,
+    -2.44
+   ],
+   "baseY": 0.84,
+   "topY": 0.99,
+   "thickness": 0.14,
+   "facing": "+z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
+   "material": "wall-white"
+  },
+  {
+   "id": "t-north-band",
+   "name": "north (slab band)",
+   "level": "third",
+   "a": [
+    0.22,
+    2.69
+   ],
+   "b": [
+    -7.08,
+    2.69
+   ],
+   "baseY": 0.84,
+   "topY": 0.99,
+   "thickness": 0.14,
+   "facing": "-z",
+   "openings": [],
+   "noHang": [],
+   "hang": false,
    "material": "wall-white"
   }
  ],
@@ -1487,6 +1655,91 @@
    "y": -0.1
   },
   {
+   "kind": "slab",
+   "name": "bridge floor",
+   "box": [
+    [
+     0.22,
+     -2.2600000000000002,
+     -0.39
+    ],
+    [
+     4.2,
+     -2.14,
+     0.51
+    ]
+   ],
+   "material": "concrete"
+  },
+  {
+   "kind": "slab",
+   "name": "bridge roof",
+   "box": [
+    [
+     0.22,
+     -0.0900000000000003,
+     -0.39
+    ],
+    [
+     4.2,
+     0.06000000000000005,
+     0.51
+    ]
+   ],
+   "material": "concrete"
+  },
+  {
+   "kind": "slab",
+   "name": "bridge wall a",
+   "box": [
+    [
+     0.22,
+     -2.2600000000000002,
+     -0.49
+    ],
+    [
+     4.2,
+     0.06000000000000005,
+     -0.39
+    ]
+   ],
+   "material": "render"
+  },
+  {
+   "kind": "slab",
+   "name": "bridge wall b",
+   "box": [
+    [
+     0.22,
+     -2.2600000000000002,
+     0.51
+    ],
+    [
+     4.2,
+     0.06000000000000005,
+     0.61
+    ]
+   ],
+   "material": "render"
+  },
+  {
+   "kind": "slab",
+   "name": "bridge end",
+   "box": [
+    [
+     4.2,
+     -2.2600000000000002,
+     -0.49
+    ],
+    [
+     4.3,
+     0.06000000000000005,
+     0.61
+    ]
+   ],
+   "material": "render"
+  },
+  {
    "kind": "aircon",
    "level": "ground",
    "at": [
@@ -1644,15 +1897,15 @@
    "name": "plants over the red wall",
    "along": [
     [
-     4.42,
-     -4.2
+     0.35,
+     -3.05
     ],
     [
-     4.42,
-     -0.5
+     4.3,
+     -3.05
     ]
    ],
-   "y": -3.3,
+   "y": -3.14,
    "r": 0.45,
    "step": 0.55,
    "material": "foliage"
@@ -1662,14 +1915,14 @@
    "name": "stone figure",
    "box": [
     [
-     4.05,
+     0.3,
      -5.54,
-     -0.25
+     -3.0
     ],
     [
-     4.45,
+     0.7,
      -4.79,
-     0.15
+     -2.6
     ]
    ],
    "material": "stone"

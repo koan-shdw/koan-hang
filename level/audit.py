@@ -21,10 +21,10 @@ def seg_dist(p, a, b):
 
 # 1. every room-wall endpoint touches another wall of the same level (corners closed); courtyard walls exempt
 for w in walls:
-    if w["id"].startswith("c-"): continue
+    if w["id"].startswith("c-") or w["id"].endswith("-band"): continue
     for end in ("a", "b"):
         p = w[end]
-        touch = any(o is not w and o["level"] == w["level"] and not o["id"].startswith("c-") and seg_dist(p, o["a"], o["b"]) < 0.16 for o in walls)
+        touch = any(o is not w and o["level"] == w["level"] and not o["id"].startswith("c-") and not o["id"].endswith("-band") and seg_dist(p, o["a"], o["b"]) < 0.16 for o in walls)
         ok(touch, f"corner closed: {w['id']} {end} {p}")
 
 # 2. openings inside their wall, not overlapping each other, heights inside the wall

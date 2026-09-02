@@ -81,13 +81,14 @@ walls = [
          openings=[panel(0.0, round(SW - W, 3), 0.0, GH, "corrugated")], note="hallway end wall: corrugated, gas meter, boxes, pipes"),
     wall("g-north", "north", "ground", [E, NG], [W, NG], "-z", G0, G1),
     # courtyard (plain for now, textures later)
-    wall("c-1", "red rusted wall, facing the front door", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -3.30, hang=False, material="corten"),
+    wall("c-1", "courtyard fence, straight ahead of the door", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
     wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
-    wall("c-3", "courtyard low wall north", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
-    wall("c-4", "white corrugated building behind the red wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -0.80, hang=False, material="corrugated-white"),
-    wall("c-7", "white corrugated building, side", "ground", [4.70, -4.49], [4.70, -0.40], "-x", G0, -0.80, hang=False, material="corrugated-white"),
-    wall("c-5", "courtyard low wall south", "ground", [0.60, -3.12], [4.39, -3.12], "+z", G0, -2.30, hang=False, material="concrete"),
-    wall("c-6", "white corrugated building behind", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="corrugated-white"),
+    wall("c-3", "courtyard low wall, far end", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
+    wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
+    wall("c-5", "red rusted wall: step out the door, on your immediate left, from the glass corner away from the building", "ground",
+         [E, -3.12], [4.39, -3.12], "+z", G0, round(G0 + 2.40, 3), hang=False, material="corten"),
+    wall("c-8", "white corrugated building behind the red wall", "ground", [E, -3.60], [4.60, -3.60], "+z", G0, -0.60, hang=False, material="corrugated-white"),
+    wall("c-6", "neighbour wall, far end", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
 ]
 # ---------------- second + third (identical) ----------------
 def upper(level, base, top, tag, with_door=True):
@@ -108,6 +109,12 @@ def upper(level, base, top, tag, with_door=True):
         wall(f"{tag}-north", "north", level, [E, NF], [W, NF], "-z", base, top),
     ]
 walls += upper("first", F0, F1, "f") + upper("third", T0, T1, "t", with_door=False)
+bands = []
+for w_ in walls:
+    if w_["level"] in ("first", "third"):
+        base = round(w_["baseY"] - (F0 - G1 if w_["level"] == "first" else T0 - F1), 3)
+        bands.append(wall(w_["id"] + "-band", w_["name"] + " (slab band)", w_["level"], w_["a"], w_["b"], w_["facing"], base, w_["baseY"], hang=False))
+walls += bands
 
 def strip_polys(level, floor_name, room_s, room_n, has_foot, has_landing):
     # the room floor runs right up to the flight's edge; landing and stair foot fill the flight strip at its ends
@@ -135,7 +142,7 @@ level = dict(
         dict(level="first", poly=[[SW, SF], [E, SF], [E, NF], [SW, NF]], material="corrugated-ceiling", draw=False),
         dict(level="first", poly=[[W, SF], [SW, SF], [SW, STAIR_Z0], [W, STAIR_Z0]], material="corrugated-ceiling", draw=False),
         dict(level="first", poly=[[W, STAIR_TOP], [SW, STAIR_TOP], [SW, NF], [W, NF]], material="corrugated-ceiling", draw=False),
-        dict(level="third", poly=[[W, SF], [E, SF], [E, NF], [W, NF]], material="corrugated-ceiling"),
+        dict(level="third", poly=[[W - 0.14, SF - 0.14], [E + 0.14, SF - 0.14], [E + 0.14, NF + 0.14], [W - 0.14, NF + 0.14]], material="corrugated-ceiling"),  # roof covers the wall tops
     ],
     walls=walls,
     stairs=[
@@ -156,6 +163,11 @@ level = dict(
         dict(kind="light", level="ground", at=[STAIR_X, 0.6], size=[0, 0], y=-3.4),
         dict(kind="light", level="ground", at=[STAIR_X, 2.3], size=[0, 0], y=-2.6),
         dict(kind="light", level="first", at=[STAIR_X, 0.6], size=[0, 0], y=-0.1),
+        dict(kind="slab", name="bridge floor", box=[[E, F0 - 0.12, round(SF + 2.05, 3)], [4.2, F0, round(SF + 2.95, 3)]], material="concrete"),
+        dict(kind="slab", name="bridge roof", box=[[E, F0 + 2.05, round(SF + 2.05, 3)], [4.2, F0 + 2.20, round(SF + 2.95, 3)]], material="concrete"),
+        dict(kind="slab", name="bridge wall a", box=[[E, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.2, F0 + 2.20, round(SF + 2.05, 3)]], material="render"),
+        dict(kind="slab", name="bridge wall b", box=[[E, F0 - 0.12, round(SF + 2.95, 3)], [4.2, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
+        dict(kind="slab", name="bridge end", box=[[4.2, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.3, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
         dict(kind="aircon", level="ground", at=[-2.4, 0.4], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="first", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="third", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
@@ -168,8 +180,8 @@ level = dict(
         dict(kind="slab", name="concrete path", box=[[E, G0, 0.05], [4.4, G0 + 0.03, 1.75]], material="concrete-path"),
         dict(kind="pavegrid", name="gravel squares", area=[[E, -4.49], [6.84, 3.62]], skip=[[E, -1.30], [4.4, 1.75]], cell=0.95, edge=0.10, lift=0.03, tileEvery=3, material="concrete", tileMaterial="red-tile"),
         dict(kind="slab", name="dirt strip", box=[[1.0, G0 + 0.005, -1.30], [4.4, G0 + 0.02, 0.05]], material="dirt"),
-        dict(kind="hedge", name="plants over the red wall", along=[[4.42, -4.2], [4.42, -0.5]], y=-3.30, r=0.45, step=0.55, material="foliage"),
-        dict(kind="slab", name="stone figure", box=[[4.05, G0, -0.25], [4.45, G0 + 0.75, 0.15]], material="stone"),
+        dict(kind="hedge", name="plants over the red wall", along=[[0.35, -3.05], [4.30, -3.05]], y=round(G0 + 2.40, 3), r=0.45, step=0.55, material="foliage"),
+        dict(kind="slab", name="stone figure", box=[[0.30, G0, -3.00], [0.70, G0 + 0.75, -2.60]], material="stone"),
 
     ],
     sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),

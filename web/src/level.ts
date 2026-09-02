@@ -218,13 +218,17 @@ export function buildLevel(lv: Level): Built {
         m.userData.wall = w.id; group.add(m); addWire(m.geometry, m)
       }
     }
+    // corner posts: where a window or door reaches a wall end, fill the corner volume behind the neighbouring wall's face
+    const ops = w.openings.filter((o) => o.kind !== 'panel')
+    if (ops.some((o) => o.u < t + 0.011)) { const m = wallBox(w, t, H, t, -t / 2, w.baseY + H / 2, -t / 2, material); m.userData.wall = w.id; group.add(m) }
+    if (ops.some((o) => o.u + o.w > L - t - 0.011)) { const m = wallBox(w, t, H, t, L + t / 2, w.baseY + H / 2, -t / 2, material); m.userData.wall = w.id; group.add(m) }
     for (const o of w.openings) {
       const uc = o.u + o.w / 2, yc = w.baseY + o.bottom + o.h / 2
       if (o.kind === 'panel') {
         group.add(wallBox(w, o.w, o.h, t, uc, yc, -t / 2, o.material ?? 'corrugated'))
       } else if (o.kind === 'window') {
         const frame = o.frame ?? 'steel-grey', bar = 0.05, deep = 0.08
-        group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + bar / 2, -t / 2, frame))
+        group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + bar / 2 - (o.bottom < 0.001 ? 0.01 : 0), -t / 2, frame)) // sill sinks 1 cm into the floor
         group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + o.h - bar / 2, -t / 2, frame))
         group.add(wallBox(w, bar, o.h, deep, o.u + bar / 2, yc, -t / 2, frame))
         group.add(wallBox(w, bar, o.h, deep, o.u + o.w - bar / 2, yc, -t / 2, frame))
@@ -279,6 +283,7 @@ export function buildLevel(lv: Level): Built {
               pivot.add(leaf, handle)
             }
           } else {
+            if (d.recess) group.add(wallBox(w, o.w, 0.06, (d.recess ?? 0) + t, uc, w.baseY + o.bottom + 0.03 - 0.01, -((d.recess ?? 0) + t) / 2, 'concrete')) // threshold under a recessed door
             pivot.add(wallBox(w, leafW, leafH, 0.05, uc, w.baseY + o.bottom + leafH / 2, -t / 2 - (d.recess ?? 0), 'door-metal'))
             if (d.face === 'mesh') pivot.add(wallBox(w, 0.18, leafH * 0.55, 0.06, uc, w.baseY + o.bottom + leafH * 0.55, -t / 2 - (d.recess ?? 0), 'steel-black'))
             const lock = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.03, 10), mat('steel-grey'))
@@ -488,6 +493,56 @@ export function meshAudit(lv: Level, group: THREE.Group): string[] {
   for (const f of kids.filter((o) => o.userData.kind === 'floor')) {
     const L = floorOf(lv, f.userData.level), fb = box(f)
     ok(Math.abs(fb.max.y - L.floorY) < 0.011 && Math.abs(fb.max.y - fb.min.y - (L.slab ?? 0.2)) < 0.011, `floor '${f.userData.name}' (${L.id}): top ${fb.max.y.toFixed(3)} thick ${(fb.max.y - fb.min.y).toFixed(3)}`)
+  }
+  return out
+}
+
+/** Sky-leak audit: from points inside every room, cast rays in all directions; a ray that hits nothing is a hole.
+ *  Rays leaving through an OPEN doorway to the outside (the front door) are not holes. Returns PASS/FAIL lines. */
+export function skyLeakAudit(lv: Level, group: THREE.Group, doors: DoorRuntime[]): string[] {
+  const out: string[] = []
+  const ray = new THREE.Raycaster(); ray.far = 60
+  const meshes: THREE.Object3D[] = []
+  group.traverse((o) => { if ((o as THREE.Mesh).isMesh) meshes.push(o) })
+  // open doors to the outside: their opening rectangles let rays out legitimately
+  const exits = doors.filter((d) => d.open && d.wall.id === 'g-east').map((d) => ({ w: d.wall, o: d.opening }))
+  const throughExit = (origin: THREE.Vector3, dir: THREE.Vector3): boolean => {
+    for (const e of exits) {
+      const [nx, nz] = facingNormal(e.w.facing)
+      const p0 = wallPoint(e.w, 0, 0, 0)
+      const denom = dir.x * nx + dir.z * nz
+      if (Math.abs(denom) < 1e-6) continue
+      const tt = ((p0.x - origin.x) * nx + (p0.z - origin.z) * nz) / denom
+      if (tt < 0) continue
+      const hit = origin.clone().addScaledVector(dir, tt)
+      const [dx, dz] = wallDir(e.w)
+      const u = (hit.x - e.w.a[0]) * dx + (hit.z - e.w.a[1]) * dz, y = hit.y - e.w.baseY
+      if (u > e.o.u && u < e.o.u + e.o.w && y > e.o.bottom && y < e.o.bottom + e.o.h) return true
+    }
+    return false
+  }
+  const dirs: THREE.Vector3[] = []
+  for (let i = 0; i < 400; i++) { // fibonacci sphere
+    const y = 1 - (i / 399) * 2, r = Math.sqrt(1 - y * y), th = i * 2.399963
+    dirs.push(new THREE.Vector3(Math.cos(th) * r, y, Math.sin(th) * r))
+  }
+  for (const f of lv.floors) {
+    if (f.name === 'courtyard') continue
+    const L = floorOf(lv, f.level)
+    // sample points: the poly's centroid and points 40 cm inside each corner
+    const cx = f.poly.reduce((a, p) => a + p[0], 0) / f.poly.length, cz = f.poly.reduce((a, p) => a + p[1], 0) / f.poly.length
+    const pts: [number, number][] = [[cx, cz], ...f.poly.map(([x, z]) => [x + (cx > x ? 0.4 : -0.4), z + (cz > z ? 0.4 : -0.4)] as [number, number])]
+    for (const [x, z] of pts) {
+      if (!pointInPoly(x, z, f.poly)) continue
+      const origin = new THREE.Vector3(x, L.floorY + 1.5, z)
+      let leaks = 0; let sample = ''
+      for (const d of dirs) {
+        ray.set(origin, d)
+        const hits = ray.intersectObjects(meshes, false)
+        if (hits.length === 0 && !throughExit(origin, d)) { leaks++; if (!sample) sample = `dir ${d.x.toFixed(2)},${d.y.toFixed(2)},${d.z.toFixed(2)}` }
+      }
+      out.push((leaks === 0 ? 'PASS  ' : 'FAIL  ') + `no sky through the walls from '${f.name}' (${L.id}) at ${x.toFixed(2)},${z.toFixed(2)}${leaks ? `: ${leaks} rays escape, first ${sample}` : ''}`)
+    }
   }
   return out
 }
