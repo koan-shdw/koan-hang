@@ -159,7 +159,7 @@ async function main(): Promise<void> {
   const view = (lvl: string, x: number, z: number, yawDeg: number, pitchDeg = 0): void => {
     walker.teleport(lvl, x, z); walker.state.yaw = THREE.MathUtils.degToRad(yawDeg); walker.state.pitch = THREE.MathUtils.degToRad(pitchDeg); walker.update(0.016)
   }
-  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, view }
+  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, view, THREE }
 
   // ---- keys ------------------------------------------------------------------------
   window.addEventListener('keydown', (e) => {
