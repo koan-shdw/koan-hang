@@ -5,7 +5,7 @@ import * as THREE from 'three'
 
 export type Facing = '+x' | '-x' | '+z' | '-z'
 export type Dir = Facing
-export interface DoorSpec { type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean }
+export interface DoorSpec { type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean; face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean }
 export interface GridSpec { cols: number; bars: number[]; cross: number[] }
 export interface Opening { kind: 'door' | 'window'; u: number; w: number; bottom: number; h: number; door?: DoorSpec; grid?: GridSpec; frame?: string }
 export interface Wall {
@@ -243,14 +243,19 @@ export function buildLevel(lv: Level): Built {
             pivot.position.copy(hinge)
             const [dx, dz] = wallDir(w)
             pivot.rotation.y = Math.atan2(-dz, dx)
-            const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.04), mat('steel-grey')); fr.position.set(leafW / 2, leafH / 2, 0)
-            const gl = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.16, leafH - 0.16, 0.01), mat('glass')); gl.position.set(leafW / 2, leafH / 2, 0)
-            pivot.add(fr, gl); leaf = fr
+            if (o.door.face === 'glass') {
+              const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.04), mat('steel-grey')); fr.position.set(leafW / 2, leafH / 2, 0)
+              const gl = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.16, leafH - 0.16, 0.01), mat('glass')); gl.position.set(leafW / 2, leafH / 2, 0)
+              pivot.add(fr, gl); leaf = fr
+            } else {
+              leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.05), mat('door-metal')); leaf.position.set(leafW / 2, leafH / 2, 0)
+              const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.12, 10), mat('steel-grey')); handle.rotation.z = Math.PI / 2; handle.position.set(leafW - 0.1, 1.0, 0.05)
+              pivot.add(leaf, handle)
+            }
           } else {
             leaf = wallBox(w, leafW, leafH, 0.05, uc, w.baseY + o.bottom + leafH / 2, -t / 2, 'door-metal')
-            // a mesh window strip in the metal door
-            const strip = wallBox(w, 0.18, leafH * 0.55, 0.06, uc, w.baseY + o.bottom + leafH * 0.55, -t / 2, 'steel-black')
-            pivot.add(leaf, strip)
+            pivot.add(leaf)
+            if (o.door.face === 'mesh') pivot.add(wallBox(w, 0.18, leafH * 0.55, 0.06, uc, w.baseY + o.bottom + leafH * 0.55, -t / 2, 'steel-black')) // mesh window strip
           }
           group.add(pivot)
           const slideDir: 1 | -1 = o.u + o.w / 2 < L / 2 ? 1 : -1
@@ -356,11 +361,12 @@ export function updateDoors(doors: DoorRuntime[], dt: number): void {
       const s = d.slideDir * (d.opening.w - 0.06) * ease
       d.pivot.position.set(dx * s, 0, dz * s)
     } else if (d.type === 'swing') {
-      const base = Math.atan2(-wallDir(d.wall)[1], wallDir(d.wall)[0])
-      const [nx] = facingNormal(d.wall.facing)
-      const into = d.wall.facing === '+x' || d.wall.facing === '-z' ? 1 : -1
-      void nx
-      d.pivot.rotation.y = base + into * (Math.PI / 2) * ease
+      const [dx, dz] = wallDir(d.wall), [nx, nz] = facingNormal(d.wall.facing)
+      const base = Math.atan2(-dz, dx)
+      // rotating the leaf by +90 deg about y sends its free end along (dz, -dx); pick the sign that points into the room, or out
+      const dot = dz * nx - dx * nz
+      const sign = (d.opening.door?.swingOut ? -1 : 1) * (dot > 0 ? 1 : -1)
+      d.pivot.rotation.y = base + sign * (Math.PI / 2) * ease
     }
   }
 }

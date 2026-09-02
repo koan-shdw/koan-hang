@@ -315,38 +315,53 @@
    "openings": [
     {
      "kind": "window",
-     "u": 0.15,
-     "w": 3.45,
+     "u": 0.1,
+     "w": 4.12,
      "bottom": 0.3,
      "h": 2.76,
      "grid": {
-      "cols": 4,
+      "cols": 5,
       "bars": [
        1.0,
        2.1
       ],
       "cross": []
      },
-     "frame": "steel-black"
+     "frame": "steel-grey"
     },
     {
      "kind": "door",
-     "u": 3.72,
+     "u": 4.22,
      "w": 0.8,
      "bottom": 0,
      "h": 2.1,
      "door": {
-      "type": "swing",
+      "type": "metal",
       "open": false,
       "toggle": false,
-      "leaf": true
+      "leaf": true,
+      "face": "steel",
+      "swingOut": false
      }
+    },
+    {
+     "kind": "window",
+     "u": 4.22,
+     "w": 0.8,
+     "bottom": 2.15,
+     "h": 1.0099999999999998,
+     "grid": {
+      "cols": 1,
+      "bars": [],
+      "cross": []
+     },
+     "frame": "steel-grey"
     }
    ],
    "noHang": [],
    "hang": false,
    "material": "wall-blue",
-   "note": "owner: windows behind the 1st-to-2nd stair, and the street door on the other side at the stair bottom (floorplan gap z -1.8..-1.0)"
+   "note": "owner: one big grey-framed window from the north corner to the steel street door opposite the south doorway, pane over the door"
   },
   {
    "id": "g-stair-room",
@@ -375,7 +390,9 @@
       "type": "slide",
       "open": true,
       "toggle": true,
-      "leaf": false
+      "leaf": false,
+      "face": "steel",
+      "swingOut": false
      }
     },
     {
@@ -388,7 +405,9 @@
       "type": "slide",
       "open": true,
       "toggle": true,
-      "leaf": false
+      "leaf": false,
+      "face": "steel",
+      "swingOut": false
      }
     }
    ],
@@ -424,7 +443,9 @@
       "type": "slide",
       "open": true,
       "toggle": true,
-      "leaf": true
+      "leaf": true,
+      "face": "steel",
+      "swingOut": false
      }
     },
     {
@@ -437,7 +458,9 @@
       "type": "slide",
       "open": true,
       "toggle": true,
-      "leaf": true
+      "leaf": true,
+      "face": "steel",
+      "swingOut": false
      }
     }
    ],
@@ -489,7 +512,9 @@
       "type": "swing",
       "open": true,
       "toggle": true,
-      "leaf": true
+      "leaf": true,
+      "face": "steel",
+      "swingOut": true
      }
     },
     {
@@ -511,7 +536,7 @@
    "noHang": [],
    "hang": false,
    "material": "wall-white",
-   "note": "owner: cross-bar window | door | three frames; one grey steel grid, bar at ~1 m"
+   "note": "owner: cross-bar window | grey steel door standing open into the courtyard | three frames; one grey steel grid, bar at ~1 m"
   },
   {
    "id": "g-south",
@@ -540,7 +565,9 @@
       "type": "swing",
       "open": false,
       "toggle": false,
-      "leaf": true
+      "leaf": true,
+      "face": "steel",
+      "swingOut": false
      }
     }
    ],
@@ -780,7 +807,9 @@
       "type": "metal",
       "open": false,
       "toggle": false,
-      "leaf": true
+      "leaf": true,
+      "face": "mesh",
+      "swingOut": false
      }
     },
     {

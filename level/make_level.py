@@ -25,17 +25,18 @@ def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), han
              openings=list(openings), noHang=list(noHang), hang=hang, material=material)
     if note: d["note"] = note
     return d
-def door(u, w, h, type, open, toggle=True, leaf=True):
-    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf))
+def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False):
+    return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf, face=face, swingOut=swingOut))
 def window(u, w, bottom, h, cols, bars, frame, cross=()):
     return dict(kind="window", u=u, w=w, bottom=bottom, h=h, grid=dict(cols=cols, bars=list(bars), cross=list(cross)), frame=frame)
 
 walls = [
     # ---------------- ground ----------------
     wall("g-west", "hallway west, windows behind the stair", "ground", [WG, N], [WG, S], "+x", G0, G1, hang=False, material="wall-blue",
-         openings=[window(0.15, 3.45, 0.30, GH - 0.45, 4, [1.0, 2.1], BLACK),
-                   door(3.72, 0.80, 2.10, "swing", False, toggle=False)],
-         note="owner: windows behind the 1st-to-2nd stair, and the street door on the other side at the stair bottom (floorplan gap z -1.8..-1.0)"),
+         openings=[window(0.10, 4.12, 0.30, GH - 0.45, 5, [1.0, 2.1], GREY),
+                   door(4.22, 0.80, 2.10, "metal", False, toggle=False),
+                   window(4.22, 0.80, 2.15, GH - 2.20, 1, [], GREY)],
+         note="owner: one big grey-framed window from the north corner to the steel street door opposite the south doorway, pane over the door"),
     wall("g-stair-room", "back wall (stair wall), room side", "ground", [SW, N], [SW, S], "+x", G0, G1,
          openings=[door(0.12, 0.80, 2.00, "slide", True, leaf=False), door(4.34, 0.80, 2.00, "slide", True, leaf=False)],
          note="two same-size doors: left (north) slides, goes under the stairs; right (south) at the bottom of the stairs; leaves live on the hallway side (g-stair-hall)"),
@@ -43,9 +44,9 @@ walls = [
          openings=[door(0.00, 0.80, 2.00, "slide", True), door(4.22, 0.80, 2.00, "slide", True)]),
     wall("g-east", "glass front", "ground", [E, S], [E, N], "-x", G0, G1, hang=False,
          openings=[window(0.10, 2.17, 0, GH, 3, [1.0], GREY, cross=[1]),
-                   door(2.32, 1.15, 2.30, "swing", True, toggle=True),
+                   door(2.32, 1.15, 2.30, "swing", True, toggle=True, face="steel", swingOut=True),
                    window(3.52, 1.57, 0, GH, 3, [1.0], GREY)],
-         note="owner: cross-bar window | door | three frames; one grey steel grid, bar at ~1 m"),
+         note="owner: cross-bar window | grey steel door standing open into the courtyard | three frames; one grey steel grid, bar at ~1 m"),
     wall("g-south", "south", "ground", [WG, S], [E, S], "+z", G0, G1,
          openings=[door(0.00, 1.17, 2.10, "swing", False, toggle=False)], note="hallway end = street door, closed"),
     wall("g-north", "north", "ground", [E, N], [WG, N], "-z", G0, G1),
@@ -62,7 +63,7 @@ walls = [
          note="one black grid six across, Tokyo street outside"),
     wall("f-east", "east glass", "first", [E, S], [E, N], "-x", F0, F1, hang=False,
          openings=[window(0.10, 1.20, 0, FH, 1, [1.0, 2.1], BLACK, cross=[0]),
-                   door(2.00, 0.90, 2.10, "metal", False, toggle=False),
+                   door(2.00, 0.90, 2.10, "metal", False, toggle=False, face="mesh"),
                    window(3.35, 1.69, 0, FH, 2, [1.0, 2.1], BLACK)],
          note="owner: cross-bar window | closed metal door | two windows"),
     wall("f-south", "south", "first", [W, S], [E, S], "+z", F0, F1),
