@@ -19,6 +19,16 @@ wrong fight. This is the cleanest approach.
 Every claim below is **PROVEN** (I ran it), **BUILT** (code exists, his run pending),
 or **OPEN** (untested, or his call).
 
+**2026-09-02 late: level v3.** After the owner walked P2 and corrected it line by line, every wall was measured on the raw
+scan (`scan/check.py`, `scan/check_raw.py`, results in `docs/CHECK-SHEET.md`) and the level was rewritten from that sheet
+plus his answers: the whole back (west) wall is one window grid on every floor; the ground floor south end of it holds the
+steel street door (metal panel above) and a corrugated panel with the gas meter; two identical 85 x 200 doorways in the
+gallery back wall, slider leaves on the stair side in the 15 cm gap between wall and stringer; front glass 4 panes | steel
+door 85 hinged north, open, full height | fixed pane | 2 panes, X in pane 2; second floor east X-window | wall | steel door
++ panel | wall | 2-pane window; side walls plain; third floor = copy of the second, no stairs up; stairs with checker
+treads, plywood risers, blue stringers. Sky: `textures/sky-tokyo.jpg` when it exists (P3, ComfyUI), flat colour until then.
+RULE learned the hard way: mid-turn corrections are discussion; spec, GO, build.
+
 ---
 
 ## 1. What it is
@@ -86,7 +96,7 @@ dev server writes `docs/sheet/<name>.jpg` (BUILT, dev only).
 
 ## 4. Geometry
 
-### 4.1 Shell — `level/level.json` (format `koan-hang-level/1`, unchanged from v1)
+### 4.1 Shell — `level/level.json` (format `koan-hang-level/3`, written by `level/make_level.py` from `docs/CHECK-SHEET.md`)
 
 Metres, y up, the de-rotated scan frame. `levels` (floorY, ceilY), `floors` (polys), `walls`
 (`a→b` left→right as seen from the room, `facing`, `openings` door/window, `noHang`, `hang`),
