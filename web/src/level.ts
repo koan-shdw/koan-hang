@@ -31,6 +31,7 @@ export interface Blocker { level: string; poly: [number, number][] }
 export type LevelObject =
   | { kind: 'ribs'; level: string; dir: Dir; pitch: number; depth: number; width: number }
   | { kind: 'light'; level: string; at: [number, number]; size: [number, number]; y?: number }
+  | { kind: 'rail'; level: string; z: number; x0: number; x1: number; spots: number[] }
   | { kind: 'aircon'; level: string; at: [number, number]; size: [number, number, number] }
   | { kind: 'slab'; name?: string; box: [[number, number, number], [number, number, number]]; material?: string }
   | { kind: 'wallbox'; wall: string; u: number; y: number; w: number; h: number; d: number; material?: string }
@@ -393,6 +394,17 @@ export function buildLevel(lv: Level): Built {
         m.position.set(o.at[0], cy - 0.09, o.at[1]); group.add(m)
       }
       const pl = new THREE.PointLight(0xfff0d0, 14, 9, 2); pl.position.set(o.at[0], cy - 0.25, o.at[1]); group.add(pl); lights.push(pl)
+    } else if (o.kind === 'rail') {
+      // a track under the ceiling with spotlights clipped on it
+      const cy = floorOf(lv, o.level).ceilY
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(o.x1 - o.x0, 0.03, 0.03), mat('steel-black'))
+      rail.position.set((o.x0 + o.x1) / 2, cy - 0.065, o.z); group.add(rail)
+      for (const sx of o.spots) {
+        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.10, 6), mat('steel-black')); arm.position.set(sx, cy - 0.13, o.z); group.add(arm)
+        const head = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, 0.12, 12), mat('steel-black')); head.rotation.x = Math.PI / 6; head.position.set(sx, cy - 0.24, o.z); group.add(head)
+        const lens = new THREE.Mesh(new THREE.CircleGeometry(0.04, 12), mat('light')); lens.rotation.x = -Math.PI / 2 + Math.PI / 6; lens.position.set(sx, cy - 0.30, o.z + 0.03); group.add(lens)
+        const pl = new THREE.PointLight(0xfff0d0, 3.5, 7, 2); pl.position.set(sx, cy - 0.35, o.z); group.add(pl); lights.push(pl)
+      }
     } else if (o.kind === 'aircon') {
       const cy = floorOf(lv, o.level).ceilY
       const m = new THREE.Mesh(new THREE.BoxGeometry(o.size[0], o.size[1], o.size[2]), mat('aircon'))

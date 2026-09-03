@@ -40,7 +40,7 @@ async function main(): Promise<void> {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xbfd9f2) // plain sky until the street backdrop lands (P3)
   const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 200)
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8078, 0.9))
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8078, 0.55))
   const sun = new THREE.DirectionalLight(0xfff4e0, 1.2); sun.position.set(6, 10, -4); scene.add(sun)
   const resize = () => {
     const w = shell.viewport.clientWidth, h = shell.viewport.clientHeight

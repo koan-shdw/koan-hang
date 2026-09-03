@@ -629,8 +629,7 @@
        1.05
       ],
       "bars": [
-       0.9,
-       1.65
+       1.7
       ],
       "cross": [],
       "crossAll": false
@@ -780,10 +779,10 @@
   },
   {
    "id": "c-5",
-   "name": "red rusted wall: step out the door, on your immediate left, from the glass corner away from the building",
+   "name": "red intro wall (measured: z -3.12, x 0.60..4.39, 1.45 m)",
    "level": "ground",
    "a": [
-    0.22,
+    0.6,
     -3.12
    ],
    "b": [
@@ -791,28 +790,29 @@
     -3.12
    ],
    "baseY": -5.54,
-   "topY": -3.14,
+   "topY": -4.09,
    "thickness": 0.14,
    "facing": "+z",
    "openings": [],
    "noHang": [],
-   "hang": false,
-   "material": "corten"
+   "hang": true,
+   "material": "corten",
+   "note": "signage wall"
   },
   {
    "id": "c-8",
-   "name": "white corrugated building behind the red wall",
+   "name": "white corrugated building behind the red intro wall (measured z -3.50)",
    "level": "ground",
    "a": [
     0.22,
-    -3.6
+    -3.5
    ],
    "b": [
     4.6,
-    -3.6
+    -3.5
    ],
    "baseY": -5.54,
-   "topY": -0.6,
+   "topY": 0.15,
    "thickness": 0.14,
    "facing": "+z",
    "openings": [],
@@ -1366,7 +1366,7 @@
   {
    "kind": "ribs",
    "level": "ground",
-   "dir": "+x",
+   "dir": "+z",
    "pitch": 0.15,
    "depth": 0.05,
    "width": 0.06
@@ -1374,7 +1374,7 @@
   {
    "kind": "ribs",
    "level": "first",
-   "dir": "+x",
+   "dir": "+z",
    "pitch": 0.15,
    "depth": 0.05,
    "width": 0.06
@@ -1382,225 +1382,96 @@
   {
    "kind": "ribs",
    "level": "third",
-   "dir": "+x",
+   "dir": "+z",
    "pitch": 0.15,
    "depth": 0.05,
    "width": 0.06
   },
   {
-   "kind": "light",
+   "kind": "rail",
    "level": "ground",
-   "at": [
-    -4.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
+   "z": 1.8,
+   "x0": -5.4,
+   "x1": -0.2,
+   "spots": [
+    -5.1,
+    -4.2,
+    -3.6,
+    -2.4,
+    -1.5,
+    -0.3
    ]
   },
   {
-   "kind": "light",
+   "kind": "rail",
    "level": "ground",
-   "at": [
-    -4.6,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
+   "z": -1.5,
+   "x0": -5.4,
+   "x1": -0.2,
+   "spots": [
+    -4.5,
+    -3.9,
+    -3.0,
+    -1.8,
+    -0.9
    ]
   },
   {
-   "kind": "light",
-   "level": "ground",
-   "at": [
-    -2.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "ground",
-   "at": [
-    -2.6,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "ground",
-   "at": [
-    -0.8,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "ground",
-   "at": [
-    -0.8,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
+   "kind": "rail",
    "level": "first",
-   "at": [
-    -4.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
+   "z": 1.8,
+   "x0": -5.4,
+   "x1": -0.2,
+   "spots": [
+    -5.1,
+    -4.2,
+    -3.6,
+    -2.4,
+    -1.5,
+    -0.3
    ]
   },
   {
-   "kind": "light",
+   "kind": "rail",
    "level": "first",
-   "at": [
-    -4.6,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
+   "z": -1.5,
+   "x0": -5.4,
+   "x1": -0.2,
+   "spots": [
+    -4.5,
+    -3.9,
+    -3.0,
+    -1.8,
+    -0.9
    ]
   },
   {
-   "kind": "light",
-   "level": "first",
-   "at": [
-    -2.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "first",
-   "at": [
-    -2.6,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "first",
-   "at": [
-    -0.8,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "first",
-   "at": [
-    -0.8,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
+   "kind": "rail",
    "level": "third",
-   "at": [
-    -4.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
+   "z": 1.8,
+   "x0": -5.4,
+   "x1": -0.2,
+   "spots": [
+    -5.1,
+    -4.2,
+    -3.6,
+    -2.4,
+    -1.5,
+    -0.3
    ]
   },
   {
-   "kind": "light",
+   "kind": "rail",
    "level": "third",
-   "at": [
-    -4.6,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "third",
-   "at": [
-    -2.6,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "third",
-   "at": [
-    -2.6,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "third",
-   "at": [
-    -0.8,
-    -1.2
-   ],
-   "size": [
-    1.2,
-    0.08
-   ]
-  },
-  {
-   "kind": "light",
-   "level": "third",
-   "at": [
-    -0.8,
-    1.4
-   ],
-   "size": [
-    1.2,
-    0.08
+   "z": -1.5,
+   "x0": -5.4,
+   "x1": -0.2,
+   "spots": [
+    -4.5,
+    -3.9,
+    -3.0,
+    -1.8,
+    -0.9
    ]
   },
   {
@@ -1743,8 +1614,8 @@
    "kind": "aircon",
    "level": "ground",
    "at": [
-    -2.4,
-    0.4
+    -2.25,
+    0.25
    ],
    "size": [
     0.95,
@@ -1756,8 +1627,8 @@
    "kind": "aircon",
    "level": "first",
    "at": [
-    -3.2,
-    0.2
+    -2.75,
+    0.25
    ],
    "size": [
     0.95,
@@ -1769,8 +1640,8 @@
    "kind": "aircon",
    "level": "third",
    "at": [
-    -3.2,
-    0.2
+    -2.75,
+    0.25
    ],
    "size": [
     0.95,
@@ -1894,35 +1765,70 @@
   },
   {
    "kind": "hedge",
-   "name": "plants over the red wall",
+   "name": "plants in front of the red intro wall, mass 1",
    "along": [
     [
-     0.35,
-     -3.05
+     1.25,
+     -3.02
     ],
     [
-     4.3,
-     -3.05
+     2.55,
+     -3.02
     ]
    ],
-   "y": -3.14,
-   "r": 0.45,
-   "step": 0.55,
+   "y": -4.54,
+   "r": 0.36,
+   "step": 0.4,
+   "material": "foliage"
+  },
+  {
+   "kind": "hedge",
+   "name": "plants in front of the red intro wall, mass 2",
+   "along": [
+    [
+     3.45,
+     -3.02
+    ],
+    [
+     4.25,
+     -3.02
+    ]
+   ],
+   "y": -4.54,
+   "r": 0.36,
+   "step": 0.4,
    "material": "foliage"
   },
   {
    "kind": "slab",
-   "name": "stone figure",
+   "name": "stone figure (measured x 0.45 z -2.75, 1.25 tall)",
    "box": [
     [
-     0.3,
+     0.28,
      -5.54,
-     -3.0
+     -2.92
     ],
     [
-     0.7,
-     -4.79,
-     -2.6
+     0.62,
+     -4.29,
+     -2.58
+    ]
+   ],
+   "material": "stone"
+  },
+  {
+   "kind": "slab",
+   "name": "pot beside the figure",
+   "box": [
+    [
+     0.95,
+     -5.54,
+     -2.9
+    ],
+    [
+     1.25,
+     -5.04,
+     -2.55
     ]
    ],
    "material": "stone"

@@ -75,7 +75,7 @@ walls = [
          openings=[window(0.07, round(0.25 - SG - 0.07, 3), 0, GH, GREY, uprights=[round(-1.55 - SG - 0.07, 3), round(-0.87 - SG - 0.07, 3), round(-0.15 - SG - 0.07, 3)], bars=[0.9], cross=[1]),
                    door(round(0.40 - SG, 3), 0.85, round(GH - 0.05, 3), "swing", True, toggle=True, face="steel", swingOut=True, hinge="b",
                         jambW=0.10, frameMaterial="wood-dark", leafH=round(GH - 0.05, 3)),
-                   window(round(1.35 - SG, 3), round(NG - 1.35, 3), 0, GH, GREY, uprights=[round(1.85 - 1.35, 3), round(2.40 - 1.35, 3)], bars=[0.9, 1.65])],
+                   window(round(1.35 - SG, 3), round(NG - 1.35, 3), 0, GH, GREY, uprights=[round(1.85 - 1.35, 3), round(2.40 - 1.35, 3)], bars=[1.7])],
          note="4 panes | jamb post | door 85 hinged north, open, full height | fixed pane | 2 panes; X in pane 2"),
     wall("g-south", "south", "ground", [W, SG], [E, SG], "+z", G0, G1,
          openings=[panel(0.0, round(SW - W, 3), 0.0, GH, "corrugated")], note="hallway end wall: corrugated, gas meter, boxes, pipes"),
@@ -85,9 +85,9 @@ walls = [
     wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
     wall("c-3", "courtyard low wall, far end", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
     wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
-    wall("c-5", "red rusted wall: step out the door, on your immediate left, from the glass corner away from the building", "ground",
-         [E, -3.12], [4.39, -3.12], "+z", G0, round(G0 + 2.40, 3), hang=False, material="corten"),
-    wall("c-8", "white corrugated building behind the red wall", "ground", [E, -3.60], [4.60, -3.60], "+z", G0, -0.60, hang=False, material="corrugated-white"),
+    wall("c-5", "red intro wall (measured: z -3.12, x 0.60..4.39, 1.45 m)", "ground",
+         [0.60, -3.12], [4.39, -3.12], "+z", G0, round(G0 + 1.45, 3), hang=True, material="corten", note="signage wall"),
+    wall("c-8", "white corrugated building behind the red intro wall (measured z -3.50)", "ground", [E, -3.50], [4.60, -3.50], "+z", G0, 0.15, hang=False, material="corrugated-white"),
     wall("c-6", "neighbour wall, far end", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
 ]
 # ---------------- second + third (identical) ----------------
@@ -155,10 +155,11 @@ level = dict(
     ],
     blockers=[],
     objects=[
-        dict(kind="ribs", level="ground", dir="+x", pitch=0.15, depth=0.05, width=0.06),
-        dict(kind="ribs", level="first", dir="+x", pitch=0.15, depth=0.05, width=0.06),
-        dict(kind="ribs", level="third", dir="+x", pitch=0.15, depth=0.05, width=0.06),
-    ] + [dict(kind="light", level=lv, at=[x, z], size=[1.2, 0.08]) for lv in ("ground", "first", "third") for x in (-4.6, -2.6, -0.8) for z in (-1.2, 1.4)] + [
+        dict(kind="ribs", level="ground", dir="+z", pitch=0.15, depth=0.05, width=0.06),
+        dict(kind="ribs", level="first", dir="+z", pitch=0.15, depth=0.05, width=0.06),
+        dict(kind="ribs", level="third", dir="+z", pitch=0.15, depth=0.05, width=0.06),
+    ] + [dict(kind="rail", level=lv, z=z, x0=-5.4, x1=-0.2, spots=spots) for lv in ("ground", "first", "third")
+         for z, spots in ((1.8, [-5.1, -4.2, -3.6, -2.4, -1.5, -0.3]), (-1.5, [-4.5, -3.9, -3.0, -1.8, -0.9]))] + [
         dict(kind="light", level="ground", at=[STAIR_X, -2.1], size=[0.6, 0.08]),
         dict(kind="light", level="ground", at=[STAIR_X, 0.6], size=[0, 0], y=-3.4),
         dict(kind="light", level="ground", at=[STAIR_X, 2.3], size=[0, 0], y=-2.6),
@@ -168,9 +169,9 @@ level = dict(
         dict(kind="slab", name="bridge wall a", box=[[E, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.2, F0 + 2.20, round(SF + 2.05, 3)]], material="render"),
         dict(kind="slab", name="bridge wall b", box=[[E, F0 - 0.12, round(SF + 2.95, 3)], [4.2, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
         dict(kind="slab", name="bridge end", box=[[4.2, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.3, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
-        dict(kind="aircon", level="ground", at=[-2.4, 0.4], size=[0.95, 0.25, 0.95]),
-        dict(kind="aircon", level="first", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
-        dict(kind="aircon", level="third", at=[-3.2, 0.2], size=[0.95, 0.25, 0.95]),
+        dict(kind="aircon", level="ground", at=[-2.25, 0.25], size=[0.95, 0.25, 0.95]),
+        dict(kind="aircon", level="first", at=[-2.75, 0.25], size=[0.95, 0.25, 0.95]),
+        dict(kind="aircon", level="third", at=[-2.75, 0.25], size=[0.95, 0.25, 0.95]),
         # gas meter, boxes, pipes on the corrugated end wall of the hallway (wall g-south, u from the west corner)
         dict(kind="wallbox", wall="g-south", u=0.55, y=2.05, w=0.30, h=0.40, d=0.18, material="meter-box"),
         dict(kind="wallbox", wall="g-south", u=0.40, y=1.50, w=0.22, h=0.18, d=0.10, material="junction-box"),
@@ -180,8 +181,10 @@ level = dict(
         dict(kind="slab", name="concrete path", box=[[E, G0, 0.05], [4.4, G0 + 0.03, 1.75]], material="concrete-path"),
         dict(kind="pavegrid", name="gravel squares", area=[[E, -4.49], [6.84, 3.62]], skip=[[E, -1.30], [4.4, 1.75]], cell=0.95, edge=0.10, lift=0.03, tileEvery=3, material="concrete", tileMaterial="red-tile"),
         dict(kind="slab", name="dirt strip", box=[[1.0, G0 + 0.005, -1.30], [4.4, G0 + 0.02, 0.05]], material="dirt"),
-        dict(kind="hedge", name="plants over the red wall", along=[[0.35, -3.05], [4.30, -3.05]], y=round(G0 + 2.40, 3), r=0.45, step=0.55, material="foliage"),
-        dict(kind="slab", name="stone figure", box=[[0.30, G0, -3.00], [0.70, G0 + 0.75, -2.60]], material="stone"),
+        dict(kind="hedge", name="plants in front of the red intro wall, mass 1", along=[[1.25, -3.02], [2.55, -3.02]], y=round(G0 + 1.0, 3), r=0.36, step=0.40, material="foliage"),
+        dict(kind="hedge", name="plants in front of the red intro wall, mass 2", along=[[3.45, -3.02], [4.25, -3.02]], y=round(G0 + 1.0, 3), r=0.36, step=0.40, material="foliage"),
+        dict(kind="slab", name="stone figure (measured x 0.45 z -2.75, 1.25 tall)", box=[[0.28, G0, -2.92], [0.62, G0 + 1.25, -2.58]], material="stone"),
+        dict(kind="slab", name="pot beside the figure", box=[[0.95, G0, -2.90], [1.25, G0 + 0.50, -2.55]], material="stone"),
 
     ],
     sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),
