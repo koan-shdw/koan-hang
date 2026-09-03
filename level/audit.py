@@ -95,8 +95,8 @@ for s_ in stairs:
 
 # 5c. courtyard items against the scan measurements (scan/measured.json)
 import os
-if os.path.exists("scan/measured.json"):
-    mz = json.load(open("scan/measured.json"))
+mz = json.load(open("scan/measured.json")) if os.path.exists("scan/measured.json") else {}
+if mz:
     rw = next((w for w in walls if w["id"] == "c-5"), None); m = mz["red_intro_wall"]
     if rw:
         xs = sorted([rw["a"][0], rw["b"][0]])
@@ -105,8 +105,45 @@ if os.path.exists("scan/measured.json"):
         ok(abs((rw["topY"] - rw["baseY"]) - m["height"]) < 0.05, f"red intro wall height {round(rw['topY']-rw['baseY'],3)} = scan {m['height']}")
     fig = next((o for o in lv["objects"] if o["kind"] == "slab" and "figure" in (o.get("name") or "")), None); f_ = mz["figure"]
     if fig:
-        cx = (fig["box"][0][0] + fig["box"][1][0]) / 2; cz = (fig["box"][0][2] + fig["box"][1][2]) / 2; h = fig["box"][1][1] - fig["box"][0][1]
+        cx = (fig["box"][0][0] + fig["box"][1][0]) / 2; cz = (fig["box"][0][2] + fig["box"][1][2]) / 2; h = fig["box"][1][1] - levels["ground"]["floorY"]   # top above the yard floor (the figure stands on a cell)
         ok(abs(cx - f_["x"]) < 0.05 and abs(cz - f_["z"]) < 0.05 and abs(h - f_["height"]) < 0.05, f"stone figure at {cx:.2f},{cz:.2f} h {h:.2f} = scan {f_['x']},{f_['z']} h {f_['height']}")
+
+# 5d. courtyard floor: every measured cell, apron box, dirt, passage present in the level, red counts right
+if os.path.exists("scan/measured.json") and "yard" in mz:
+    Y = mz["yard"]; objs = lv["objects"]
+    def same(b1, b2): return all(abs(b1[i][k] - b2[i][k]) < 0.011 for i in (0, 1) for k in (0, 1))
+    pav = [o for o in objs if o["kind"] == "paving"]
+    for p_ in Y["patches"]:
+        got = next((o for o in pav if same(o["zone"], p_["zone"])), None)
+        ok(got is not None, f"paving zone '{p_['name']}' {p_['zone']} in level")
+        if got:
+            for c_ in p_["cells"]:
+                ok(any(same(c["box"], c_["box"]) and c["material"] == c_["material"] for c in got["cells"]), f"cell {c_['material']} {c_['box']} in '{p_['name']}'")
+            ok(len(got["cells"]) == len(p_["cells"]), f"'{p_['name']}' has {len(got['cells'])} cells = measured {len(p_['cells'])}")
+    reds = [c for o in pav for c in o["cells"] if c["material"] == "red-tile"]
+    ok(len(reds) == 4, f"red tiles: {len(reds)} = 4 (door 2, far 1, side 1)")
+    door = next((o for o in pav if o["name"] == "door patch"), None); row4 = next((o for o in pav if o["name"] == "door patch row 4"), None)
+    if door and row4:
+        dr = [c for c in door["cells"] if c["material"] == "red-tile"] + [c for c in row4["cells"] if c["material"] == "red-tile"]
+        ok(len(dr) == 2 and sorted(round(c["box"][0][1], 2) for c in dr) == [-2.27, -0.8], f"door patch reds in row 2 and row 4: {[c['box'] for c in dr]}")
+    slabs = [o for o in objs if o["kind"] == "slab"]
+    def slab_xz(o): return [[o["box"][0][0], o["box"][0][2]], [o["box"][1][0], o["box"][1][2]]]
+    for a_ in Y["apron"]: ok(any(same(slab_xz(o), a_["box"]) for o in slabs), f"apron '{a_['name']}' {a_['box']} in level")
+    ok(any(same(slab_xz(o), Y["dirt"]["box"]) and o["material"] == "dirt" for o in slabs), f"dirt bed {Y['dirt']['box']} in level")
+    ok(any(same(slab_xz(o), Y["passage"]["box"]) for o in slabs), f"passage floor {Y['passage']['box']} in level")
+    ok(any(same(slab_xz(o), Y["rack"]["box"]) for o in slabs), f"door step grating {Y['rack']['box']} in level")
+    ok(any(same(slab_xz(o), Y["counter"]["box"]) for o in slabs), f"counter inside {Y['counter']['box']} in level")
+    yard_floor = next((f for f in floors if f.get("name") == "courtyard"), None)
+    ok(yard_floor is not None and yard_floor["poly"] == Y["outline"], "courtyard walk outline = measured outline")
+    # no two drawn yard boxes overlap in plan (cells inside their zone excepted)
+    tops = [(o["name"], slab_xz(o)) for o in slabs if o["box"][0][1] < levels["ground"]["floorY"] - 0.1] + [(o["name"], o["zone"]) for o in pav]
+    for i in range(len(tops)):
+        for j in range(i + 1, len(tops)):
+            (na, A_), (nb, B_) = tops[i], tops[j]
+            ov = min(A_[1][0], B_[1][0]) - max(A_[0][0], B_[0][0]) > 0.011 and min(A_[1][1], B_[1][1]) - max(A_[0][1], B_[0][1]) > 0.011
+            if ov: ok(False, f"yard boxes overlap: '{na}' and '{nb}'")
+    b8 = next((w for w in walls if w["id"] == "c-8"), None)
+    if b8: ok(abs(max(b8["a"][0], b8["b"][0]) - Y["building_end_x"]) < 0.011, f"corrugated building ends at the dirt {Y['building_end_x']}")
 
 # 6. reachability: spawn level -> every level via stairs with matching floors
 reach = {lv["spawn"]["level"]}; changed = True

@@ -8,6 +8,8 @@ front glass: 4 panes | door 85 hinged north open | fixed pane | 2 panes, X in pa
 second floor east: X window 2 panes | wall | steel door + panel | wall | 2-pane window; side walls plain;
 third floor = copy of the second, no stairs up; stairs: checker-plate treads, plywood risers, blue stringers."""
 import json
+YARD = json.load(open("scan/measured.json"))["yard"]   # the courtyard floor, measured (scan/yard_grid.py)
+YH = YARD["heights"]
 
 G0, G1 = -5.54, -2.30
 F0, F1 = -2.14, 0.84
@@ -87,7 +89,7 @@ walls = [
     wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
     wall("c-5", "red intro wall (measured: z -3.12, x 0.60..3.50, 1.75 m)", "ground",
          [0.60, -3.12], [3.50, -3.12], "+z", G0, round(G0 + 1.75, 3), hang=True, material="corten", note="signage wall"),
-    wall("c-8", "white corrugated building behind the red intro wall (measured z -3.50)", "ground", [E, -3.50], [4.60, -3.50], "+z", G0, 0.15, hang=False, material="corrugated-white"),
+    wall("c-8", "white corrugated building behind the red intro wall (measured z -3.50)", "ground", [E, -3.50], [YARD["building_end_x"], -3.50], "+z", G0, 0.15, hang=False, material="corrugated-white"),
     wall("c-6", "neighbour wall, far end", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
 ]
 # ---------------- second + third (identical) ----------------
@@ -133,7 +135,7 @@ level = dict(
     floors=[
         dict(level="ground", name="gallery", poly=[[SW, SG], [E, SG], [E, NG], [SW, NG]], material="concrete-polished"),
         dict(level="ground", name="hallway", poly=[[W, SG], [SW, SG], [SW, NG], [W, NG]], material="concrete-grey"),
-        dict(level="ground", name="courtyard", poly=[[E, -4.49], [6.84, -4.49], [6.84, 3.62], [E, 3.62]], material="gravel"),
+        dict(level="ground", name="courtyard", poly=YARD["outline"], material="gravel", draw=False),   # walk only; the yard floor is drawn from the measured boxes below
     ] + strip_polys("first", "second", SF, NF, True, True) + strip_polys("third", "third", SF, NF, False, True),
     ceilings=[
         # ceilings under a slab are the slab's underside (draw=False keeps them for the rib layout only)
@@ -158,8 +160,10 @@ level = dict(
         dict(kind="ribs", level="ground", dir="+z", pitch=0.15, depth=0.05, width=0.06),
         dict(kind="ribs", level="first", dir="+z", pitch=0.15, depth=0.05, width=0.06),
         dict(kind="ribs", level="third", dir="+z", pitch=0.15, depth=0.05, width=0.06),
-    ] + [dict(kind="rail", level=lv, z=z, x0=-5.4, x1=-0.2, spots=spots) for lv in ("ground", "first", "third")
-         for z, spots in ((1.8, [-5.1, -4.2, -3.6, -2.4, -1.5, -0.3]), (-1.5, [-4.5, -3.9, -3.0, -1.8, -0.9]))] + [
+    ] + [dict(kind="track", level=lv, rect=[[-5.4, -1.5], [-0.2, 1.8]],
+              spots=[[-5.1, 1.8], [-4.2, 1.8], [-3.6, 1.8], [-2.4, 1.8], [-1.5, 1.8], [-0.3, 1.8],
+                     [-4.5, -1.5], [-3.9, -1.5], [-3.0, -1.5], [-1.8, -1.5], [-0.9, -1.5],
+                     [-5.4, 0.0], [-0.2, -0.3], [-0.2, 0.9]]) for lv in ("ground", "first", "third")] + [
         dict(kind="light", level="ground", at=[STAIR_X, -2.1], size=[0.6, 0.08]),
         dict(kind="light", level="ground", at=[STAIR_X, 0.6], size=[0, 0], y=-3.4),
         dict(kind="light", level="ground", at=[STAIR_X, 2.3], size=[0, 0], y=-2.6),
@@ -178,20 +182,18 @@ level = dict(
         dict(kind="wallbox", wall="g-south", u=0.78, y=1.45, w=0.10, h=0.14, d=0.06, material="junction-box"),
         dict(kind="pipe", wall="g-south", u=0.62, y0=0.05, y1=1.85, r=0.012, d=0.04, material="pipe-white"),
         dict(kind="pipe", wall="g-south", u=0.30, y0=0.05, y1=2.60, r=0.010, d=0.04, material="pipe-white"),
-        dict(kind="slab", name="concrete slab from the door", box=[[E, G0, -1.50], [3.20, G0 + 0.03, 3.55]], material="concrete-path"),
-        dict(kind="slab", name="dirt strip along the fence", box=[[3.32, G0 + 0.005, -3.05], [4.45, G0 + 0.02, 3.55]], material="dirt"),
-        dict(kind="slab", name="kerb between paving and dirt", box=[[3.20, G0, -3.05], [3.32, G0 + 0.10, 3.55]], material="concrete"),
-        dict(kind="cells", name="paving between the slab and the red intro wall", edge=0.10, lift=0.03, cells=[
-            dict(box=[[0.62, -3.02], [1.48, -2.32]], material="slate"),
-            dict(box=[[1.48, -3.02], [2.34, -2.32]], material="red-tile"),
-            dict(box=[[2.34, -3.02], [3.20, -2.32]], material="slate"),
-            dict(box=[[0.30, -2.32], [1.75, -1.30]], material="red-tile"),
-            dict(box=[[1.75, -2.32], [3.20, -1.50]], material="slate"),
-        ]),
+        # ---- courtyard floor, every box measured (scan/measured.json yard) ----
+        *[dict(kind="slab", name=a_["name"], box=[[a_["box"][0][0], G0 - 0.20, a_["box"][0][1]], [a_["box"][1][0], round(G0 + YH["apron"], 3), a_["box"][1][1]]], material="concrete-path") for a_ in YARD["apron"]],
+        *[dict(kind="paving", name=p_["name"], zone=p_["zone"], zoneTop=round(G0 + YH["paving"], 3), base=G0 - 0.20,
+               cells=[dict(box=c_["box"], material=c_["material"], top=round(G0 + (YH["red"] if c_["material"] == "red-tile" else YH["slate"]), 3)) for c_ in p_["cells"]]) for p_ in YARD["patches"]],
+        dict(kind="slab", name="dirt bed along the fence", box=[[YARD["dirt"]["box"][0][0], G0 - 0.20, YARD["dirt"]["box"][0][1]], [YARD["dirt"]["box"][1][0], round(G0 + YH["dirt"], 3), YARD["dirt"]["box"][1][1]]], material="dirt"),
+        dict(kind="slab", name="sliver between the dirt and the fence", box=[[YARD["fence_gap"]["box"][0][0], G0 - 0.20, YARD["fence_gap"]["box"][0][1]], [YARD["fence_gap"]["box"][1][0], round(G0 + YH["apron"], 3), YARD["fence_gap"]["box"][1][1]]], material="concrete"),
+        dict(kind="slab", name="passage floor off the far corner", box=[[YARD["passage"]["box"][0][0], G0 - 0.20, YARD["passage"]["box"][0][1]], [YARD["passage"]["box"][1][0], round(G0 + YH["passage"], 3), YARD["passage"]["box"][1][1]]], material="concrete"),
+        dict(kind="slab", name="grating on the door step", box=[[YARD["rack"]["box"][0][0], round(G0 + YH["paving"], 3), YARD["rack"]["box"][0][1]], [YARD["rack"]["box"][1][0], round(G0 + YH["rack"], 3), YARD["rack"]["box"][1][1]]], material="steel-black"),
+        dict(kind="slab", name="counter inside by the front glass (measured; what it is: OPEN)", box=[[YARD["counter"]["box"][0][0], G0, YARD["counter"]["box"][0][1]], [YARD["counter"]["box"][1][0], round(G0 + YARD["counter"]["height"], 3), YARD["counter"]["box"][1][1]]], material="plywood"),
         dict(kind="hedge", name="plants behind the red intro wall, spilling over its top", along=[[0.75, -3.28], [3.40, -3.28]], y=round(G0 + 1.75, 3), r=0.42, step=0.38, material="foliage"),
         dict(kind="hedge", name="plants, front fringe over the wall top", along=[[0.95, -3.08], [3.30, -3.08]], y=round(G0 + 1.62, 3), r=0.28, step=0.45, material="foliage"),
-        dict(kind="slab", name="stone figure (measured x 0.45 z -2.75, 1.25 tall)", box=[[0.28, G0, -2.92], [0.62, G0 + 1.25, -2.58]], material="stone"),
-        dict(kind="slab", name="pot beside the figure", box=[[0.95, G0, -2.90], [1.25, G0 + 0.50, -2.55]], material="stone"),
+        dict(kind="slab", name="stone figure (measured x 0.45 z -2.75, 1.25 tall)", box=[[round(YARD["figure"]["x"] - 0.17, 3), round(G0 + YH["slate"], 3), round(YARD["figure"]["z"] - 0.17, 3)], [round(YARD["figure"]["x"] + 0.17, 3), round(G0 + YARD["figure"]["height"], 3), round(YARD["figure"]["z"] + 0.17, 3)]], material="stone"),
 
     ],
     sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),

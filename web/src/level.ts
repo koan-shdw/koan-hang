@@ -19,7 +19,7 @@ export interface Wall {
   openings: Opening[]; noHang: { u: number; w: number }[]
   hang?: boolean; material?: string; note?: string
 }
-export interface Surface { level: string; name?: string; poly: [number, number][]; material?: string }
+export interface Surface { level: string; name?: string; poly: [number, number][]; material?: string; draw?: boolean }
 export interface Stair {
   id: string; level: string; to: string | null; topBlocked?: number; from: [number, number]; dir: Dir
   width: number; run: number; bottomY: number; topY: number; treads: number; riser: number; tread: number; nosing?: number
@@ -32,13 +32,14 @@ export type LevelObject =
   | { kind: 'ribs'; level: string; dir: Dir; pitch: number; depth: number; width: number }
   | { kind: 'light'; level: string; at: [number, number]; size: [number, number]; y?: number }
   | { kind: 'rail'; level: string; z: number; x0: number; x1: number; spots: number[] }
+  | { kind: 'track'; level: string; rect: [[number, number], [number, number]]; spots: [number, number][] }
   | { kind: 'aircon'; level: string; at: [number, number]; size: [number, number, number] }
   | { kind: 'slab'; name?: string; box: [[number, number, number], [number, number, number]]; material?: string }
   | { kind: 'wallbox'; wall: string; u: number; y: number; w: number; h: number; d: number; material?: string }
   | { kind: 'pipe'; wall: string; u: number; y0: number; y1: number; r: number; d: number; material?: string }
   | { kind: 'pavegrid'; name?: string; area: [[number, number], [number, number]]; skip?: [[number, number], [number, number]]; cell: number; edge: number; lift: number; tileEvery?: number; material?: string; tileMaterial?: string }
   | { kind: 'hedge'; name?: string; along: [[number, number], [number, number]]; y: number; r: number; step: number; material?: string }
-  | { kind: 'cells'; name?: string; edge: number; lift: number; cells: { box: [[number, number], [number, number]]; material: string }[] }
+  | { kind: 'paving'; name?: string; zone: [[number, number], [number, number]]; zoneTop: number; base: number; cells: { box: [[number, number], [number, number]]; material: string; top: number }[] }
 export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number; slab?: number; roof?: number }
 export interface Ceiling extends Surface { draw?: boolean }
 export interface Level {
@@ -301,6 +302,7 @@ export function buildLevel(lv: Level): Built {
   }
   // floors: solid slabs (top at floorY, going down by the level's slab thickness); the underside is the ceiling below
   for (const f of lv.floors) {
+    if (f.draw === false) continue
     const L = floorOf(lv, f.level), th = L.slab ?? 0.2
     const sh = new THREE.Shape(f.poly.map(([x, z]) => new THREE.Vector2(x, z)))
     const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false })
@@ -396,6 +398,29 @@ export function buildLevel(lv: Level): Built {
         m.position.set(o.at[0], cy - 0.09, o.at[1]); group.add(m)
       }
       const pl = new THREE.PointLight(0xfff0d0, 14, 9, 2); pl.position.set(o.at[0], cy - 0.25, o.at[1]); group.add(pl); lights.push(pl)
+    } else if (o.kind === 'track') {
+      // a rectangle of lighting track under the ceiling, spotlights clipped on it; each spot is one tilted piece
+      const cy = floorOf(lv, o.level).ceilY
+      const [[x0, z0], [x1, z1]] = o.rect
+      for (const [ax, az, bx, bz] of [[x0, z0, x1, z0], [x0, z1, x1, z1], [x0, z0, x0, z1], [x1, z0, x1, z1]]) {
+        const alongX = ax !== bx
+        const r = new THREE.Mesh(new THREE.BoxGeometry(alongX ? bx - ax + 0.03 : 0.03, 0.03, alongX ? 0.03 : bz - az + 0.03), mat('steel-black'))
+        r.position.set((ax + bx) / 2, cy - 0.065, (az + bz) / 2); group.add(r)
+      }
+      const cxm = (x0 + x1) / 2, czm = (z0 + z1) / 2
+      for (const [sx, sz] of o.spots) {
+        const spot = new THREE.Group()
+        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.10, 6), mat('steel-black')); arm.position.set(0, -0.05, 0)
+        const head = new THREE.Group(); head.position.set(0, -0.12, 0)
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, 0.13, 14), mat('steel-black')); body.position.set(0, -0.065, 0)
+        const lens = new THREE.Mesh(new THREE.CircleGeometry(0.042, 14), mat('light')); lens.rotation.x = -Math.PI / 2; lens.position.set(0, -0.131, 0)
+        head.add(body, lens)
+        // aim the head toward the room centre, tilted 30 degrees from straight down
+        head.rotation.y = Math.atan2(cxm - sx, czm - sz)
+        head.rotateX(Math.PI / 6)
+        spot.add(arm, head); spot.position.set(sx, cy - 0.08, sz); group.add(spot)
+        const pl = new THREE.PointLight(0xfff0d0, 3.0, 7, 2); pl.position.set(sx, cy - 0.32, sz); group.add(pl); lights.push(pl)
+      }
     } else if (o.kind === 'rail') {
       // a track under the ceiling with spotlights clipped on it
       const cy = floorOf(lv, o.level).ceilY
@@ -437,17 +462,15 @@ export function buildLevel(lv: Level): Built {
           const tl = new THREE.Mesh(new THREE.BoxGeometry(o.cell - o.edge, o.lift * 0.8, o.cell - o.edge), mat(o.tileMaterial ?? 'red-tile')); tl.position.set(cxp, y + o.lift * 0.4, czp); group.add(tl)
         }
       }
-    } else if (o.kind === 'cells') {
-      // explicit paving cells: a filled box each, concrete edge strips around every cell
-      const y = floorOf(lv, 'ground').floorY
+    } else if (o.kind === 'paving') {
+      // a paving patch: one concrete slab for the zone (its top = the strips), each cell a box on it at its own measured top
+      const [[zx0, zz0], [zx1, zz1]] = o.zone
+      const zone = new THREE.Mesh(new THREE.BoxGeometry(zx1 - zx0, o.zoneTop - o.base, zz1 - zz0), mat('concrete'))
+      zone.position.set((zx0 + zx1) / 2, (o.zoneTop + o.base) / 2, (zz0 + zz1) / 2); group.add(zone)
       for (const c of o.cells) {
-        const [[x0, z0], [x1, z1]] = c.box
-        const fill = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, o.lift * 0.7, z1 - z0), mat(c.material)); fill.position.set((x0 + x1) / 2, y + o.lift * 0.35, (z0 + z1) / 2); group.add(fill)
-        for (const [ex0, ez0, ex1, ez1] of [[x0, z0, x1, z0], [x0, z1, x1, z1], [x0, z0, x0, z1], [x1, z0, x1, z1]]) {
-          const along = Math.abs(ex1 - ex0) > 0
-          const e = new THREE.Mesh(new THREE.BoxGeometry(along ? ex1 - ex0 + o.edge : o.edge, o.lift, along ? o.edge : ez1 - ez0 + o.edge), mat('concrete'))
-          e.position.set((ex0 + ex1) / 2, y + o.lift / 2, (ez0 + ez1) / 2); group.add(e)
-        }
+        const [[x0, z0], [x1, z1]] = c.box, h = Math.max(0.01, c.top - o.zoneTop + 0.02)
+        const fill = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, h, z1 - z0), mat(c.material)); fill.position.set((x0 + x1) / 2, c.top - h / 2, (z0 + z1) / 2)
+        fill.userData = { kind: 'cell', material: c.material }; group.add(fill)
       }
     } else if (o.kind === 'hedge') {
       const [[ax, az], [bx, bz]] = o.along, L = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.floor(L / o.step))

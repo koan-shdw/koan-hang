@@ -175,10 +175,23 @@ async function main(): Promise<void> {
     const r = await fetch(`${BASE}__shot?name=${encodeURIComponent(name)}`, { method: 'POST', body: url })
     return r.text()
   }
+  // plan(name, x0, z0, x1, z1): straight-down orthographic render at 1 px = 1 cm, posted like shot(); overlays the scan ortho
+  const plan = async (name: string, x0 = -0.5, z0 = -4.6, x1 = 8.0, z1 = 5.2, maxY = -2.5): Promise<string> => {
+    const w = Math.round((x1 - x0) * 100), h = Math.round((z1 - z0) * 100)
+    const cam = new THREE.OrthographicCamera(x0, x1, -z0, -z1, 0.1, 50)   // top = -z0 so +z runs down the image like the scan ortho
+    cam.position.set(0, maxY, 0); cam.up.set(0, 0, -1); cam.lookAt(0, -100, 0)
+    cam.near = 0.1; cam.far = maxY + 100; cam.updateProjectionMatrix()
+    const keep = renderer.getSize(new THREE.Vector2())
+    renderer.setSize(w, h, false); renderer.render(scene, cam)
+    const url = renderer.domElement.toDataURL('image/png')
+    renderer.setSize(keep.x, keep.y, false); resize()
+    const r = await fetch(`${BASE}__shot?name=${encodeURIComponent(name)}`, { method: 'POST', body: url })
+    return r.text()
+  }
   const view = (lvl: string, x: number, z: number, yawDeg: number, pitchDeg = 0): void => {
     walker.teleport(lvl, x, z); walker.state.yaw = THREE.MathUtils.degToRad(yawDeg); walker.state.pitch = THREE.MathUtils.degToRad(pitchDeg); walker.update(0.016)
   }
-  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, view, THREE, built, toggleDoor, meshAudit: () => meshAudit(level, built.group), skyLeakAudit: () => skyLeakAudit(level, built.group, built.doors) }
+  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, plan, view, THREE, built, toggleDoor, meshAudit: () => meshAudit(level, built.group), skyLeakAudit: () => skyLeakAudit(level, built.group, built.doors) }
 }
 
 main().catch((e) => { console.error(e); alert(`KOAN.hang failed: ${(e as Error).message}`) })
