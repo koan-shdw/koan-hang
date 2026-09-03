@@ -10,14 +10,14 @@ export interface DoorSpec {
   face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean; frame?: boolean; hinge?: 'a' | 'b'
   jambW?: number; frameMaterial?: string | null; panelAbove?: number; recess?: number; leafH?: number | null
 }
-export interface GridSpec { uprights?: number[]; cols?: number; bars: number[]; cross: number[]; crossAll?: boolean }
+export interface GridSpec { uprights?: number[]; cols?: number; bars: number[]; cross: number[]; crossAll?: boolean; frostBelow?: number }
 export interface Opening { kind: 'door' | 'window' | 'panel'; u: number; w: number; bottom: number; h: number; door?: DoorSpec; grid?: GridSpec; frame?: string; material?: string }
 export interface Wall {
   id: string; name: string; level: string
   a: [number, number]; b: [number, number]
   baseY: number; topY: number; thickness: number; facing: Facing
   openings: Opening[]; noHang: { u: number; w: number }[]
-  hang?: boolean; material?: string; note?: string
+  hang?: boolean; material?: string; note?: string; draw?: boolean; src?: string
 }
 export interface Surface { level: string; name?: string; poly: [number, number][]; material?: string; draw?: boolean }
 export interface Stair {
@@ -38,6 +38,9 @@ export type LevelObject =
   | { kind: 'wallbox'; wall: string; u: number; y: number; w: number; h: number; d: number; material?: string }
   | { kind: 'pipe'; wall: string; u: number; y0: number; y1: number; r: number; d: number; material?: string }
   | { kind: 'pavegrid'; name?: string; area: [[number, number], [number, number]]; skip?: [[number, number], [number, number]]; cell: number; edge: number; lift: number; tileEvery?: number; material?: string; tileMaterial?: string }
+  | { kind: 'block'; name?: string; poly: [number, number][]; h: number; src?: string }
+  | { kind: 'road'; name?: string; pts: [number, number][]; w: number; src?: string }
+  | { kind: 'ground'; r: number; y: number; src?: string }
   | { kind: 'hedge'; name?: string; along: [[number, number], [number, number]]; y: number; r: number; step: number; material?: string }
   | { kind: 'paving'; name?: string; zone: [[number, number], [number, number]]; zoneTop: number; base: number; cells: { box: [[number, number], [number, number]]; material: string; top: number }[] }
 export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number; slab?: number; roof?: number }
@@ -142,6 +145,10 @@ const PALETTE: Record<string, { color: number; rough?: number; metal?: number; o
   'steel-black': { color: 0x1c1c1e, rough: 0.5, metal: 0.5 },
   'wood-dark': { color: 0x6b4a2b, rough: 0.8 },
   'glass': { color: 0xa8c8e8, rough: 0.1, metal: 0.1, opacity: 0.18 },
+  'block': { color: 0xb9b6b0, rough: 0.95 },
+  'road': { color: 0x6f6d6a, rough: 0.95 },
+  'ground-plate': { color: 0x9a968f, rough: 1.0 },
+  'glass-frosted': { color: 0xe6e9ea, rough: 0.6, metal: 0.0, opacity: 0.93, emissive: 0x3a3c3e },
   'door-slide': { color: 0xe8e8e4, rough: 0.8 },
   'door-metal': { color: 0x8a8c8f, rough: 0.5, metal: 0.5 },
   'meter-box': { color: 0xf0f0ec, rough: 0.6 },
@@ -203,6 +210,7 @@ export function buildLevel(lv: Level): Built {
   const addWire = (g: THREE.BufferGeometry, m: THREE.Mesh) => { const l = new THREE.LineSegments(new THREE.EdgesGeometry(g, 30), wireMat); l.position.copy(m.position); l.rotation.copy(m.rotation); wire.add(l) }
 
   for (const w of lv.walls) {
+    if (w.draw === false) continue   // walk-only entry of a merged line (one skin)
     const L = wallLength(w), H = w.topY - w.baseY, t = w.thickness
     const material = w.material ?? 'wall-white'
     // wall columns between openings; boxes below / above each opening
@@ -213,10 +221,12 @@ export function buildLevel(lv: Level): Built {
       const u0 = cuts[i], u1 = cuts[i + 1]
       if (u1 - u0 < 1e-4) continue
       const um = (u0 + u1) / 2
-      const o = w.openings.find((op) => um > op.u && um < op.u + op.w)
-      const spans: [number, number][] = o
-        ? ([[0, o.bottom], [o.bottom + o.h, H]] as [number, number][]).filter(([a, b]) => b - a > 1e-3)
-        : [[0, H]]
+      // every opening over this column (one skin stacks them): solid wall only in the vertical gaps between them
+      const over = w.openings.filter((op) => um > op.u && um < op.u + op.w).sort((p, q) => p.bottom - q.bottom)
+      const spans: [number, number][] = []
+      let yCur = 0
+      for (const op of over) { if (op.bottom - yCur > 1e-3) spans.push([yCur, op.bottom]); yCur = Math.max(yCur, op.bottom + op.h) }
+      if (H - yCur > 1e-3) spans.push([yCur, H])
       for (const [y0, y1] of spans) {
         const m = wallBox(w, u1 - u0, y1 - y0, t, um, w.baseY + (y0 + y1) / 2, -t / 2, material)
         m.userData.wall = w.id; group.add(m); addWire(m.geometry, m)
@@ -250,7 +260,12 @@ export function buildLevel(lv: Level): Built {
           const len = Math.hypot(cw, h), ang = Math.atan2(h, cw)
           for (const sgn of [1, -1]) { const m = wallBox(w, len, 0.03, 0.03, cu, yy, -t / 2 + 0.06, frame); m.rotateZ(sgn * ang); group.add(m) }
         }
-        group.add(wallBox(w, o.w - bar, o.h - bar, 0.01, uc, yc, -t / 2, 'glass'))
+        if (g.frostBelow && g.frostBelow > o.bottom && g.frostBelow < o.bottom + o.h) {
+          // frosted panes below a height (the ground floor of the back grid), clear above
+          const fh = g.frostBelow - o.bottom
+          group.add(wallBox(w, o.w - bar, fh - bar / 2, 0.01, uc, w.baseY + o.bottom + fh / 2, -t / 2, 'glass-frosted'))
+          const gl = wallBox(w, o.w - bar, o.h - fh - bar / 2, 0.01, uc, w.baseY + o.bottom + fh + (o.h - fh) / 2, -t / 2, 'glass'); gl.userData = { kind: 'glass', wall: w.id, u: o.u, bottom: o.bottom }; group.add(gl)
+        } else { const gl = wallBox(w, o.w - bar, o.h - bar, 0.01, uc, yc, -t / 2, 'glass'); gl.userData = { kind: 'glass', wall: w.id, u: o.u, bottom: o.bottom }; group.add(gl) }
       } else if (o.door) {
         const d = o.door
         const frameM = d.frameMaterial ?? (d.type === 'metal' || w.level === 'ground' ? 'steel-grey' : 'steel-black')
@@ -472,6 +487,23 @@ export function buildLevel(lv: Level): Built {
         const fill = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, h, z1 - z0), mat(c.material)); fill.position.set((x0 + x1) / 2, c.top - h / 2, (z0 + z1) / 2)
         fill.userData = { kind: 'cell', material: c.material }; group.add(fill)
       }
+    } else if (o.kind === 'block') {
+      // a neighbouring building: its map footprint extruded up from the ground, one plain grey
+      const y0 = floorOf(lv, 'ground').floorY
+      const sh = new THREE.Shape(o.poly.map(([x, z]) => new THREE.Vector2(x, z)))
+      const g = new THREE.ExtrudeGeometry(sh, { depth: o.h, bevelEnabled: false })
+      g.rotateX(Math.PI / 2); g.translate(0, y0 + o.h, 0)   // like the floors: shape y -> world z, extrusion goes down from the roof to the ground
+      const m = new THREE.Mesh(g, mat('block')); m.userData = { kind: 'block', name: o.name }; group.add(m)
+    } else if (o.kind === 'road') {
+      const y0 = floorOf(lv, 'ground').floorY - 0.01
+      for (let i = 0; i + 1 < o.pts.length; i++) {
+        const [ax, az] = o.pts[i], [bx, bz] = o.pts[i + 1], L = Math.hypot(bx - ax, bz - az)
+        if (L < 0.05) continue
+        const m = new THREE.Mesh(new THREE.BoxGeometry(L + o.w * 0.5, 0.02, o.w), mat('road'))
+        m.position.set((ax + bx) / 2, y0, (az + bz) / 2); m.rotation.y = -Math.atan2(bz - az, bx - ax); m.userData = { kind: 'road' }; group.add(m)
+      }
+    } else if (o.kind === 'ground') {
+      const m = new THREE.Mesh(new THREE.CircleGeometry(o.r, 48), mat('ground-plate')); m.rotation.x = -Math.PI / 2; m.position.y = o.y; m.userData = { kind: 'ground' }; group.add(m)
     } else if (o.kind === 'hedge') {
       const [[ax, az], [bx, bz]] = o.along, L = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.floor(L / o.step))
       for (let i = 0; i <= n; i++) {
@@ -510,6 +542,23 @@ export function meshAudit(lv: Level, group: THREE.Group): string[] {
   const ok = (c: boolean, m: string) => out.push((c ? 'PASS  ' : 'FAIL  ') + m)
   const box = (o: THREE.Object3D) => new THREE.Box3().setFromObject(o)
   const kids = group.children
+  // every window opening of every drawn wall has its glass, and no solid wall piece sits over the opening's centre
+  for (const w of lv.walls) {
+    if (w.draw === false) continue
+    for (const o of w.openings) {
+      if (o.kind !== 'window') continue
+      const c = wallPoint(w, o.u + o.w / 2, w.baseY + o.bottom + o.h / 2, -w.thickness / 2)
+      const glass = kids.find((k) => k.userData.kind === 'glass' && k.userData.wall === w.id && Math.abs(k.userData.u - o.u) < 0.011 && Math.abs(k.userData.bottom - o.bottom) < 0.011)
+      ok(!!glass, `window ${w.id} u ${o.u} y ${o.bottom}: glass built`)
+      const covered = kids.filter((k) => k.userData.wall === w.id && !k.userData.kind).some((k) => box(k).expandByScalar(-0.005).containsPoint(c))
+      ok(!covered, `window ${w.id} u ${o.u} y ${o.bottom}: no solid wall over it`)
+    }
+  }
+  // nothing floats: every context block and slab bottom sits on the ground plate or another mesh top (within 2 cm)
+  const gY = floorOf(lv, 'ground').floorY
+  for (const k of kids.filter((o) => o.userData.kind === 'block')) {
+    const b = box(k); ok(Math.abs(b.min.y - gY) < 0.021, `block '${k.userData.name}' stands on the ground (${b.min.y.toFixed(3)})`)
+  }
   for (const s of lv.stairs) {
     const r = stairRect(s)
     const body = kids.find((o) => o.userData.kind === 'stair-body' && o.userData.stair === s.id)

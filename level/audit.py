@@ -2,6 +2,7 @@
 stairs, stairs meeting landings and floors, slabs solid, sliders clear of stairs, every level reachable from the spawn.
 Prints PASS / FAIL lines. Exit code 1 on any FAIL."""
 import json, math, sys
+sys.stdout.reconfigure(encoding='utf-8')
 lv = json.load(open("level/level.json"))
 TOL = 0.011
 fails = 0
@@ -34,8 +35,12 @@ for w in walls:
     for o in ops:
         ok(o["u"] >= -TOL and o["u"] + o["w"] <= L + TOL, f"opening inside wall: {w['id']} {o['kind']} u {o['u']}..{round(o['u']+o['w'],3)} of {round(L,3)}")
         ok(o["bottom"] >= -TOL and o["bottom"] + o["h"] <= H + TOL, f"opening height inside wall: {w['id']} {o['kind']} {o['bottom']}..{round(o['bottom']+o['h'],3)} of {round(H,3)}")
-    for a, b in zip(ops, ops[1:]):
-        ok(a["u"] + a["w"] <= b["u"] + TOL, f"openings do not overlap: {w['id']} {a['kind']}/{b['kind']}")
+    for i_, a in enumerate(ops):
+        for b in ops[i_ + 1:]:
+            # stacked openings on one skin may share u; they overlap only if both u and height ranges intersect
+            u_ov = min(a["u"] + a["w"], b["u"] + b["w"]) - max(a["u"], b["u"]) > TOL
+            h_ov = min(a["bottom"] + a["h"], b["bottom"] + b["h"]) - max(a["bottom"], b["bottom"]) > TOL
+            ok(not (u_ov and h_ov), f"openings do not overlap: {w['id']} {a['kind']} u{a['u']} y{a['bottom']} / {b['kind']} u{b['u']} y{b['bottom']}")
 
 # 3. slabs: upper floors thick enough to reach the ceiling below
 order = sorted(lv["levels"], key=lambda l: l["floorY"])
@@ -144,6 +149,38 @@ if os.path.exists("scan/measured.json") and "yard" in mz:
             if ov: ok(False, f"yard boxes overlap: '{na}' and '{nb}'")
     b8 = next((w for w in walls if w["id"] == "c-8"), None)
     if b8: ok(abs(max(b8["a"][0], b8["b"][0]) - Y["building_end_x"]) < 0.011, f"corrugated building ends at the dirt {Y['building_end_x']}")
+
+# 5e. one skin: walls on one line = exactly one drawn, from the lowest base to the highest top; upper entries walk-only
+groups = {}
+for w in walls: groups.setdefault((tuple(w["a"]), tuple(w["b"]), w["facing"]), []).append(w)
+for key, grp in groups.items():
+    drawn = [w for w in grp if w.get("draw", True)]
+    ok(len(drawn) == 1, f"one skin: line {key[0]}->{key[1]} has {len(drawn)} drawn wall(s) of {len(grp)}: {[w['id'] for w in drawn]}")
+    if len(drawn) == 1 and len(grp) > 1:
+        d = drawn[0]
+        ok(abs(d["baseY"] - min(w["baseY"] for w in grp)) < TOL and abs(d["topY"] - max(w["topY"] for w in grp)) < TOL, f"one skin: {d['id']} spans {d['baseY']}..{d['topY']} = the line's full height")
+ok(not any(w["id"].endswith("-band") for w in walls), "no slab bands left")
+# 5f. provenance: every wall and object names its source
+for w in walls: ok(w.get("src") not in (None, "", "UNSOURCED"), f"source on wall {w['id']}: {w.get('src')}")
+for o in lv["objects"]: ok(o.get("src") not in (None, "", "UNSOURCED"), f"source on object {o['kind']} '{o.get('name', '')}': {o.get('src')}")
+# 5g. the back grid: one window run ground to roof on g-west (owner x4), frosted low panes
+gw = next((w for w in walls if w["id"] == "g-west"), None)
+if gw:
+    wins = sorted([o for o in gw["openings"] if o["kind"] == "window"], key=lambda o: o["bottom"])
+    ok(len(wins) >= 2 and abs(wins[0]["bottom"] + wins[0]["h"] - wins[-1]["bottom"]) < TOL, "back grid: ground piece meets the upper piece at the slab, no wall between")
+    ok(bool(wins) and abs(gw["baseY"] + wins[-1]["bottom"] + wins[-1]["h"] - max(l["ceilY"] for l in lv["levels"])) < 0.11, "back grid: reaches the top floor ceiling")
+    ok(bool(wins) and wins[0].get("grid", {}).get("frostBelow"), "back grid: frosted low panes on the ground floor")
+
+# 5h. context blocks: none on our plot (building + yard), a ground plate, roads present
+blocks = [o for o in lv["objects"] if o["kind"] == "block"]
+if blocks:
+    PX0, PZ0, PX1, PZ1 = -7.30, -4.60, 7.00, 5.20
+    def pt_in_plot(p): return PX0 + 0.25 < p[0] < PX1 - 0.25 and PZ0 + 0.25 < p[1] < PZ1 - 0.25
+    bad = [b for b in blocks if any(pt_in_plot(p) for p in b["poly"]) or any(in_poly(x, z, b["poly"]) for x, z in ((-3.4, 0.2), (3.0, 1.0), (-6.5, 0.0), (5.5, 1.5)))]
+    ok(not bad, f"no context block on the gallery plot ({len(bad)} do: {[b.get('src') for b in bad][:3]})")
+    ok(any(o["kind"] == "ground" for o in lv["objects"]), "ground plate under the context")
+    ok(sum(1 for o in lv["objects"] if o["kind"] == "road") > 0, f"roads present: {sum(1 for o in lv['objects'] if o['kind'] == 'road')}")
+    ok(all(b["h"] > 2.5 for b in blocks), "every block has a height")
 
 # 6. reachability: spawn level -> every level via stairs with matching floors
 reach = {lv["spawn"]["level"]}; changed = True

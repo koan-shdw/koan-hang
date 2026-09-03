@@ -1,0 +1,1016 @@
+PASS  corner closed: g-west a [-7.08, 2.72]
+PASS  corner closed: g-west b [-7.08, -2.37]
+PASS  corner closed: g-stair-room a [-5.87, 2.72]
+PASS  corner closed: g-stair-room b [-5.87, -2.37]
+PASS  corner closed: g-stair-hall a [-6.01, -2.37]
+PASS  corner closed: g-stair-hall b [-6.01, 2.72]
+PASS  corner closed: g-east a [0.22, -2.37]
+PASS  corner closed: g-east b [0.22, 2.72]
+PASS  corner closed: g-south a [-7.08, -2.37]
+PASS  corner closed: g-south b [0.22, -2.37]
+PASS  corner closed: g-north a [0.22, 2.72]
+PASS  corner closed: g-north b [-7.08, 2.72]
+PASS  corner closed: f-west a [-7.08, 2.72]
+PASS  corner closed: f-west b [-7.08, -2.37]
+PASS  corner closed: f-east a [0.22, -2.37]
+PASS  corner closed: f-east b [0.22, 2.72]
+PASS  corner closed: f-south a [-7.08, -2.37]
+PASS  corner closed: f-south b [0.22, -2.37]
+PASS  corner closed: f-north a [0.22, 2.72]
+PASS  corner closed: f-north b [-7.08, 2.72]
+PASS  corner closed: t-west a [-7.08, 2.72]
+PASS  corner closed: t-west b [-7.08, -2.37]
+PASS  corner closed: t-east a [0.22, -2.37]
+PASS  corner closed: t-east b [0.22, 2.72]
+PASS  corner closed: t-south a [-7.08, -2.37]
+PASS  corner closed: t-south b [0.22, -2.37]
+PASS  corner closed: t-north a [0.22, 2.72]
+PASS  corner closed: t-north b [-7.08, 2.72]
+PASS  opening inside wall: g-west window u 0.0..4.29 of 5.09
+PASS  opening height inside wall: g-west window 0.1..3.4 of 9.51
+PASS  opening inside wall: g-west window u 0.0..5.09 of 5.09
+PASS  opening height inside wall: g-west window 3.4..9.51 of 9.51
+PASS  opening inside wall: g-west door u 4.29..5.09 of 5.09
+PASS  opening height inside wall: g-west door 0..2.05 of 9.51
+PASS  openings do not overlap: g-west window u0.0 y0.1 / window u0.0 y3.4
+PASS  openings do not overlap: g-west window u0.0 y0.1 / door u4.29 y0
+PASS  openings do not overlap: g-west window u0.0 y3.4 / door u4.29 y0
+PASS  opening inside wall: g-stair-room door u 0.12..0.97 of 5.09
+PASS  opening height inside wall: g-stair-room door 0..2.0 of 3.24
+PASS  opening inside wall: g-stair-room door u 4.24..5.09 of 5.09
+PASS  opening height inside wall: g-stair-room door 0..2.0 of 3.24
+PASS  openings do not overlap: g-stair-room door u0.12 y0 / door u4.24 y0
+PASS  opening inside wall: g-stair-hall door u 0.0..0.85 of 5.09
+PASS  opening height inside wall: g-stair-hall door 0..2.0 of 3.24
+PASS  opening inside wall: g-stair-hall door u 4.12..4.97 of 5.09
+PASS  opening height inside wall: g-stair-hall door 0..2.0 of 3.24
+PASS  openings do not overlap: g-stair-hall door u0.0 y0 / door u4.12 y0
+PASS  opening inside wall: g-east window u 0.05..1.45 of 5.09
+PASS  opening height inside wall: g-east window 3.4..6.38 of 9.51
+PASS  opening inside wall: g-east window u 0.05..5.04 of 5.09
+PASS  opening height inside wall: g-east window 6.53..9.51 of 9.51
+PASS  opening inside wall: g-east window u 0.07..2.62 of 5.09
+PASS  opening height inside wall: g-east window 0..3.24 of 9.51
+PASS  opening inside wall: g-east door u 2.05..2.95 of 5.09
+PASS  opening height inside wall: g-east door 3.4..5.45 of 9.51
+PASS  opening inside wall: g-east door u 2.77..3.62 of 5.09
+PASS  opening height inside wall: g-east door 0..3.19 of 9.51
+PASS  opening inside wall: g-east window u 3.55..4.95 of 5.09
+PASS  opening height inside wall: g-east window 3.4..6.38 of 9.51
+PASS  opening inside wall: g-east window u 3.72..5.09 of 5.09
+PASS  opening height inside wall: g-east window 0..3.24 of 9.51
+PASS  openings do not overlap: g-east window u0.05 y3.4 / window u0.05 y6.53
+PASS  openings do not overlap: g-east window u0.05 y3.4 / window u0.07 y0
+PASS  openings do not overlap: g-east window u0.05 y3.4 / door u2.05 y3.4
+PASS  openings do not overlap: g-east window u0.05 y3.4 / door u2.77 y0
+PASS  openings do not overlap: g-east window u0.05 y3.4 / window u3.55 y3.4
+PASS  openings do not overlap: g-east window u0.05 y3.4 / window u3.72 y0
+PASS  openings do not overlap: g-east window u0.05 y6.53 / window u0.07 y0
+PASS  openings do not overlap: g-east window u0.05 y6.53 / door u2.05 y3.4
+PASS  openings do not overlap: g-east window u0.05 y6.53 / door u2.77 y0
+PASS  openings do not overlap: g-east window u0.05 y6.53 / window u3.55 y3.4
+PASS  openings do not overlap: g-east window u0.05 y6.53 / window u3.72 y0
+PASS  openings do not overlap: g-east window u0.07 y0 / door u2.05 y3.4
+PASS  openings do not overlap: g-east window u0.07 y0 / door u2.77 y0
+PASS  openings do not overlap: g-east window u0.07 y0 / window u3.55 y3.4
+PASS  openings do not overlap: g-east window u0.07 y0 / window u3.72 y0
+PASS  openings do not overlap: g-east door u2.05 y3.4 / door u2.77 y0
+PASS  openings do not overlap: g-east door u2.05 y3.4 / window u3.55 y3.4
+PASS  openings do not overlap: g-east door u2.05 y3.4 / window u3.72 y0
+PASS  openings do not overlap: g-east door u2.77 y0 / window u3.55 y3.4
+PASS  openings do not overlap: g-east door u2.77 y0 / window u3.72 y0
+PASS  openings do not overlap: g-east window u3.55 y3.4 / window u3.72 y0
+PASS  opening inside wall: g-south panel u 0.0..1.21 of 7.3
+PASS  opening height inside wall: g-south panel 0.0..3.24 of 9.51
+PASS  slab solid: first floor -2.14 - slab 0.16 = ceiling of ground -2.3
+PASS  slab solid: third floor 0.99 - slab 0.15 = ceiling of first 0.84
+PASS  stair s1 bottom meets a floor of ground at z -1.55
+PASS  stair s1 top meets a floor of first at z 2.22
+PASS  stair s1 heights match its floors
+PASS  slider leaf (-6.08) clear of the stringer edge (-6.16)
+PASS  stair s2 bottom meets a floor of first at z -1.55
+PASS  stair s2 top meets a floor of third at z 2.22
+PASS  stair s2 heights match its floors
+PASS  floor 'gallery' (ground) touches walls or other floors
+PASS  floor 'hallway' (ground) touches walls or other floors
+PASS  floor 'second room' (first) touches walls or other floors
+PASS  floor 'second landing' (first) touches walls or other floors
+PASS  floor 'second stair foot' (first) touches walls or other floors
+PASS  floor 'third room' (third) touches walls or other floors
+PASS  floor 'third landing' (third) touches walls or other floors
+PASS  room floor of first starts at the flight edge -6.16
+PASS  room floor of third starts at the flight edge -6.16
+PASS  red intro wall ends [0.6, 3.5] = scan 0.6..3.5
+PASS  red intro wall line z -3.12 = scan -3.12
+PASS  red intro wall height 1.75 = scan 1.75
+PASS  stone figure at 0.45,-2.75 h 1.25 = scan 0.45,-2.75 h 1.25
+PASS  paving zone 'door patch' [[0.32, -3.12], [3.7, -0.85]] in level
+PASS  cell slate [[0.42, -3.12], [0.8, -2.4]] in 'door patch'
+PASS  cell slate [[0.94, -3.12], [1.99, -2.4]] in 'door patch'
+PASS  cell slate [[2.15, -3.12], [3.1, -2.4]] in 'door patch'
+PASS  cell slate [[0.42, -2.27], [0.8, -1.63]] in 'door patch'
+PASS  cell slate [[0.94, -2.27], [1.99, -1.63]] in 'door patch'
+PASS  cell red-tile [[2.15, -2.27], [3.1, -1.63]] in 'door patch'
+PASS  cell slate [[3.22, -2.27], [3.46, -1.63]] in 'door patch'
+PASS  cell slate [[0.42, -1.54], [0.8, -0.91]] in 'door patch'
+PASS  cell slate [[0.94, -1.54], [1.99, -0.91]] in 'door patch'
+PASS  cell slate [[2.15, -1.54], [3.1, -0.91]] in 'door patch'
+PASS  cell slate [[3.22, -1.54], [3.46, -0.91]] in 'door patch'
+PASS  'door patch' has 11 cells = measured 11
+PASS  paving zone 'door patch row 4' [[0.32, -0.85], [2.05, -0.1]] in level
+PASS  cell slate [[0.42, -0.8], [0.8, -0.17]] in 'door patch row 4'
+PASS  cell red-tile [[0.94, -0.8], [1.99, -0.17]] in 'door patch row 4'
+PASS  'door patch row 4' has 2 cells = measured 2
+PASS  paving zone 'far patch' [[0.22, 2.16], [4.84, 3.62]] in level
+PASS  cell slate [[0.3, 2.92], [0.65, 3.59]] in 'far patch'
+PASS  cell slate [[0.75, 2.92], [1.72, 3.59]] in 'far patch'
+PASS  cell slate [[1.86, 2.92], [2.87, 3.59]] in 'far patch'
+PASS  cell slate [[2.99, 2.92], [3.95, 3.59]] in 'far patch'
+PASS  cell slate [[4.06, 2.92], [4.81, 3.59]] in 'far patch'
+PASS  cell slate [[0.3, 2.16], [0.65, 2.79]] in 'far patch'
+PASS  cell slate [[0.75, 2.16], [1.72, 2.79]] in 'far patch'
+PASS  cell red-tile [[1.86, 2.16], [2.87, 2.79]] in 'far patch'
+PASS  cell slate [[2.99, 2.16], [3.95, 2.79]] in 'far patch'
+PASS  'far patch' has 9 cells = measured 9
+PASS  paving zone 'side strip' [[4.84, 0.0], [6.35, 2.3]] in level
+PASS  cell red-tile [[4.93, 0.32], [5.38, 2.3]] in 'side strip'
+PASS  cell slate [[5.41, 0.1], [6.27, 0.7]] in 'side strip'
+PASS  cell slate [[5.41, 0.81], [6.27, 1.44]] in 'side strip'
+PASS  cell slate [[5.41, 1.53], [6.27, 2.19]] in 'side strip'
+PASS  'side strip' has 4 cells = measured 4
+PASS  red tiles: 4 = 4 (door 2, far 1, side 1)
+PASS  door patch reds in row 2 and row 4: [[[2.15, -2.27], [3.1, -1.63]], [[0.94, -0.8], [1.99, -0.17]]]
+PASS  apron 'apron by the glass' [[0.22, -0.1], [2.05, 2.16]] in level
+PASS  apron 'apron beside row 4' [[2.05, -0.85], [3.7, -0.45]] in level
+PASS  apron 'apron middle' [[2.05, -0.45], [4.84, 2.16]] in level
+PASS  apron 'apron wide part top' [[4.84, -0.45], [6.84, 0.0]] in level
+PASS  apron 'apron beside the side strip' [[6.35, 0.0], [6.84, 2.3]] in level
+PASS  apron 'apron wide part bottom' [[4.84, 2.3], [6.84, 3.62]] in level
+PASS  dirt bed [[3.7, -4.49], [4.4, -0.45]] in level
+PASS  passage floor [[5.53, 3.62], [6.84, 5.0]] in level
+PASS  door step grating [[0.42, -2.36], [0.77, -1.48]] in level
+PASS  counter inside [[-1.25, -2.3], [0.13, -1.46]] in level
+PASS  courtyard walk outline = measured outline
+PASS  corrugated building ends at the dirt 3.7
+PASS  one skin: line (-7.08, 2.72)->(-7.08, -2.37) has 1 drawn wall(s) of 3: ['g-west']
+PASS  one skin: g-west spans -5.54..3.97 = the line's full height
+PASS  one skin: line (-5.87, 2.72)->(-5.87, -2.37) has 1 drawn wall(s) of 1: ['g-stair-room']
+PASS  one skin: line (-6.01, -2.37)->(-6.01, 2.72) has 1 drawn wall(s) of 1: ['g-stair-hall']
+PASS  one skin: line (0.22, -2.37)->(0.22, 2.72) has 1 drawn wall(s) of 3: ['g-east']
+PASS  one skin: g-east spans -5.54..3.97 = the line's full height
+PASS  one skin: line (-7.08, -2.37)->(0.22, -2.37) has 1 drawn wall(s) of 3: ['g-south']
+PASS  one skin: g-south spans -5.54..3.97 = the line's full height
+PASS  one skin: line (0.22, 2.72)->(-7.08, 2.72) has 1 drawn wall(s) of 3: ['g-north']
+PASS  one skin: g-north spans -5.54..3.97 = the line's full height
+PASS  one skin: line (4.49, -4.49)->(4.49, -0.32) has 1 drawn wall(s) of 1: ['c-1']
+PASS  one skin: line (6.84, 0.66)->(6.84, 4.94) has 1 drawn wall(s) of 1: ['c-2']
+PASS  one skin: line (5.53, 3.62)->(-0.21, 3.62) has 1 drawn wall(s) of 1: ['c-3']
+PASS  one skin: line (4.49, -0.4)->(7.03, -0.4) has 1 drawn wall(s) of 1: ['c-4']
+PASS  one skin: line (0.6, -3.12)->(3.5, -3.12) has 1 drawn wall(s) of 1: ['c-5']
+PASS  one skin: line (0.22, -3.5)->(3.7, -3.5) has 1 drawn wall(s) of 1: ['c-8']
+PASS  one skin: line (3.71, 4.25)->(-0.56, 4.25) has 1 drawn wall(s) of 1: ['c-6']
+PASS  no slab bands left
+PASS  source on wall g-west: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall g-stair-room: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall g-stair-hall: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall g-east: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall g-south: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall g-north: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-1: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-2: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-3: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-4: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-5: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-8: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall c-6: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall f-west: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall f-east: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall f-south: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall f-north: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall t-west: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall t-east: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall t-south: docs/CHECK-SHEET.md + owner notes
+PASS  source on wall t-north: docs/CHECK-SHEET.md + owner notes
+PASS  source on object ribs '': docs/CHECK-SHEET.md ceiling
+PASS  source on object ribs '': docs/CHECK-SHEET.md ceiling
+PASS  source on object ribs '': docs/CHECK-SHEET.md ceiling
+PASS  source on object track '': scan/measure2.py lights
+PASS  source on object track '': scan/measure2.py lights
+PASS  source on object track '': scan/measure2.py lights
+PASS  source on object light '': docs/CHECK-SHEET.md
+PASS  source on object light '': docs/CHECK-SHEET.md
+PASS  source on object light '': docs/CHECK-SHEET.md
+PASS  source on object light '': docs/CHECK-SHEET.md
+PASS  source on object slab 'bridge floor': owner note 2026-09-02 (bridge)
+PASS  source on object slab 'bridge roof': owner note 2026-09-02 (bridge)
+PASS  source on object slab 'bridge wall a': owner note 2026-09-02 (bridge)
+PASS  source on object slab 'bridge wall b': owner note 2026-09-02 (bridge)
+PASS  source on object slab 'bridge end': owner note 2026-09-02 (bridge)
+PASS  source on object aircon '': scan/measure2.py hanging boxes
+PASS  source on object aircon '': scan/measure2.py hanging boxes
+PASS  source on object aircon '': scan/measure2.py hanging boxes
+PASS  source on object wallbox '': docs/CHECK-SHEET.md meter wall
+PASS  source on object wallbox '': docs/CHECK-SHEET.md meter wall
+PASS  source on object wallbox '': docs/CHECK-SHEET.md meter wall
+PASS  source on object pipe '': docs/CHECK-SHEET.md meter wall
+PASS  source on object pipe '': docs/CHECK-SHEET.md meter wall
+PASS  source on object slab 'apron by the glass': scan/measured.json yard
+PASS  source on object slab 'apron beside row 4': scan/measured.json yard
+PASS  source on object slab 'apron middle': scan/measured.json yard
+PASS  source on object slab 'apron wide part top': scan/measured.json yard
+PASS  source on object slab 'apron beside the side strip': scan/measured.json yard
+PASS  source on object slab 'apron wide part bottom': scan/measured.json yard
+PASS  source on object paving 'door patch': scan/measured.json yard
+PASS  source on object paving 'door patch row 4': scan/measured.json yard
+PASS  source on object paving 'far patch': scan/measured.json yard
+PASS  source on object paving 'side strip': scan/measured.json yard
+PASS  source on object slab 'dirt bed along the fence': scan/measured.json yard
+PASS  source on object slab 'sliver between the dirt and the fence': scan/measured.json yard
+PASS  source on object slab 'passage floor off the far corner': scan/measured.json yard
+PASS  source on object slab 'grating on the door step': scan/measured.json yard
+PASS  source on object slab 'counter inside by the front glass (measured; what it is: OPEN)': scan/measured.json yard
+PASS  source on object hedge 'plants behind the red intro wall, spilling over its top': owner photos 2026-09-03 (plants: forget for now)
+PASS  source on object hedge 'plants, front fringe over the wall top': owner photos 2026-09-03 (plants: forget for now)
+PASS  source on object slab 'stone figure (measured x 0.45 z -2.75, 1.25 tall)': scan/measured.json yard
+PASS  source on object block 'yes': osm way 96356994
+PASS  source on object block 'yes': osm way 96356996
+PASS  source on object block 'yes': osm way 96357004
+PASS  source on object block 'yes': osm way 96357010
+PASS  source on object block 'yes': osm way 96357012
+PASS  source on object block 'yes': osm way 96357013
+PASS  source on object block 'yes': osm way 96357014
+PASS  source on object block 'yes': osm way 96357017
+PASS  source on object block 'yes': osm way 96357018
+PASS  source on object block 'yes': osm way 96378349
+PASS  source on object block 'yes': osm way 96378355
+PASS  source on object block 'yes': osm way 96378358
+PASS  source on object block 'yes': osm way 96378564
+PASS  source on object block 'yes': osm way 96378565
+PASS  source on object block 'yes': osm way 96378566
+PASS  source on object block 'yes': osm way 96378567
+PASS  source on object block 'yes': osm way 96378568
+PASS  source on object block 'yes': osm way 96378569
+PASS  source on object block '京セラ原宿ビル': osm way 138917015
+PASS  source on object block '宮崎ビル': osm way 138917017
+PASS  source on object block 'yes': osm way 138917029
+PASS  source on object block 'yes': osm way 138917030
+PASS  source on object block 'yes': osm way 138917031
+PASS  source on object block 'yes': osm way 138917033
+PASS  source on object block 'yes': osm way 138917035
+PASS  source on object block 'yes': osm way 138917040
+PASS  source on object block 'yes': osm way 138917041
+PASS  source on object block 'yes': osm way 138917045
+PASS  source on object block 'yes': osm way 138917047
+PASS  source on object block 'yes': osm way 138917049
+PASS  source on object block 'yes': osm way 138917058
+PASS  source on object block 'yes': osm way 138917061
+PASS  source on object block 'yes': osm way 138917065
+PASS  source on object block 'yes': osm way 138917066
+PASS  source on object block '神宮前コーポラス': osm way 138917074
+PASS  source on object block 'yes': osm way 138917079
+PASS  source on object block 'yes': osm way 138917083
+PASS  source on object block 'yes': osm way 138917092
+PASS  source on object block 'yes': osm way 138917094
+PASS  source on object block 'yes': osm way 138917097
+PASS  source on object block 'yes': osm way 138917103
+PASS  source on object block 'yes': osm way 138917112
+PASS  source on object block 'yes': osm way 138921121
+PASS  source on object block 'yes': osm way 138921131
+PASS  source on object block 'yes': osm way 138921132
+PASS  source on object block 'yes': osm way 138921133
+PASS  source on object block 'Gregory': osm way 138921134
+PASS  source on object block 'yes': osm way 138921138
+PASS  source on object block 'yes': osm way 138921141
+PASS  source on object block 'yes': osm way 138921146
+PASS  source on object block 'yes': osm way 138921148
+PASS  source on object block 'apartments': osm way 138921149
+PASS  source on object block 'yes': osm way 138921152
+PASS  source on object block 'yes': osm way 138921153
+PASS  source on object block 'yes': osm way 138921156
+PASS  source on object block 'yes': osm way 138921159
+PASS  source on object block 'yes': osm way 138921160
+PASS  source on object block 'yes': osm way 138921166
+PASS  source on object block 'detached': osm way 138921168
+PASS  source on object block 'yes': osm way 138921181
+PASS  source on object block 'yes': osm way 138921186
+PASS  source on object block 'Patagonia': osm way 138921187
+PASS  source on object block 'yes': osm way 138921188
+PASS  source on object block 'yes': osm way 138921191
+PASS  source on object block 'Los Gatos': osm way 138921192
+PASS  source on object block 'yes': osm way 138921195
+PASS  source on object block 'yes': osm way 138921203
+PASS  source on object block 'yes': osm way 138921206
+PASS  source on object block 'yes': osm way 138921216
+PASS  source on object block 'yes': osm way 138921219
+PASS  source on object block 'yes': osm way 138921220
+PASS  source on object block 'yes': osm way 138921228
+PASS  source on object block 'yes': osm way 138921234
+PASS  source on object block 'yes': osm way 138921238
+PASS  source on object block 'yes': osm way 138921239
+PASS  source on object block 'yes': osm way 138921244
+PASS  source on object block 'yes': osm way 138921246
+PASS  source on object block 'detached': osm way 138921247
+PASS  source on object block 'yes': osm way 138921251
+PASS  source on object block 'yes': osm way 138921253
+PASS  source on object block 'yes': osm way 138921257
+PASS  source on object block 'yes': osm way 138921260
+PASS  source on object block 'detached': osm way 138921261
+PASS  source on object block 'yes': osm way 138921265
+PASS  source on object block 'yes': osm way 138921269
+PASS  source on object block 'yes': osm way 138921274
+PASS  source on object block 'yes': osm way 138921277
+PASS  source on object block 'yes': osm way 138921278
+PASS  source on object block 'yes': osm way 138921284
+PASS  source on object block 'yes': osm way 138921285
+PASS  source on object block 'yes': osm way 138921293
+PASS  source on object block 'yes': osm way 138921295
+PASS  source on object block 'yes': osm way 138921300
+PASS  source on object block 'yes': osm way 138921306
+PASS  source on object block 'yes': osm way 138921308
+PASS  source on object block 'yes': osm way 138921310
+PASS  source on object block 'apartments': osm way 138921313
+PASS  source on object block 'yes': osm way 138921318
+PASS  source on object block 'yes': osm way 138921322
+PASS  source on object block 'yes': osm way 138921324
+PASS  source on object block 'yes': osm way 138921327
+PASS  source on object block 'yes': osm way 138921328
+PASS  source on object block 'apartments': osm way 138921331
+PASS  source on object block '穏田神社': osm way 138921337
+PASS  source on object block 'yes': osm way 138921338
+PASS  source on object block 'yes': osm way 138932226
+PASS  source on object block 'yes': osm way 138932233
+PASS  source on object block 'yes': osm way 138932244
+PASS  source on object block 'yes': osm way 138932258
+PASS  source on object block 'yes': osm way 138932259
+PASS  source on object block 'yes': osm way 138932262
+PASS  source on object block 'yes': osm way 138932266
+PASS  source on object block 'yes': osm way 138932279
+PASS  source on object block 'yes': osm way 138932288
+PASS  source on object block 'yes': osm way 138932292
+PASS  source on object block 'yes': osm way 138932297
+PASS  source on object block 'yes': osm way 138932303
+PASS  source on object block 'yes': osm way 138932311
+PASS  source on object block 'yes': osm way 138932315
+PASS  source on object block 'yes': osm way 138932317
+PASS  source on object block 'yes': osm way 138932321
+PASS  source on object block 'yes': osm way 138932326
+PASS  source on object block 'yes': osm way 138932330
+PASS  source on object block 'yes': osm way 138932334
+PASS  source on object block 'yes': osm way 138932340
+PASS  source on object block 'yes': osm way 138932343
+PASS  source on object block 'yes': osm way 138932347
+PASS  source on object block 'yes': osm way 138932358
+PASS  source on object block 'yes': osm way 138932359
+PASS  source on object block 'yes': osm way 138932361
+PASS  source on object block 'yes': osm way 138932367
+PASS  source on object block 'yes': osm way 138932371
+PASS  source on object block 'yes': osm way 138932373
+PASS  source on object block 'yes': osm way 138932374
+PASS  source on object block '表参道オオサキスクエアビル': osm way 138932378
+PASS  source on object block 'yes': osm way 138932382
+PASS  source on object block 'yes': osm way 138932388
+PASS  source on object block 'yes': osm way 138932389
+PASS  source on object block 'yes': osm way 138932391
+PASS  source on object block 'yes': osm way 138932394
+PASS  source on object block 'yes': osm way 138932399
+PASS  source on object block '明治ハイム': osm way 138932407
+PASS  source on object block 'yes': osm way 138932408
+PASS  source on object block 'yes': osm way 138932411
+PASS  source on object block 'yes': osm way 138932412
+PASS  source on object block 'yes': osm way 138932415
+PASS  source on object block 'yes': osm way 138932420
+PASS  source on object block 'yes': osm way 138932424
+PASS  source on object block 'yes': osm way 138932425
+PASS  source on object block 'yes': osm way 138932433
+PASS  source on object block 'yes': osm way 138932443
+PASS  source on object block 'yes': osm way 138932446
+PASS  source on object block 'yes': osm way 138932448
+PASS  source on object block 'yes': osm way 138932449
+PASS  source on object block 'yes': osm way 138932460
+PASS  source on object block 'METROCAビル': osm way 138932462
+PASS  source on object block 'yes': osm way 138932470
+PASS  source on object block 'yes': osm way 138932472
+PASS  source on object block 'yes': osm way 138932475
+PASS  source on object block 'yes': osm way 138932478
+PASS  source on object block 'yes': osm way 138932483
+PASS  source on object block 'yes': osm way 138932486
+PASS  source on object block 'yes': osm way 138932489
+PASS  source on object block 'yes': osm way 138932491
+PASS  source on object block 'yes': osm way 138932496
+PASS  source on object block 'yes': osm way 138932497
+PASS  source on object block 'yes': osm way 138932502
+PASS  source on object block 'yes': osm way 138932507
+PASS  source on object block 'yes': osm way 138932509
+PASS  source on object block 'yes': osm way 138932511
+PASS  source on object block 'yes': osm way 138932512
+PASS  source on object block 'yes': osm way 138932518
+PASS  source on object block 'yes': osm way 138932521
+PASS  source on object block 'yes': osm way 138932526
+PASS  source on object block 'yes': osm way 138932528
+PASS  source on object block 'グリーンリーフ': osm way 138932534
+PASS  source on object block 'yes': osm way 138932536
+PASS  source on object block 'yes': osm way 138932541
+PASS  source on object block 'yes': osm way 138932542
+PASS  source on object block 'yes': osm way 138932545
+PASS  source on object block 'yes': osm way 138932546
+PASS  source on object block 'yes': osm way 138932547
+PASS  source on object block 'yes': osm way 138932551
+PASS  source on object block 'apartments': osm way 138932561
+PASS  source on object block 'yes': osm way 138932565
+PASS  source on object block 'yes': osm way 138932570
+PASS  source on object block 'yes': osm way 138932574
+PASS  source on object block 'yes': osm way 138932576
+PASS  source on object block 'yes': osm way 138932579
+PASS  source on object block 'yes': osm way 138932583
+PASS  source on object block 'yes': osm way 138932595
+PASS  source on object block 'yes': osm way 138932597
+PASS  source on object block 'yes': osm way 138932601
+PASS  source on object block 'yes': osm way 138932603
+PASS  source on object block 'yes': osm way 138932611
+PASS  source on object block 'yes': osm way 138932632
+PASS  source on object block 'yes': osm way 138932638
+PASS  source on object block 'yes': osm way 138932639
+PASS  source on object block 'yes': osm way 138932651
+PASS  source on object block 'yes': osm way 138932655
+PASS  source on object block 'yes': osm way 138932657
+PASS  source on object block 'yes': osm way 138932674
+PASS  source on object block 'yes': osm way 138932682
+PASS  source on object block 'yes': osm way 138932689
+PASS  source on object block 'yes': osm way 138932698
+PASS  source on object block 'yes': osm way 138932716
+PASS  source on object block 'ダイイチＨＯＫＩ神宮前ビル': osm way 138932725
+PASS  source on object block 'yes': osm way 138932732
+PASS  source on object block 'yes': osm way 138932739
+PASS  source on object block 'yes': osm way 138932740
+PASS  source on object block 'yes': osm way 138932746
+PASS  source on object block 'yes': osm way 138958634
+PASS  source on object block 'VERNU JAPAN': osm way 138958637
+PASS  source on object block 'yes': osm way 138958638
+PASS  source on object block 'yes': osm way 138958643
+PASS  source on object block 'yes': osm way 138958647
+PASS  source on object block 'コーポ井上': osm way 138958648
+PASS  source on object block 'yes': osm way 138958651
+PASS  source on object block 'yes': osm way 138958653
+PASS  source on object block 'yes': osm way 138958654
+PASS  source on object block 'yes': osm way 138958656
+PASS  source on object block 'yes': osm way 138958658
+PASS  source on object block 'yes': osm way 138958660
+PASS  source on object block 'yes': osm way 138958661
+PASS  source on object block 'yes': osm way 138958663
+PASS  source on object block 'yes': osm way 138958667
+PASS  source on object block 'yes': osm way 138958668
+PASS  source on object block 'yes': osm way 138958671
+PASS  source on object block 'yes': osm way 138958673
+PASS  source on object block 'yes': osm way 138958674
+PASS  source on object block 'yes': osm way 138958676
+PASS  source on object block 'yes': osm way 138958680
+PASS  source on object block 'yes': osm way 138958681
+PASS  source on object block 'house': osm way 138958683
+PASS  source on object block 'yes': osm way 138958686
+PASS  source on object block 'yes': osm way 138958687
+PASS  source on object block 'yes': osm way 138958691
+PASS  source on object block 'yes': osm way 138958692
+PASS  source on object block 'house': osm way 138958697
+PASS  source on object block 'yes': osm way 138958699
+PASS  source on object block 'yes': osm way 138958703
+PASS  source on object block 'house': osm way 138958704
+PASS  source on object block 'house': osm way 138958708
+PASS  source on object block 'yes': osm way 138958709
+PASS  source on object block 'house': osm way 138958710
+PASS  source on object block 'house': osm way 138958714
+PASS  source on object block 'yes': osm way 138958716
+PASS  source on object block 'yes': osm way 138958719
+PASS  source on object block 'yes': osm way 138958721
+PASS  source on object block 'house': osm way 138958724
+PASS  source on object block 'yes': osm way 138958727
+PASS  source on object block 'wjk': osm way 138958731
+PASS  source on object block 'house': osm way 138958734
+PASS  source on object block 'office': osm way 138958738
+PASS  source on object block 'yes': osm way 138958741
+PASS  source on object block 'yes': osm way 138958744
+PASS  source on object block 'house': osm way 138958746
+PASS  source on object block 'yes': osm way 138958747
+PASS  source on object block 'yes': osm way 138958750
+PASS  source on object block 'yes': osm way 138958752
+PASS  source on object block 'house': osm way 138958754
+PASS  source on object block 'retail': osm way 138958757
+PASS  source on object block 'yes': osm way 138958758
+PASS  source on object block 'yes': osm way 138958760
+PASS  source on object block 'house': osm way 138958764
+PASS  source on object block 'yes': osm way 138958769
+PASS  source on object block 'yes': osm way 138958770
+PASS  source on object block 'yes': osm way 138958771
+PASS  source on object block 'yes': osm way 138958775
+PASS  source on object block 'house': osm way 138958776
+PASS  source on object block 'yes': osm way 138958777
+PASS  source on object block 'yes': osm way 138958780
+PASS  source on object block 'ＦＦＦビル': osm way 138958782
+PASS  source on object block 'yes': osm way 138958784
+PASS  source on object block 'yes': osm way 138958786
+PASS  source on object block 'yes': osm way 138958788
+PASS  source on object block 'yes': osm way 138958789
+PASS  source on object block 'yes': osm way 138958791
+PASS  source on object block 'エクサスペース': osm way 138958794
+PASS  source on object block 'ハイツ碧水 神宮前': osm way 138958795
+PASS  source on object block 'yes': osm way 138958797
+PASS  source on object block 'yes': osm way 138958800
+PASS  source on object block 'yes': osm way 138958801
+PASS  source on object block 'yes': osm way 138958805
+PASS  source on object block 'house': osm way 138958806
+PASS  source on object block 'yes': osm way 138958807
+PASS  source on object block 'yes': osm way 138958811
+PASS  source on object block 'house': osm way 138958812
+PASS  source on object block 'yes': osm way 138958814
+PASS  source on object block 'アパートメント神宮前': osm way 138958816
+PASS  source on object block 'yes': osm way 138958818
+PASS  source on object block 'retail': osm way 138958821
+PASS  source on object block 'yes': osm way 138958825
+PASS  source on object block 'yes': osm way 138958826
+PASS  source on object block 'yes': osm way 138958827
+PASS  source on object block 'house': osm way 138958831
+PASS  source on object block 'ドミール表参道': osm way 138958832
+PASS  source on object block 'yes': osm way 138958835
+PASS  source on object block 'yes': osm way 138958837
+PASS  source on object block 'yes': osm way 138958840
+PASS  source on object block 'yes': osm way 138958843
+PASS  source on object block 'retail': osm way 138958844
+PASS  source on object block 'house': osm way 138958846
+PASS  source on object block 'yes': osm way 138958849
+PASS  source on object block 'house': osm way 138958850
+PASS  source on object block '清明荘': osm way 138958854
+PASS  source on object block 'yes': osm way 138958855
+PASS  source on object block 'commercial': osm way 138958859
+PASS  source on object block 'yes': osm way 138958860
+PASS  source on object block 'yes': osm way 138958863
+PASS  source on object block 'yes': osm way 138958865
+PASS  source on object block 'yes': osm way 138958867
+PASS  source on object block 'yes': osm way 138958871
+PASS  source on object block 'ガーデンスクエア原宿': osm way 138960187
+PASS  source on object block '鈴木ビル': osm way 138960188
+PASS  source on object block 'yes': osm way 138960192
+PASS  source on object block 'yes': osm way 138960194
+PASS  source on object block '神宮前リーベル': osm way 138960196
+PASS  source on object block 'キャットストリートビル': osm way 138960197
+PASS  source on object block 'yes': osm way 138960198
+PASS  source on object block 'yes': osm way 138960199
+PASS  source on object block 'yes': osm way 138960200
+PASS  source on object block 'yes': osm way 138960201
+PASS  source on object block '神宮前トーラス': osm way 138960202
+PASS  source on object block 'yes': osm way 138960203
+PASS  source on object block 'yes': osm way 138960204 clipped by our plot
+PASS  source on object block 'yes': osm way 138960204 clipped by our plot
+PASS  source on object block 'yes': osm way 138960205
+PASS  source on object block 'yes': osm way 138960206
+PASS  source on object block 'yes': osm way 138960207
+PASS  source on object block 'commercial': osm way 138960208
+PASS  source on object block 'yes': osm way 138960209
+PASS  source on object block 'apartments': osm way 138960211 clipped by our plot
+PASS  source on object block 'yes': osm way 138960212
+PASS  source on object block '小花ビル': osm way 138960215
+PASS  source on object block 'yes': osm way 138960216
+PASS  source on object block 'yes': osm way 138960217
+PASS  source on object block 'yes': osm way 138960219 clipped by our plot
+PASS  source on object block 'yes': osm way 138960219 clipped by our plot
+PASS  source on object block 'パークサイドオーサキ': osm way 138960220
+PASS  source on object block 'yes': osm way 138960221
+PASS  source on object block 'yes': osm way 138960222
+PASS  source on object block '原宿ＸＳ': osm way 138960223
+PASS  source on object block 'Omotesando Branch': osm way 138960224
+PASS  source on object block 'yes': osm way 138960225
+PASS  source on object block 'yes': osm way 138960226
+PASS  source on object block 'yes': osm way 138960227
+PASS  source on object block 'yes': osm way 138960228
+PASS  source on object block 'yes': osm way 138960229
+PASS  source on object block 'yes': osm way 138960230
+PASS  source on object block 'yes': osm way 138960231
+PASS  source on object block 'yes': osm way 138960232
+PASS  source on object block 'yes': osm way 138960233
+PASS  source on object block 'commercial': osm way 138960234
+PASS  source on object block 'yes': osm way 138960235
+PASS  source on object block 'yes': osm way 138960236
+PASS  source on object block 'detached': osm way 138960237
+PASS  source on object block 'yes': osm way 138960238
+PASS  source on object block 'yes': osm way 138960239
+PASS  source on object block 'yes': osm way 138960240
+PASS  source on object block 'yes': osm way 138960241
+PASS  source on object block 'yes': osm way 138960242
+PASS  source on object block 'yes': osm way 138960243
+PASS  source on object block 'yes': osm way 138960245
+PASS  source on object block 'yes': osm way 138960246
+PASS  source on object block 'yes': osm way 138960247
+PASS  source on object block 'yes': osm way 138960248 clipped by our plot
+PASS  source on object block 'yes': osm way 138960248 clipped by our plot
+PASS  source on object block 'yes': osm way 138960249
+PASS  source on object block 'retail': osm way 138960250
+PASS  source on object block 'ティスモ原宿': osm way 138960251
+PASS  source on object block 'yes': osm way 138960252
+PASS  source on object block 'yes': osm way 138960256
+PASS  source on object block 'クレストコート': osm way 138960257
+PASS  source on object block 'yes': osm way 138960258
+PASS  source on object block 'yes': osm way 138960259
+PASS  source on object block '原宿古屋ビル': osm way 138960260
+PASS  source on object block 'yes': osm way 138960262
+PASS  source on object block 'ベェルコート芙蓉': osm way 138960263
+PASS  source on object block 'yes': osm way 138960264
+PASS  source on object block 'yes': osm way 138960265
+PASS  source on object block 'retail': osm way 138960267
+PASS  source on object block 'yes': osm way 138960269
+PASS  source on object block 'retail': osm way 138960270 clipped by our plot
+PASS  source on object block 'retail': osm way 138960270 clipped by our plot
+PASS  source on object block 'Harry's Sandwich Company': osm way 138960271
+PASS  source on object block 'yes': osm way 138960272
+PASS  source on object block 'Body Wild': osm way 138960273 clipped by our plot
+PASS  source on object block 'Body Wild': osm way 138960273 clipped by our plot
+PASS  source on object block 'yes': osm way 138960274
+PASS  source on object block 'yes': osm way 138960275
+PASS  source on object block 'yes': osm way 138960276
+PASS  source on object block 'RAGTAG 原宿店': osm way 138960277 clipped by our plot
+PASS  source on object block 'RAGTAG 原宿店': osm way 138960277 clipped by our plot
+PASS  source on object block 'yes': osm way 138960278
+PASS  source on object block 'house': osm way 138960279
+PASS  source on object block 'ヒューリック神宮前': osm way 138960280
+PASS  source on object block '富貴ビル': osm way 138963936
+PASS  source on object block 'yes': osm way 138963937
+PASS  source on object block 'yes': osm way 138963938
+PASS  source on object block 'アヴニール表参道': osm way 138963939
+PASS  source on object block 'yes': osm way 138963940
+PASS  source on object block 'yes': osm way 138963941
+PASS  source on object block '原宿アーバンビル': osm way 138963942
+PASS  source on object block 'yes': osm way 138963944
+PASS  source on object block 'yes': osm way 138963945
+PASS  source on object block '美鈴ビル': osm way 138963946
+PASS  source on object block '原宿山田ビル': osm way 138963947
+PASS  source on object block 'yes': osm way 138963948
+PASS  source on object block 'yes': osm way 138963949
+PASS  source on object block 'yes': osm way 138963950
+PASS  source on object block 'yes': osm way 138963951
+PASS  source on object block 'yes': osm way 138963952
+PASS  source on object block 'yes': osm way 138963953
+PASS  source on object block 'yes': osm way 138963954
+PASS  source on object block 'yes': osm way 138963955
+PASS  source on object block 'Block House': osm way 138963956
+PASS  source on object block 'yes': osm way 138963957
+PASS  source on object block 'yes': osm way 138963958
+PASS  source on object block 'yes': osm way 138963959
+PASS  source on object block '原宿アーバンビル': osm way 138963960
+PASS  source on object block 'yes': osm way 138963961
+PASS  source on object block 'yes': osm way 138963962
+PASS  source on object block '肥田野ビル': osm way 138963963
+PASS  source on object block 'yes': osm way 138963964
+PASS  source on object block '神宮前六郵便局': osm way 138963965
+PASS  source on object block 'yes': osm way 138963966
+PASS  source on object block 'yes': osm way 138963967
+PASS  source on object block 'yes': osm way 138963968
+PASS  source on object block 'yes': osm way 138963970
+PASS  source on object block 'yes': osm way 138963971
+PASS  source on object block 'yes': osm way 138963973
+PASS  source on object block 'KTビル': osm way 138963974
+PASS  source on object block 'yes': osm way 138963975
+PASS  source on object block '神宮前堺ビル': osm way 138963976
+PASS  source on object block 'yes': osm way 138963977
+PASS  source on object block 'Iceberg': osm way 138963978
+PASS  source on object block 'yes': osm way 138963979
+PASS  source on object block 'メゾン神宮前': osm way 138963980
+PASS  source on object block 'yes': osm way 138963981
+PASS  source on object block 'yes': osm way 138963983
+PASS  source on object block 'T・FRAME原宿': osm way 138963984
+PASS  source on object block 'yes': osm way 138963985
+PASS  source on object block 'yes': osm way 138963986
+PASS  source on object block 'yes': osm way 138963987
+PASS  source on object block 'yes': osm way 138963988
+PASS  source on object block 'yes': osm way 138963989
+PASS  source on object block 'yes': osm way 138963990
+PASS  source on object block 'yes': osm way 138963991
+PASS  source on object block 'yes': osm way 138963992
+PASS  source on object block 'yes': osm way 138963993
+PASS  source on object block 'yes': osm way 138963994
+PASS  source on object block '秋田ビル': osm way 138963997
+PASS  source on object block 'ダイヤモンドビル': osm way 138963998
+PASS  source on object block 'yes': osm way 138964000
+PASS  source on object block '和秀ビル': osm way 138964001
+PASS  source on object block 'yes': osm way 138964002
+PASS  source on object block 'yes': osm way 138964059
+PASS  source on object block 'ネスト原宿6': osm way 138964060 clipped by our plot
+PASS  source on object block '和光ビル': osm way 138964942
+PASS  source on object block 'yes': osm way 138964944
+PASS  source on object block 'yes': osm way 138964948
+PASS  source on object block 'yes': osm way 138964950
+PASS  source on object block 'yes': osm way 138964952
+PASS  source on object block 'yes': osm way 138964953
+PASS  source on object block 'yes': osm way 138964956
+PASS  source on object block '和光ビル': osm way 138964957
+PASS  source on object block 'yes': osm way 138964959
+PASS  source on object block 'yes': osm way 138964960
+PASS  source on object block 'yes': osm way 138964961
+PASS  source on object block 'yes': osm way 138964963
+PASS  source on object block 'yes': osm way 138964965
+PASS  source on object block 'yes': osm way 138964968
+PASS  source on object block 'yes': osm way 138964969
+PASS  source on object block 'yes': osm way 138964970
+PASS  source on object block 'yes': osm way 138964973
+PASS  source on object block 'yes': osm way 138964974
+PASS  source on object block 'yes': osm way 138964976
+PASS  source on object block 'yes': osm way 138964977
+PASS  source on object block 'yes': osm way 138964978
+PASS  source on object block 'yes': osm way 138964980
+PASS  source on object block 'yes': osm way 138964982
+PASS  source on object block 'commercial': osm way 138964983
+PASS  source on object block 'yes': osm way 138964984
+PASS  source on object block 'yes': osm way 138964985
+PASS  source on object block 'yes': osm way 138964986
+PASS  source on object block 'yes': osm way 138964987
+PASS  source on object block 'yes': osm way 138964988
+PASS  source on object block 'yes': osm way 138964989
+PASS  source on object block 'yes': osm way 138964990
+PASS  source on object block 'YOビル': osm way 138964992
+PASS  source on object block 'yes': osm way 138964994
+PASS  source on object block 'アイズビル': osm way 138964995
+PASS  source on object block 'yes': osm way 138964996
+PASS  source on object block 'yes': osm way 138964997
+PASS  source on object block 'yes': osm way 138964998
+PASS  source on object block 'yes': osm way 138964999
+PASS  source on object block 'yes': osm way 138965000
+PASS  source on object block 'yes': osm way 138965001
+PASS  source on object block 'yes': osm way 139043556
+PASS  source on object block 'yes': osm way 139043583
+PASS  source on object block 'yes': osm way 139043593
+PASS  source on object block 'yes': osm way 139043594
+PASS  source on object block 'yes': osm way 139043602
+PASS  source on object block 'yes': osm way 139043605
+PASS  source on object block 'yes': osm way 139043615
+PASS  source on object block 'yes': osm way 139043617
+PASS  source on object block 'yes': osm way 139043618
+PASS  source on object block 'yes': osm way 139043625
+PASS  source on object block 'yes': osm way 139043629
+PASS  source on object block 'yes': osm way 139043634
+PASS  source on object block 'yes': osm way 139043652
+PASS  source on object block 'yes': osm way 139043656
+PASS  source on object block 'yes': osm way 139043671
+PASS  source on object block 'yes': osm way 139043672
+PASS  source on object block 'yes': osm way 139043678
+PASS  source on object block 'yes': osm way 139043679
+PASS  source on object block 'yes': osm way 139043684
+PASS  source on object block 'yes': osm way 139043686
+PASS  source on object block 'yes': osm way 139043687
+PASS  source on object block 'yes': osm way 139043694
+PASS  source on object block 'yes': osm way 139043696
+PASS  source on object block '威辺利亜ビル': osm way 139043712
+PASS  source on object block 'yes': osm way 139043715
+PASS  source on object block 'yes': osm way 139043716
+PASS  source on object block 'yes': osm way 139043720
+PASS  source on object block 'yes': osm way 139043727
+PASS  source on object block 'yes': osm way 139043728
+PASS  source on object block 'yes': osm way 139043738
+PASS  source on object block 'yes': osm way 139043746
+PASS  source on object block 'retail': osm way 139043748
+PASS  source on object block 'yes': osm way 139043749
+PASS  source on object block 'yes': osm way 139043751
+PASS  source on object block 'yes': osm way 139043756
+PASS  source on object block 'yes': osm way 139043757
+PASS  source on object block 'yes': osm way 139043761
+PASS  source on object block 'yes': osm way 139043763
+PASS  source on object block 'yes': osm way 139043778
+PASS  source on object block 'yes': osm way 139043780
+PASS  source on object block 'yes': osm way 139043781
+PASS  source on object block 'yes': osm way 139043787
+PASS  source on object block 'gyre': osm way 139043792
+PASS  source on object block 'yes': osm way 139043795
+PASS  source on object block '±0 深澤直人': osm way 209471407
+PASS  source on object block 'retail': osm way 209961240
+PASS  source on object block 'retail': osm way 209961241
+PASS  source on object block 'retail': osm way 209961242
+PASS  source on object block '東武ビル': osm way 355228915
+PASS  source on object block 'キュープラザ原宿': osm way 355228916
+PASS  source on object block 'yes': osm way 399414180
+PASS  source on object block 'yes': osm way 520427221
+PASS  source on object block '笑たこ 原宿表参道店': osm way 520427223
+PASS  source on object block 'yes': osm way 547672336
+PASS  source on object block 'apartments': osm way 547672338
+PASS  source on object block 'J6 Frontビル': osm way 547672340
+PASS  source on object block 'yes': osm way 588320770
+PASS  source on object block 'yes': osm way 588320771
+PASS  source on object block 'retail': osm way 653155148
+PASS  source on object block 'yes': osm way 971255557
+PASS  source on object block 'コモンズ表参道': osm way 1072594116
+PASS  source on object block 'warehouse': osm way 1072624252
+PASS  source on object block 'shed': osm way 1072624253
+PASS  source on object block 'shed': osm way 1072624254
+PASS  source on object block 'commercial': osm way 1072624255
+PASS  source on object block 'roof': osm way 1072624257
+PASS  source on object block 'commercial': osm way 1072624258
+PASS  source on object block 'carport': osm way 1072754766
+PASS  source on object block 'yes': osm way 1072801932
+PASS  source on object block '紫波興産': osm way 1073104560
+PASS  source on object block 'roof': osm way 1073104568
+PASS  source on object block 'Ａ棟': osm way 1073279184
+PASS  source on object block 'Ｂ棟': osm way 1073279200
+PASS  source on object block 'yes': osm way 1073423160
+PASS  source on object block 'service': osm way 1073423161
+PASS  source on object block 'service': osm way 1073505581
+PASS  source on object block 'グランドオム': osm way 1245535354
+PASS  source on object block 'yes': osm way 1387452351
+PASS  source on object block 'yes': osm way 1415411695
+PASS  source on object block 'yes': osm way 1415411701
+PASS  source on object block 'yes': osm way 1425315558
+PASS  source on object block 'yes': osm way 1425315561
+PASS  source on object block 'yes': osm way 1425315562
+PASS  source on object block 'yes': osm way 1425315563
+PASS  source on object block 'yes': osm way 1425315564
+PASS  source on object block 'yes': osm way 1425315565
+PASS  source on object block 'yes': osm way 1425315566
+PASS  source on object block 'roof': osm way 1432936305
+PASS  source on object block '稲荷神社': osm way 1432936306
+PASS  source on object road 'residential': osm way 39581918
+PASS  source on object road '表参道': osm way 41521096
+PASS  source on object road 'residential': osm way 41854011
+PASS  source on object road 'residential': osm way 41854030
+PASS  source on object road 'service': osm way 41857126
+PASS  source on object road 'service': osm way 41857127
+PASS  source on object road 'residential': osm way 41857173
+PASS  source on object road 'service': osm way 41857174
+PASS  source on object road 'service': osm way 41857176
+PASS  source on object road 'path': osm way 41857177
+PASS  source on object road 'service': osm way 41857179
+PASS  source on object road 'path': osm way 41857184
+PASS  source on object road 'service': osm way 41857186
+PASS  source on object road 'service': osm way 41857187
+PASS  source on object road 'residential': osm way 41857188
+PASS  source on object road 'service': osm way 41857189
+PASS  source on object road 'residential': osm way 41857191
+PASS  source on object road 'residential': osm way 41857210
+PASS  source on object road 'service': osm way 41857214
+PASS  source on object road 'service': osm way 41857216
+PASS  source on object road 'service': osm way 41857218
+PASS  source on object road 'path': osm way 41857219
+PASS  source on object road 'residential': osm way 41857220
+PASS  source on object road 'residential': osm way 41857223
+PASS  source on object road 'service': osm way 41857226
+PASS  source on object road 'residential': osm way 41857227
+PASS  source on object road 'residential': osm way 41857228
+PASS  source on object road 'service': osm way 41857229
+PASS  source on object road 'service': osm way 93208066
+PASS  source on object road 'residential': osm way 93208069
+PASS  source on object road 'service': osm way 138913755
+PASS  source on object road 'service': osm way 138913758
+PASS  source on object road 'service': osm way 138913759
+PASS  source on object road 'service': osm way 138913760
+PASS  source on object road 'residential': osm way 138917006
+PASS  source on object road 'residential': osm way 138917007
+PASS  source on object road 'service': osm way 138917008
+PASS  source on object road 'service': osm way 138917009
+PASS  source on object road 'service': osm way 138921115
+PASS  source on object road 'residential': osm way 138921116
+PASS  source on object road 'footway': osm way 139117052
+PASS  source on object road 'footway': osm way 139487215
+PASS  source on object road 'footway': osm way 139487216
+PASS  source on object road 'steps': osm way 139487218
+PASS  source on object road 'residential': osm way 220547106
+PASS  source on object road 'service': osm way 520422790
+PASS  source on object road 'キャットストリート': osm way 520422791
+PASS  source on object road 'service': osm way 520422793
+PASS  source on object road 'footway': osm way 520422794
+PASS  source on object road 'path': osm way 520422795
+PASS  source on object road 'footway': osm way 520427218
+PASS  source on object road 'footway': osm way 520427219
+PASS  source on object road 'footway': osm way 520427222
+PASS  source on object road 'steps': osm way 520427224
+PASS  source on object road 'path': osm way 520427225
+PASS  source on object road 'footway': osm way 544373680
+PASS  source on object road 'residential': osm way 547678602
+PASS  source on object road 'residential': osm way 548301617
+PASS  source on object road 'service': osm way 579301818
+PASS  source on object road 'footway': osm way 588320765
+PASS  source on object road 'footway': osm way 588320766
+PASS  source on object road 'footway': osm way 588320767
+PASS  source on object road 'footway': osm way 588320768
+PASS  source on object road 'footway': osm way 662925207
+PASS  source on object road 'footway': osm way 662925211
+PASS  source on object road 'footway': osm way 662926165
+PASS  source on object road 'steps': osm way 662926166
+PASS  source on object road 'footway': osm way 662928196
+PASS  source on object road 'footway': osm way 662929508
+PASS  source on object road 'footway': osm way 662929509
+PASS  source on object road 'footway': osm way 662931489
+PASS  source on object road 'footway': osm way 662999828
+PASS  source on object road 'footway': osm way 665967930
+PASS  source on object road 'service': osm way 702089732
+PASS  source on object road 'ネッコ坂': osm way 756290726
+PASS  source on object road '明治通り': osm way 798739072
+PASS  source on object road '明治通り': osm way 798794768
+PASS  source on object road 'footway': osm way 884973198
+PASS  source on object road 'residential': osm way 963385012
+PASS  source on object road 'service': osm way 1072594113
+PASS  source on object road 'service': osm way 1072594114
+PASS  source on object road 'service': osm way 1072594115
+PASS  source on object road 'path': osm way 1072594117
+PASS  source on object road 'steps': osm way 1072594118
+PASS  source on object road 'path': osm way 1072594119
+PASS  source on object road 'service': osm way 1072627745
+PASS  source on object road 'path': osm way 1072627746
+PASS  source on object road 'service': osm way 1072627747
+PASS  source on object road 'service': osm way 1072627748
+PASS  source on object road 'service': osm way 1072779982
+PASS  source on object road 'steps': osm way 1072779985
+PASS  source on object road 'footway': osm way 1072779986
+PASS  source on object road 'service': osm way 1072779993
+PASS  source on object road 'path': osm way 1072801938
+PASS  source on object road 'path': osm way 1072801939
+PASS  source on object road 'pedestrian': osm way 1073104558
+PASS  source on object road 'service': osm way 1073104562
+PASS  source on object road 'service': osm way 1073227881
+PASS  source on object road 'footway': osm way 1073227882
+PASS  source on object road 'footway': osm way 1073227883
+PASS  source on object road 'footway': osm way 1073227884
+PASS  source on object road 'steps': osm way 1073227885
+PASS  source on object road 'footway': osm way 1073227886
+PASS  source on object road 'footway': osm way 1073227887
+PASS  source on object road 'footway': osm way 1073227888
+PASS  source on object road 'footway': osm way 1073227889
+PASS  source on object road 'residential': osm way 1073227890
+PASS  source on object road 'footway': osm way 1073227891
+PASS  source on object road 'footway': osm way 1073279185
+PASS  source on object road 'footway': osm way 1073279186
+PASS  source on object road 'steps': osm way 1073279187
+PASS  source on object road 'footway': osm way 1073279188
+PASS  source on object road 'footway': osm way 1073279189
+PASS  source on object road 'footway': osm way 1073279190
+PASS  source on object road 'footway': osm way 1073279191
+PASS  source on object road 'footway': osm way 1073279192
+PASS  source on object road 'footway': osm way 1073279199
+PASS  source on object road 'steps': osm way 1073279201
+PASS  source on object road 'footway': osm way 1073279202
+PASS  source on object road 'steps': osm way 1073279203
+PASS  source on object road 'footway': osm way 1073279204
+PASS  source on object road 'footway': osm way 1073279205
+PASS  source on object road 'footway': osm way 1073279207
+PASS  source on object road 'footway': osm way 1073279208
+PASS  source on object road 'service': osm way 1073279212
+PASS  source on object road 'service': osm way 1073294151
+PASS  source on object road 'footway': osm way 1073294153
+PASS  source on object road 'footway': osm way 1073294154
+PASS  source on object road 'footway': osm way 1073294155
+PASS  source on object road 'footway': osm way 1073294157
+PASS  source on object road 'footway': osm way 1073294158
+PASS  source on object road 'footway': osm way 1073294160
+PASS  source on object road 'pedestrian': osm way 1073530345
+PASS  source on object road 'pedestrian': osm way 1073530346
+PASS  source on object road 'pedestrian': osm way 1073530353
+PASS  source on object road 'pedestrian': osm way 1073530354
+PASS  source on object road 'pedestrian': osm way 1073530357
+PASS  source on object road 'pedestrian': osm way 1073530358
+PASS  source on object road 'pedestrian': osm way 1073530359
+PASS  source on object road 'pedestrian': osm way 1073530360
+PASS  source on object road 'pedestrian': osm way 1073530361
+PASS  source on object road 'pedestrian': osm way 1073530362
+PASS  source on object road 'pedestrian': osm way 1073530363
+PASS  source on object road 'pedestrian': osm way 1073530364
+PASS  source on object road 'pedestrian': osm way 1073530369
+PASS  source on object road 'pedestrian': osm way 1073530372
+PASS  source on object road 'footway': osm way 1073530395
+PASS  source on object road 'path': osm way 1073530396
+PASS  source on object road 'steps': osm way 1073530397
+PASS  source on object road 'steps': osm way 1073530398
+PASS  source on object road 'steps': osm way 1073530399
+PASS  source on object road 'steps': osm way 1073530400
+PASS  source on object road 'steps': osm way 1073670531
+PASS  source on object road 'steps': osm way 1073670532
+PASS  source on object road 'steps': osm way 1073670533
+PASS  source on object road 'steps': osm way 1073670534
+PASS  source on object road 'steps': osm way 1073670535
+PASS  source on object road 'steps': osm way 1073670536
+PASS  source on object road 'steps': osm way 1073670537
+PASS  source on object road 'steps': osm way 1073670538
+PASS  source on object road 'steps': osm way 1073670539
+PASS  source on object road 'footway': osm way 1084561629
+PASS  source on object road 'footway': osm way 1271366326
+PASS  source on object road 'service': osm way 1314829324
+PASS  source on object road 'steps': osm way 1314829325
+PASS  source on object road '表参道': osm way 1368012336
+PASS  source on object road 'residential': osm way 1378353105
+PASS  source on object road 'footway': osm way 1432936302
+PASS  source on object road 'footway': osm way 1432936303
+PASS  source on object road 'steps': osm way 1432936304
+PASS  source on object road 'steps': osm way 1432936307
+PASS  source on object road 'back street (not in OSM; street-view photo)': street-view photo 2021-05, manual
+PASS  source on object ground '': plate under everything
+PASS  back grid: ground piece meets the upper piece at the slab, no wall between
+PASS  back grid: reaches the top floor ceiling
+PASS  back grid: frosted low panes on the ground floor
+PASS  no context block on the gallery plot (0 do: [])
+PASS  ground plate under the context
+PASS  roads present: 172
+PASS  every block has a height
+PASS  level reachable: ground
+PASS  level reachable: first
+PASS  level reachable: third
+PASS  door tall enough to walk: g-stair-room u 0.12 h 2.0
+PASS  slider leaf on the hallway side only: g-stair-room u 0.12 leaf=False
+PASS  door tall enough to walk: g-stair-room u 4.24 h 2.0
+PASS  slider leaf on the hallway side only: g-stair-room u 4.24 leaf=False
+PASS  door tall enough to walk: g-stair-hall u 0.0 h 2.0
+PASS  slider leaf on the hallway side only: g-stair-hall u 0.0 leaf=True
+PASS  door tall enough to walk: g-stair-hall u 4.12 h 2.0
+PASS  slider leaf on the hallway side only: g-stair-hall u 4.12 leaf=True
+PASS  door tall enough to walk: g-east u 2.77 h 3.19
+
+ALL PASS

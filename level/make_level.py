@@ -27,10 +27,11 @@ STAIR_E = round(W + STAIR_W, 3)            # east edge of the flight: the upper 
 PITCH = round((NG - SG) / 6, 3)            # six columns across the back window
 GREY, BLACK = "steel-grey", "steel-black"
 
-def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), hang=True, material="wall-white", note=None):
+def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), hang=True, material="wall-white", note=None, src="docs/CHECK-SHEET.md + owner notes"):
     d = dict(id=id, name=name, level=level, a=a, b=b, baseY=baseY, topY=topY, thickness=0.14, facing=facing,
              openings=list(openings), noHang=list(noHang), hang=hang, material=material)
     if note: d["note"] = note
+    d["src"] = src
     return d
 def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False, frame=True, hinge="a",
          jambW=0.05, frameMaterial=None, panelAbove=0.0, recess=0.0, leafH=None):
@@ -59,9 +60,19 @@ def back_window(base, top, u0, u1, origin_u):
 DOOR_N = round(SG + 0.80, 3)         # north edge of the street door (flush in the corner)
 STAIR_Z0 = round(DOOR_N + 0.02, 3)   # first riser just past the door edge
 STAIR_TOP = round(STAIR_Z0 + 3.77, 3)
+def back_grid(u0, u1, bottom, top_y, bars, frost=None):
+    """one piece of the back grid: uprights on the shared pitch from the south corner, bars at absolute heights above G0"""
+    win = back_window(G0, G0 + 1, u0, u1, round(NG - SG, 3))
+    win["bottom"] = bottom; win["h"] = round(top_y - G0 - bottom, 3)
+    win["grid"]["bars"] = [round(b_, 3) for b_ in bars]
+    if frost: win["grid"]["frostBelow"] = frost
+    return win
+# rows: ground = frosted panes to 1.74 then a bar at 2.58 (street photo, estimate); upper floors = thirds; a bar at each slab
+ROWS_UP = [1.0, 2.0]
 g_west_openings = [
-    back_window(G0, G1, 0.0, round(NG - DOOR_N, 3), round(NG - SG, 3)),                    # window from the north corner to the door
+    back_grid(0.0, round(NG - DOOR_N, 3), 0.10, F0, [1.74, 2.58], frost=1.74),                                    # ground: north corner to the door, up to the slab
     door(round(NG - DOOR_N, 3), 0.80, 2.05, "metal", False, toggle=False, face="steel", recess=0.10, panelAbove=round(GH - 2.05, 3)),
+    back_grid(0.0, round(NG - SG, 3), round(F0 - G0, 3), T1, [F0 - G0 + r for r in ROWS_UP] + [T0 - G0] + [T0 - G0 + r for r in ROWS_UP]),  # upper floors: full width, one grid
 ]
 walls = [
     wall("g-west", "back wall of the building, ground (window, street door, meter panel)", "ground", [W, NG], [W, SG], "+x", G0, G1,
@@ -101,22 +112,33 @@ def upper(level, base, top, tag, with_door=True):
                 window(3.55, 1.40, 0, H, BLACK, uprights=[0.70], bars=[1.0])]
         east_note = "X window 2 panes | wall | steel door + mesh strip + panel above | wall | 2-pane window"
     else:
-        east = [window(0.05, round(NF - SF - 0.10, 3), 0, H, BLACK, uprights=[round(0.719 * k, 3) for k in range(1, 7)], bars=[1.0])]
+        east = [window(0.05, round(NG - SG - 0.10, 3), 0, H, BLACK, uprights=[round(0.719 * k, 3) for k in range(1, 7)], bars=[1.0])]
         east_note = "owner: third floor east = windows all the way across, no door"
     return [
-        wall(f"{tag}-west", "back window wall", level, [W, NF], [W, SF], "+x", base, top, hang=False,
-             openings=[back_window(base, top, 0.0, round(NF - SF, 3), round(NF - SG, 3))]),
-        wall(f"{tag}-east", "east glass", level, [E, SF], [E, NF], "-x", base, top, hang=False, openings=east, note=east_note),
-        wall(f"{tag}-south", "south (stair side wall)", level, [W, SF], [E, SF], "+z", base, top),
-        wall(f"{tag}-north", "north", level, [E, NF], [W, NF], "-z", base, top),
+        wall(f"{tag}-west", "back window wall", level, [W, NG], [W, SG], "+x", base, top, hang=False, openings=[]),   # the one grid lives on g-west
+        wall(f"{tag}-east", "east glass", level, [E, SG], [E, NG], "-x", base, top, hang=False, openings=east, note=east_note),
+        wall(f"{tag}-south", "south (stair side wall)", level, [W, SG], [E, SG], "+z", base, top),
+        wall(f"{tag}-north", "north", level, [E, NG], [W, NG], "-z", base, top),
     ]
 walls += upper("first", F0, F1, "f") + upper("third", T0, T1, "t", with_door=False)
-bands = []
-for w_ in walls:
-    if w_["level"] in ("first", "third"):
-        base = round(w_["baseY"] - (F0 - G1 if w_["level"] == "first" else T0 - F1), 3)
-        bands.append(wall(w_["id"] + "-band", w_["name"] + " (slab band)", w_["level"], w_["a"], w_["b"], w_["facing"], base, w_["baseY"], hang=False))
-walls += bands
+def merge_lines(walls):
+    """ONE SKIN (owner): walls on the same line across floors become one drawn wall from the lowest base to the highest top,
+    openings of the upper floors lifted onto it; the upper-floor entries stay for walking only (draw=False)."""
+    groups = {}
+    for w_ in walls: groups.setdefault((tuple(w_["a"]), tuple(w_["b"]), w_["facing"]), []).append(w_)
+    for grp in groups.values():
+        if len(grp) < 2: continue
+        grp.sort(key=lambda w_: w_["baseY"])
+        base = grp[0]
+        for up_ in grp[1:]:
+            lift = round(up_["baseY"] - base["baseY"], 3)
+            for o in up_["openings"]:
+                o2 = dict(o); o2["bottom"] = round(o["bottom"] + lift, 3); base["openings"].append(o2)
+            up_["openings"] = []; up_["draw"] = False
+            base["topY"] = max(base["topY"], up_["topY"])
+        base["note"] = (base.get("note", "") + " | one skin: ground to roof").strip(" |")
+    return walls
+walls = merge_lines(walls)
 
 def strip_polys(level, floor_name, room_s, room_n, has_foot, has_landing):
     # the room floor runs right up to the flight's edge; landing and stair foot fill the flight strip at its ends
@@ -199,5 +221,15 @@ level = dict(
     sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),
     source=dict(made="level/make_level.py v3 2026-09-02", from_="docs/CHECK-SHEET.md + owner answers"),
 )
+CTX = json.load(open("level/context.json", encoding="utf-8")) if __import__("os").path.exists("level/context.json") else None
+if CTX:
+    level["objects"] += CTX["blocks"] + CTX["roads"] + [CTX["ground"]]
+    level["context"] = dict(source=CTX["source"], blocks=len(CTX["blocks"]), roads=len(CTX["roads"]))
+SRC = dict(ribs="docs/CHECK-SHEET.md ceiling", track="scan/measure2.py lights", light="docs/CHECK-SHEET.md", aircon="scan/measure2.py hanging boxes",
+           wallbox="docs/CHECK-SHEET.md meter wall", pipe="docs/CHECK-SHEET.md meter wall", hedge="owner photos 2026-09-03 (plants: forget for now)",
+           paving="scan/measured.json yard", slab="scan/measured.json yard", block="osm", road="osm")
+for o in level["objects"]:
+    if "src" not in o:
+        o["src"] = "owner note 2026-09-02 (bridge)" if "bridge" in (o.get("name") or "") else SRC.get(o["kind"], "UNSOURCED")
 json.dump(level, open("level/level.json", "w"), indent=1)
 print("wrote level/level.json:", len(walls), "walls,", len(level["objects"]), "objects; stair width", STAIR_W, "centre", STAIR_X, "pitch", PITCH)

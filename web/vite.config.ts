@@ -41,6 +41,18 @@ function dataDirs(): Plugin {
           })
           return
         }
+        // dev only: POST /__audit?name=x with a text body writes docs/audit/x.txt (browser-side audit results)
+        if (url === '/__audit' && req.method === 'POST') {
+          const name = (new URL(req.url ?? '', 'http://x').searchParams.get('name') ?? 'audit').replace(/[^a-z0-9_-]/gi, '')
+          let body = ''
+          req.on('data', (c: Buffer) => { body += c.toString() })
+          req.on('end', () => {
+            const dir = join(ROOT, 'docs', 'audit'); mkdirSync(dir, { recursive: true })
+            writeFileSync(join(dir, `${name}.txt`), body)
+            res.setHeader('Content-Type', 'text/plain'); res.end(`ok ${name}`)
+          })
+          return
+        }
         const m = url.match(/^\/data\/([a-z]+)\/(.+)$/)
         if (!m || !DATA_DIRS.includes(m[1]) || m[2].includes('..')) return next()
         const file = join(ROOT, m[1], decodeURIComponent(m[2]))
