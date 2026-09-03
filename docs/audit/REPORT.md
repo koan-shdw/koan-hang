@@ -1,6 +1,6 @@
 # Audit report
 
-2026-09-03 16:08, commit 1b330fa
+2026-09-03 17:30, commit ff0b896
 
 **PASS** (0 fails)
 
@@ -47,6 +47,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 - docs/sheet\open-yard-views.jpg
 - docs/sheet\skin-views-1.jpg
 - docs/sheet\skin-views-2.jpg
+- docs/sheet\tex-stock-views.jpg
 - docs/sheet\tex-views.jpg
 - docs/sheet\void-views.jpg
 - docs/sheet\yard-blend.jpg
@@ -54,7 +55,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 
 ## Stage 6 notes ledger
 
-42 notes, 11 open:
+43 notes, 11 open:
 
 - there's stairs, windows and doors which need a clean up -> built
 - textures generated or expanded from the scan, on my ComfyUI -> open

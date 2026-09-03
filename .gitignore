@@ -5,3 +5,4 @@ scan/__pycache__/
 scan/*.npy
 *.pyc
 scan/bake/*.png
+textures/stock/

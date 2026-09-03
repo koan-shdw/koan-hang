@@ -168,15 +168,16 @@ const PALETTE: Record<string, { color: number; rough?: number; metal?: number; o
   'stone': { color: 0x9a968e, rough: 0.9 },
   'corrugated-white': { color: 0xe4e4e0, rough: 0.6, metal: 0.2 },
 }
-/** P3: the scan-baked tiles (textures/*.jpg, made by textures/make_tiles.py), metres per tile. Owner's list 2026-09-03. */
+/** P3: the tiles (textures/*.jpg), metres per tile. Courtyard, red wall, dirt, ceiling, frames, stringers: baked from the scan
+ *  (textures/make_tiles.py). Floors, walls, treads, risers, doors: stock CC0 from ambientCG (textures/STOCK.md), owner's call 2026-09-03. */
 export const MAPS: Record<string, { file: string; tile: number }> = {
   'concrete-path': { file: 'concrete-path.jpg', tile: 2.0 }, 'corten': { file: 'corten.jpg', tile: 1.5 },
   'slate': { file: 'slate.jpg', tile: 0.6 }, 'red-tile': { file: 'red-tile.jpg', tile: 0.6 }, 'concrete': { file: 'concrete.jpg', tile: 1.0 },
-  'concrete-polished': { file: 'concrete-polished.jpg', tile: 2.0 }, 'concrete-bare': { file: 'concrete-bare.jpg', tile: 2.0 },
-  'concrete-grey': { file: 'concrete-grey.jpg', tile: 1.0 }, 'wall-white': { file: 'wall-white.jpg', tile: 2.0 },
-  'corrugated-ceiling': { file: 'corrugated-ceiling.jpg', tile: 1.0 }, 'plywood': { file: 'plywood.jpg', tile: 0.8 },
-  'checker': { file: 'checker.jpg', tile: 0.5 }, 'dirt': { file: 'dirt.jpg', tile: 1.0 }, 'door-metal': { file: 'door-metal.jpg', tile: 0.8 },
-  'door-slide': { file: 'door-slide.jpg', tile: 0.8 }, 'stringer-blue': { file: 'stringer-blue.jpg', tile: 0.8 },
+  'concrete-polished': { file: 'concrete-floor.jpg', tile: 2.5 }, 'concrete-bare': { file: 'concrete-floor.jpg', tile: 2.5 },
+  'concrete-grey': { file: 'concrete-floor.jpg', tile: 2.5 }, 'wall-white': { file: 'wall-white.jpg', tile: 2.0 },
+  'corrugated-ceiling': { file: 'corrugated-ceiling.jpg', tile: 1.0 }, 'plywood': { file: 'plywood.jpg', tile: 1.2 },
+  'checker': { file: 'checker.jpg', tile: 0.6 }, 'dirt': { file: 'dirt.jpg', tile: 1.0 }, 'door-metal': { file: 'door-metal.jpg', tile: 1.0 },
+  'door-slide': { file: 'door-metal.jpg', tile: 1.0 }, 'stringer-blue': { file: 'stringer-blue.jpg', tile: 0.8 },
   'steel-black': { file: 'steel-black.jpg', tile: 0.5 }, 'render': { file: 'render.jpg', tile: 0.8 },
 }
 const texCache = new Map<string, THREE.Texture>()

@@ -81,7 +81,9 @@ def make_tileable(rgb, zone=4):
     w = (w * zone).clip(0, 1)  # keep the middle untouched, blend only the outer 1/zone
     return np.clip(f * w + off * (1 - w), 0, 255).astype(np.uint8)
 
+STOCK = {"concrete-polished", "concrete-bare", "concrete-grey", "wall-white", "checker", "plywood", "door-metal", "door-slide"}   # stock files (textures/STOCK.md), never overwritten here
 for m, e in idx.items():
+    if m in STOCK: print(f"{m:18s} stock (textures/STOCK.md)"); continue
     if m not in PATCH: print(f"{m:18s} skipped (flat colour)"); continue
     size_m, mode = PATCH[m]
     img = np.asarray(Image.open(f"scan/bake/{m}.png").convert("RGB")); msk = np.asarray(Image.open(f"scan/bake/{m}.mask.png").convert("L"))
