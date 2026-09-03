@@ -8,11 +8,14 @@
  "corrugated-ceiling": 55.6,
  "corten": 34.1,
  "dirt": 87.2,
+ "door-metal": 22.6,
+ "door-slide": 16.6,
  "plywood": 32.5,
  "red-tile": 100.0,
  "render": 27.7,
  "slate": 98.4,
  "steel-black": 88.8,
  "stone": 13.6,
+ "stringer-blue": 16.6,
  "wall-white": 21.6
 }

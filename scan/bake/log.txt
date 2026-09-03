@@ -1,11 +1,21 @@
 scan: 428675 faces, 8 atlases, tracer RayMeshIntersector, 0.4s
 walls
   g-west front                           wall-white         5.09x9.51 m  cover  24.3%
+  g-west door u4.29 front                door-metal         0.80x2.05 m  cover  66.0%
   g-west back                            wall-white         5.09x9.51 m  cover   0.1%
+  g-west door u4.29 back                 door-metal         0.80x2.05 m  cover   1.1%
   g-stair-room front                     wall-white         5.09x3.24 m  cover  94.9%
+  g-stair-room door u0.12 front          door-slide         0.85x2.00 m  cover  12.9%
+  g-stair-room door u4.24 front          door-slide         0.85x2.00 m  cover  31.0%
   g-stair-room back                      wall-white         5.09x3.24 m  cover  32.4%
+  g-stair-room door u0.12 back           door-slide         0.85x2.00 m  cover   0.0%
+  g-stair-room door u4.24 back           door-slide         0.85x2.00 m  cover  22.4%
   g-east front                           wall-white         5.09x9.51 m  cover  46.4%
+  g-east door u2.77 front                door-metal         0.85x3.19 m  cover  11.2%
+  g-east door u2.05 front                door-metal         0.90x2.05 m  cover  62.2%
   g-east back                            wall-white         5.09x9.51 m  cover  12.4%
+  g-east door u2.77 back                 door-metal         0.85x3.19 m  cover   8.9%
+  g-east door u2.05 back                 door-metal         0.90x2.05 m  cover   0.1%
   g-south front                          wall-white         7.30x9.51 m  cover  31.4%
   g-south back                           wall-white         7.30x9.51 m  cover   1.9%
   g-north front                          wall-white         7.30x9.51 m  cover  33.6%
@@ -78,6 +88,8 @@ yard, slabs, stairs
   slab grating on the door step top      steel-black        0.35x0.88 m  cover  88.8%
   slab counter inside by the front glass (measured; what it is: OPEN) top plywood            1.38x0.84 m  cover  74.4%
   slab stone figure (measured x 0.45 z -2.75, 1.25 tall) top stone              0.34x0.34 m  cover  13.6%
+  s1 stringer x-6.16                     stringer-blue      5.08x0.25 m  cover  49.3%
+  s1 stringer x-7.08                     stringer-blue      5.08x0.25 m  cover   8.8%
   s1 tread 0                             checker            0.92x0.22 m  cover  51.5%
   s1 riser 0                             plywood            0.92x0.20 m  cover  16.6%
   s1 tread 1                             checker            0.92x0.22 m  cover  49.5%
@@ -110,6 +122,8 @@ yard, slabs, stairs
   s1 riser 14                            plywood            0.92x0.20 m  cover   5.4%
   s1 tread 15                            checker            0.92x0.22 m  cover 100.0%
   s1 riser 15                            plywood            0.92x0.20 m  cover   1.6%
+  s2 stringer x-6.16                     stringer-blue      4.90x0.25 m  cover   6.3%
+  s2 stringer x-7.08                     stringer-blue      4.90x0.25 m  cover   1.3%
   s2 tread 0                             checker            0.92x0.22 m  cover  91.2%
   s2 riser 0                             plywood            0.92x0.18 m  cover  56.3%
   s2 tread 1                             checker            0.92x0.22 m  cover  71.7%
@@ -151,11 +165,14 @@ concrete-polished  2048x1026  1 faces  coverage  92.9%
 corrugated-ceiling 2048x3150  6 faces  coverage  55.6%
 corten             2048x358  2 faces  coverage  34.1%
 dirt               2048x816  1 faces  coverage  87.2%
+door-metal         2048x646  6 faces  coverage  22.6%
+door-slide         2048x408  4 faces  coverage  16.6%
 plywood            2048x302  33 faces  coverage  32.5%
 red-tile           2048x404  4 faces  coverage 100.0%
 render             2048x252  6 faces  coverage  27.7%
 slate              2048x300  22 faces  coverage  98.4%
 steel-black        2048x184  1 faces  coverage  88.8%
 stone              2048x76  1 faces  coverage  13.6%
+stringer-blue      2048x112  4 faces  coverage  16.6%
 wall-white         2048x12092  10 faces  coverage  21.6%
-done 65s
+done 71s

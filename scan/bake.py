@@ -111,6 +111,12 @@ for w in lv["walls"]:
         o3 = o3 if sign > 0 else o3 + np.array([du[0] * L, 0, du[1] * L])
         inside = (lambda u, v, sign=sign, L=L: cut(u if sign > 0 else L - u, v))
         add(mat, f"{w['id']} {side}", o3, ua, np.array([0, 1, 0.0]), n3, L, H, inside=inside)
+        # door leaves sit in the wall plane: bake each door opening as its leaf material (both faces)
+        for o in ops:
+            if o["kind"] != "door" or not o.get("door", {}).get("leaf", True): continue
+            dm = "door-slide" if o["door"].get("type") == "slide" else "door-metal"
+            uo = o["u"] if sign > 0 else L - o["u"] - o["w"]
+            add(dm, f"{w['id']} door u{o['u']} {side}", o3 + ua * uo + np.array([0, o["bottom"], 0]), ua, np.array([0, 1, 0.0]), n3, o["w"], o["h"])
 
 print("floors and ceilings")
 for f in lv["floors"]:
@@ -146,6 +152,11 @@ for o in lv["objects"]:
             add(m, f"slab {o.get('name','')} bottom", np.array([p0[0], p0[1], p0[2]]), np.array([1, 0, 0.0]), np.array([0, 0, 1.0]), np.array([0, -1, 0.0]), p1[0] - p0[0], p1[2] - p0[2])
 for s in lv["stairs"]:
     fx, fz = s["from"]; wdt = s["width"]; n = s["treads"]; tr = s["tread"]; rs = s["riser"]
+    # the blue stringer plates: a strip along the flight's outer side, 25 cm deep, sampled from the room side
+    rise = s["topY"] - s["bottomY"]; run = s["run"]; L = float(np.hypot(rise, run))
+    ua = np.array([0, rise / L, run / L]); va = np.array([0, run / L, -rise / L])
+    for side_x, nrm in ((fx + wdt / 2, np.array([1, 0, 0.0])), (fx - wdt / 2, np.array([-1, 0, 0.0]))):
+        add("stringer-blue", f"{s['id']} stringer x{side_x:.2f}", np.array([side_x, s["bottomY"] + 0.05, fz]) - va * 0.25, ua, va, nrm, L, 0.25, near=0.30, reach=0.60)
     for i in range(n):
         y = s["bottomY"] + rs * (i + 1); z = fz + i * tr
         add(s.get("treadMaterial") or "checker", f"{s['id']} tread {i}", np.array([fx - wdt / 2, y, z]), np.array([1, 0, 0.0]), np.array([0, 0, 1.0]), np.array([0, 1, 0.0]), wdt, tr, near=0.30, reach=0.60)

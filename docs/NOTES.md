@@ -45,3 +45,5 @@ A note without a check, or with a failing check, fails the audit. Repeated notes
 | 09-03 | only the courtyard and the building, the rest a smokey void; do it now, before textures | level.fog + sky grey + no blocks; void-views sheet | built 09-03 |
 | 09-03 | drop the walls opposite the entrance door, the one behind the red intro wall, and these ones (the yard boundary) | c-1 c-2 c-3 c-4 c-6 c-8 removed; c-5 red wall + hedge stay; open-yard-views sheet | built 09-03 |
 | 09-03 | just remove this bar (the strip at the fence's foot) and I believe you've finally got it | fence_gap slab removed; open-yard-strip-gone.jpg | built 09-03 |
+| 09-03 | NO, the flights are perfect where they are (the scan's flights sit 35 cm nearer the door; his call: level stays) | rule; docs/sheet/stair-door-*.png | rule |
+| 09-03 | we don't need to overthink these textures; the list: courtyard floor, red wall, slate, red tile, interior floor, wall, ceiling, stairs front, stairs top + dirt, doors, stringers, hallway floor, frames, bridge, counter | textures/make_tiles.py (bake -> patch -> tile, no ComfyUI), textures/check.py, tex-tiles + tex-views sheets | built 09-03 |

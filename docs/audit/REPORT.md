@@ -1,6 +1,6 @@
 # Audit report
 
-2026-09-03 15:16, commit 4a11e7d
+2026-09-03 16:08, commit 1b330fa
 
 **PASS** (0 fails)
 
@@ -15,12 +15,17 @@ NOT AUDITED except the yard plan overlay (docs/sheet/yard-blend.jpg, checked by 
 
 ## Stage 3 mesh audit (koanHang.meshAudit)
 
-PASS: 42 pass, 0 fail
+PASS: 43 pass, 0 fail
 
 
 ## Stage 4 sky audit (koanHang.skyLeakAudit)
 
 PASS: 35 pass, 0 fail
+
+
+## Stage 8 textures (textures/check.py)
+
+PASS: 37 pass, 0 fail
 
 
 ## Stage 4 walk audit
@@ -42,13 +47,14 @@ Sheets to look at by hand (one line each goes in the commit message):
 - docs/sheet\open-yard-views.jpg
 - docs/sheet\skin-views-1.jpg
 - docs/sheet\skin-views-2.jpg
+- docs/sheet\tex-views.jpg
 - docs/sheet\void-views.jpg
 - docs/sheet\yard-blend.jpg
 - docs/sheet\yard-views.jpg
 
 ## Stage 6 notes ledger
 
-40 notes, 11 open:
+42 notes, 11 open:
 
 - there's stairs, windows and doors which need a clean up -> built
 - textures generated or expanded from the scan, on my ComfyUI -> open

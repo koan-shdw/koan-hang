@@ -24,6 +24,8 @@ for name, label in (("mesh", "Stage 3 mesh audit (koanHang.meshAudit)"), ("sky",
     stale = os.path.getmtime(p) < os.path.getmtime("level/level.json")
     stage(label, open(p, encoding="utf-8").read(), note="STALE: older than level.json" if stale else None)
     if stale: fails.append(f"{label}: stale")
+r8 = subprocess.run([sys.executable, "textures/check.py"], capture_output=True, text=True, encoding="utf-8")
+stage("Stage 8 textures (textures/check.py)", open("docs/audit/textures.txt", encoding="utf-8").read() if os.path.exists("docs/audit/textures.txt") else "")
 lines.append("## Stage 4 walk audit\n\nNOT AUDITED: flood walk not built yet.\n")
 # stage 5: shot sheets
 sheets = sorted(glob.glob("docs/sheet/*views*.jpg") + glob.glob("docs/sheet/*-blend.jpg") + glob.glob("docs/sheet/*plan-small.jpg"))

@@ -1,0 +1,182 @@
+{
+ "checker": {
+  "cover": 80.1,
+  "used": true,
+  "patch_px": 100,
+  "metres": 0.5,
+  "at": [
+   984,
+   36
+  ]
+ },
+ "concrete": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 200,
+  "metres": 1.0,
+  "at": [
+   50,
+   25
+  ]
+ },
+ "concrete-bare": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 400,
+  "metres": 2.0,
+  "at": [
+   500,
+   50
+  ]
+ },
+ "concrete-grey": {
+  "cover": 57.0,
+  "used": true,
+  "patch_px": 200,
+  "metres": 1.0,
+  "at": [
+   0,
+   825
+  ]
+ },
+ "concrete-path": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 400,
+  "metres": 2.0,
+  "at": [
+   50,
+   50
+  ]
+ },
+ "concrete-polished": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 400,
+  "metres": 2.0,
+  "at": [
+   50,
+   50
+  ]
+ },
+ "corrugated-ceiling": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 200,
+  "metres": 1.0,
+  "at": [
+   675,
+   1100
+  ]
+ },
+ "corten": {
+  "cover": 96.3,
+  "used": true,
+  "patch_px": 300,
+  "metres": 1.5,
+  "at": [
+   259,
+   37
+  ]
+ },
+ "dirt": {
+  "cover": 70.0,
+  "used": true,
+  "patch_px": 200,
+  "metres": 1.0,
+  "at": [
+   0,
+   25
+  ]
+ },
+ "door-metal": {
+  "cover": 80.8,
+  "used": true,
+  "patch_px": 160,
+  "metres": 0.8,
+  "at": [
+   720,
+   20
+  ]
+ },
+ "door-slide": {
+  "cover": 45.6,
+  "used": true,
+  "patch_px": 160,
+  "metres": 0.8,
+  "at": [
+   100,
+   240
+  ]
+ },
+ "plywood": {
+  "cover": 84.6,
+  "used": true,
+  "patch_px": 160,
+  "metres": 0.8,
+  "at": [
+   20,
+   0
+  ]
+ },
+ "red-tile": {
+  "cover": 97.5,
+  "used": true,
+  "patch_px": 120,
+  "metres": 0.6,
+  "at": [
+   525,
+   15
+  ]
+ },
+ "render": {
+  "cover": 17.3,
+  "used": true,
+  "patch_px": 160,
+  "metres": 0.8,
+  "at": [
+   780,
+   0
+  ]
+ },
+ "slate": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 120,
+  "metres": 0.6,
+  "at": [
+   75,
+   15
+  ]
+ },
+ "steel-black": {
+  "cover": 68.9,
+  "used": true,
+  "patch_px": 100,
+  "metres": 0.5,
+  "at": [
+   0,
+   36
+  ]
+ },
+ "stringer-blue": {
+  "cover": 45.1,
+  "used": true,
+  "patch_px": 112,
+  "metres": 0.56,
+  "at": [
+   840,
+   0
+  ]
+ },
+ "wall-white": {
+  "cover": 100.0,
+  "used": true,
+  "patch_px": 400,
+  "metres": 2.0,
+  "at": [
+   750,
+   650
+  ]
+ }
+}

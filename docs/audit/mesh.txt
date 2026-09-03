@@ -1,3 +1,4 @@
+PASS  no NaN geometry (0 meshes)
 PASS  window g-west u 0 y 0.1: glass built
 PASS  window g-west u 0 y 0.1: no solid wall over it
 PASS  window g-west u 0 y 3.4: glass built

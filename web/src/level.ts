@@ -168,6 +168,67 @@ const PALETTE: Record<string, { color: number; rough?: number; metal?: number; o
   'stone': { color: 0x9a968e, rough: 0.9 },
   'corrugated-white': { color: 0xe4e4e0, rough: 0.6, metal: 0.2 },
 }
+/** P3: the scan-baked tiles (textures/*.jpg, made by textures/make_tiles.py), metres per tile. Owner's list 2026-09-03. */
+export const MAPS: Record<string, { file: string; tile: number }> = {
+  'concrete-path': { file: 'concrete-path.jpg', tile: 2.0 }, 'corten': { file: 'corten.jpg', tile: 1.5 },
+  'slate': { file: 'slate.jpg', tile: 0.6 }, 'red-tile': { file: 'red-tile.jpg', tile: 0.6 }, 'concrete': { file: 'concrete.jpg', tile: 1.0 },
+  'concrete-polished': { file: 'concrete-polished.jpg', tile: 2.0 }, 'concrete-bare': { file: 'concrete-bare.jpg', tile: 2.0 },
+  'concrete-grey': { file: 'concrete-grey.jpg', tile: 1.0 }, 'wall-white': { file: 'wall-white.jpg', tile: 2.0 },
+  'corrugated-ceiling': { file: 'corrugated-ceiling.jpg', tile: 1.0 }, 'plywood': { file: 'plywood.jpg', tile: 0.8 },
+  'checker': { file: 'checker.jpg', tile: 0.5 }, 'dirt': { file: 'dirt.jpg', tile: 1.0 }, 'door-metal': { file: 'door-metal.jpg', tile: 0.8 },
+  'door-slide': { file: 'door-slide.jpg', tile: 0.8 }, 'stringer-blue': { file: 'stringer-blue.jpg', tile: 0.8 },
+  'steel-black': { file: 'steel-black.jpg', tile: 0.5 }, 'render': { file: 'render.jpg', tile: 0.8 },
+}
+const texCache = new Map<string, THREE.Texture>()
+let texturesOn = false
+/** the textured look: put every baked tile on its material, or take them all off. Missing files = flat colour + a console line. */
+export function applyTextures(on: boolean, base: string, anisotropy = 8): void {
+  texturesOn = on
+  for (const [name, m] of cache) {
+    const spec = MAPS[name]; const p = PALETTE[name]
+    if (!spec || !p) continue
+    if (!on) { m.map = null; m.color.set(p.color); m.needsUpdate = true; continue }
+    let tex = texCache.get(name)
+    if (!tex) {
+      tex = new THREE.TextureLoader().load(`${base}textures/${spec.file}`, undefined, undefined, () => { console.warn(`texture missing: ${spec.file}`); m.map = null; m.color.set(p.color); m.needsUpdate = true })
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = anisotropy
+      texCache.set(name, tex)
+    }
+    m.map = tex; m.color.set(0xffffff); m.needsUpdate = true
+  }
+}
+export function texturesAreOn(): boolean { return texturesOn }
+
+/** world-space UVs: every mesh whose material carries a map gets its uv rewritten from world position per face,
+ *  so one tile runs in metres across every piece with no seam at piece boundaries. Planar by the face normal's axis. */
+export function worldUVs(group: THREE.Group): void {
+  group.updateMatrixWorld(true)
+  const pos = new THREE.Vector3(), nrm = new THREE.Vector3()
+  group.traverse((o) => {
+    const mesh = o as THREE.Mesh
+    if (!mesh.isMesh || (mesh as THREE.InstancedMesh).isInstancedMesh) return
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    const name = [...cache.entries()].find(([, mm]) => mm === mats[0])?.[0]
+    if (!name || !MAPS[name]) return
+    const tile = MAPS[name].tile
+    const g = mesh.geometry
+    if (!g.attributes.position) return
+    if (!g.attributes.normal) g.computeVertexNormals()
+    const P = g.attributes.position, N = g.attributes.normal
+    const uv = new Float32Array(P.count * 2)
+    const nm = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld)
+    for (let i = 0; i < P.count; i++) {
+      pos.fromBufferAttribute(P, i).applyMatrix4(mesh.matrixWorld)
+      nrm.fromBufferAttribute(N, i).applyMatrix3(nm)
+      const ax = Math.abs(nrm.x), ay = Math.abs(nrm.y), az = Math.abs(nrm.z)
+      let u: number, v: number
+      if (ay >= ax && ay >= az) { u = pos.x; v = pos.z } else if (ax >= az) { u = pos.z; v = pos.y } else { u = pos.x; v = pos.y }
+      uv[i * 2] = u / tile; uv[i * 2 + 1] = v / tile
+    }
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
+  })
+}
+
 const cache = new Map<string, THREE.MeshStandardMaterial>()
 export function mat(name: string): THREE.MeshStandardMaterial {
   let m = cache.get(name)
@@ -258,10 +319,12 @@ export function buildLevel(lv: Level): Built {
         for (const hb of g.bars) if (hb > o.bottom && hb < o.bottom + o.h) group.add(tag(wallBox(w, o.w - 2 * bar, bar, deep - 0.01, uc, w.baseY + hb, -t / 2, frame), 'frame'))
         // cross bars: an X over a pane (index into the pane list) or over the whole opening
         const edges = [0, ...ups.sort((p, q) => p - q), o.w]
-        const lowest = g.bars.length ? Math.max(o.bottom, Math.min(...g.bars.filter((b) => b > o.bottom))) : o.bottom
+        const above = g.bars.filter((b) => b > o.bottom && b < o.bottom + o.h)
+        const lowest = above.length ? Math.max(o.bottom, Math.min(...above)) : o.bottom   // no bar in the opening: the X spans the whole pane
         const crosses: [number, number][] = g.crossAll ? [[0, o.w]] : (g.cross ?? []).map((c) => [edges[c] ?? 0, edges[c + 1] ?? o.w])
         for (const [c0, c1] of crosses) {
           const cw = c1 - c0, cu = o.u + c0 + cw / 2, h = o.bottom + o.h - lowest, yy = w.baseY + lowest + h / 2
+          if (!(cw > 0.01) || !(h > 0.01)) continue
           const len = Math.hypot(cw, h), ang = Math.atan2(h, cw)
           for (const sgn of [1, -1]) { const m = tag(wallBox(w, len, 0.03, 0.03, cu, yy, -t / 2 + 0.06, frame), 'cross'); m.rotateZ(sgn * ang); group.add(m) }
         }
@@ -548,6 +611,18 @@ export function meshAudit(lv: Level, group: THREE.Group): string[] {
   const ok = (c: boolean, m: string) => out.push((c ? 'PASS  ' : 'FAIL  ') + m)
   const box = (o: THREE.Object3D) => new THREE.Box3().setFromObject(o)
   const kids = group.children
+  // no geometry with a NaN vertex, no mesh at a NaN position
+  {
+    let bad = 0
+    group.traverse((o) => {
+      const m = o as THREE.Mesh
+      if (!m.isMesh) return
+      if (!Number.isFinite(m.position.x) || !Number.isFinite(m.position.y) || !Number.isFinite(m.position.z)) { bad++; return }
+      const P = m.geometry.attributes.position
+      if (P) for (let i = 0; i < P.count; i++) if (!Number.isFinite(P.getX(i)) || !Number.isFinite(P.getY(i)) || !Number.isFinite(P.getZ(i))) { bad++; break }
+    })
+    ok(bad === 0, `no NaN geometry (${bad} meshes)`)
+  }
   // every window opening of every drawn wall has its glass, and no solid wall piece sits over the opening's centre
   for (const w of lv.walls) {
     if (w.draw === false) continue

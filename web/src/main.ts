@@ -2,7 +2,7 @@
 import './styles.css'
 import * as THREE from 'three'
 import { applyTheme, currentTheme, accentColor } from './themes'
-import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, meshAudit, skyLeakAudit, type Level } from './level'
+import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, meshAudit, skyLeakAudit, type Level, applyTextures, worldUVs } from './level'
 import { Walker, isTyping } from './walk'
 import { Minimap } from './minimap'
 import { Shell, chips, el, emptyState, row, type Mode } from './ui'
@@ -59,6 +59,7 @@ async function main(): Promise<void> {
     ltxt.textContent = `level.json failed: ${(e as Error).message}`; shell.toast('level.json failed to load', 'bad', 8000); return
   }
   const built = buildLevel(level)
+  worldUVs(built.group)
   scene.add(built.group, built.wire)
   setWireColor(built.wire, accentColor())
   loading.remove()
@@ -72,11 +73,11 @@ async function main(): Promise<void> {
     }, undefined, () => { /* no panorama yet: keep the flat sky */ })
   }
 
-  let look: Look = 'clean'
-  try { look = (localStorage.getItem(LOOK_KEY) as Look) || 'clean' } catch { /* private */ }
-  if (look === 'textured') look = 'clean'
+  let look: Look = 'textured'   // highest quality is the default; clean and wire are the dials
+  try { look = (localStorage.getItem(LOOK_KEY) as Look) || 'textured' } catch { /* private */ }
   const applyLook = () => {
     built.wire.visible = look === 'wire'
+    applyTextures(look === 'textured', DATA, renderer.capabilities.getMaxAnisotropy())
     try { localStorage.setItem(LOOK_KEY, look) } catch { /* private */ }
   }
   applyLook()
@@ -117,7 +118,7 @@ async function main(): Promise<void> {
   const lookChips = chips<Look>([
     { id: 'clean', label: 'clean', tip: 'the rebuilt level, plain materials' },
     { id: 'wire', label: 'wire', tip: 'clean level with its edges drawn' },
-    { id: 'textured', label: 'textured', tip: 'baked textures from the scan', disabled: 'arrives in P3' },
+    { id: 'textured', label: 'textured', tip: 'the scan\'s own surfaces, baked and tiled' },
   ], look, (v) => { look = v; lookChips.set(v); applyLook() })
   levelCard.body.append(el('div', 'legend', 'look'), lookChips.root)
   const eye = el('input'); eye.type = 'number'; eye.min = '100'; eye.max = '220'; eye.step = '1'; eye.value = String(Math.round(level.eyeHeight * 100))
