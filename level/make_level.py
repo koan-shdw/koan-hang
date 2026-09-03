@@ -203,7 +203,7 @@ level = dict(
         *[dict(kind="paving", name=p_["name"], zone=p_["zone"], zoneTop=round(G0 + YH["paving"], 3), base=G0 - 0.20,
                cells=[dict(box=c_["box"], material=c_["material"], top=round(G0 + (YH["red"] if c_["material"] == "red-tile" else YH["slate"]), 3)) for c_ in p_["cells"]]) for p_ in YARD["patches"]],
         dict(kind="slab", name="dirt bed along the fence", box=[[YARD["dirt"]["box"][0][0], G0 - 0.20, YARD["dirt"]["box"][0][1]], [YARD["dirt"]["box"][1][0], round(G0 + YH["dirt"], 3), YARD["dirt"]["box"][1][1]]], material="dirt"),
-        dict(kind="slab", name="sliver between the dirt and the fence", box=[[YARD["fence_gap"]["box"][0][0], G0 - 0.20, YARD["fence_gap"]["box"][0][1]], [YARD["fence_gap"]["box"][1][0], round(G0 + YH["apron"], 3), YARD["fence_gap"]["box"][1][1]]], material="concrete"),
+        # "sliver between the dirt and the fence": DROPPED by the owner 2026-09-03 with the fence ("just remove this bar")
         dict(kind="slab", name="passage floor off the far corner", box=[[YARD["passage"]["box"][0][0], G0 - 0.20, YARD["passage"]["box"][0][1]], [YARD["passage"]["box"][1][0], round(G0 + YH["passage"], 3), YARD["passage"]["box"][1][1]]], material="concrete"),
         dict(kind="slab", name="grating on the door step", box=[[YARD["rack"]["box"][0][0], round(G0 + YH["paving"], 3), YARD["rack"]["box"][0][1]], [YARD["rack"]["box"][1][0], round(G0 + YH["rack"], 3), YARD["rack"]["box"][1][1]]], material="steel-black"),
         dict(kind="slab", name="counter inside by the front glass (measured; what it is: OPEN)", box=[[YARD["counter"]["box"][0][0], G0, YARD["counter"]["box"][0][1]], [YARD["counter"]["box"][1][0], round(G0 + YARD["counter"]["height"], 3), YARD["counter"]["box"][1][1]]], material="plywood"),

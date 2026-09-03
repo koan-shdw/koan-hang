@@ -203,7 +203,6 @@ PASS  source on object paving 'door patch row 4': scan/measured.json yard
 PASS  source on object paving 'far patch': scan/measured.json yard
 PASS  source on object paving 'side strip': scan/measured.json yard
 PASS  source on object slab 'dirt bed along the fence': scan/measured.json yard
-PASS  source on object slab 'sliver between the dirt and the fence': scan/measured.json yard
 PASS  source on object slab 'passage floor off the far corner': scan/measured.json yard
 PASS  source on object slab 'grating on the door step': scan/measured.json yard
 PASS  source on object slab 'counter inside by the front glass (measured; what it is: OPEN)': scan/measured.json yard

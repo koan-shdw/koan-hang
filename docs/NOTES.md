@@ -44,3 +44,4 @@ A note without a check, or with a failing check, fails the audit. Repeated notes
 | 09-03 | geometry overlaps outside, block by the yard; "all you did was cross these two shapes"; "I thought you said you audited" | blocks dissolved (no overlaps), 3 cm apart, 1 m off the plot; audit 5h cell grid | built 09-03 |
 | 09-03 | only the courtyard and the building, the rest a smokey void; do it now, before textures | level.fog + sky grey + no blocks; void-views sheet | built 09-03 |
 | 09-03 | drop the walls opposite the entrance door, the one behind the red intro wall, and these ones (the yard boundary) | c-1 c-2 c-3 c-4 c-6 c-8 removed; c-5 red wall + hedge stay; open-yard-views sheet | built 09-03 |
+| 09-03 | just remove this bar (the strip at the fence's foot) and I believe you've finally got it | fence_gap slab removed; open-yard-strip-gone.jpg | built 09-03 |

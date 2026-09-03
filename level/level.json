@@ -2085,24 +2085,6 @@
   },
   {
    "kind": "slab",
-   "name": "sliver between the dirt and the fence",
-   "box": [
-    [
-     4.4,
-     -5.74,
-     -4.49
-    ],
-    [
-     4.49,
-     -5.44,
-     -0.45
-    ]
-   ],
-   "material": "concrete",
-   "src": "scan/measured.json yard"
-  },
-  {
-   "kind": "slab",
    "name": "passage floor off the far corner",
    "box": [
     [
