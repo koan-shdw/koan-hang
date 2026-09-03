@@ -36,11 +36,15 @@ export class ArtSystem {
   library: ArtItem[] = []
   layout: Layout = { format: 'koan-hang-layout/2', name: 'draft', guides: defaultGuides(), items: [] }
   held: ArtItem | null = null
+  selected: string | null = null                 // a hung work picked with Tab: glows, takes delete / arrows / e
+  hands = true                                    // the held work shows in your hands until a wall takes it (H toggles)
+  static REACH = 3.0                              // metres: only works this close can be grabbed
   mode: 'walk' | 'hang' | 'level' = 'walk'
   preview: Preview = { hit: null, u0: 0, top: 0, ok: false, why: '' }
   onChange: (() => void) | null = null          // library or layout changed: cards redraw
   readonly group = new THREE.Group()              // placed works
   private ghost: THREE.Group | null = null
+  private handMesh: THREE.Group | null = null
   private guideLines = new THREE.Group()
   private meshes = new Map<string, THREE.Group>()
   private textures = new Map<string, THREE.Texture>()
@@ -179,9 +183,33 @@ export class ArtSystem {
   // ---- holding and placing ------------------------------------------------------------------
   hold(a: ArtItem | null): void {
     if (this.ghost) { this.scene.remove(this.ghost); this.ghost = null }
+    if (this.handMesh) { this.camera.remove(this.handMesh); this.handMesh = null }
     this.held = a
-    if (a) { this.ghost = this.meshFor(a, true); this.ghost.visible = false; this.scene.add(this.ghost) }
+    if (a) {
+      this.ghost = this.meshFor(a, true); this.ghost.visible = false; this.scene.add(this.ghost)
+      // in your hands: lower right of the view, scaled so the long side is 35 cm, tilted a touch
+      const hm = this.meshFor(a); const k = 0.35 / Math.max(a.w, a.h) * 100
+      hm.scale.setScalar(k); hm.position.set(0.26, -0.2, -0.62); hm.rotation.set(-0.12, -0.45, 0.06)
+      hm.visible = false; this.camera.add(hm); this.handMesh = hm
+    }
     this.onChange?.()
+  }
+  /** Tab: the next hung work becomes the selected one (glows); after the last, none */
+  selectNext(): Placed | null {
+    const ids = this.layout.items.map((p) => p.id)
+    if (!ids.length) { this.selected = null; return null }
+    const i = this.selected ? ids.indexOf(this.selected) : -1
+    this.selected = i + 1 < ids.length ? ids[i + 1] : null
+    return this.layout.items.find((p) => p.id === this.selected) ?? null
+  }
+  /** the work a key acts on: the Tab-selected one, else the one under the crosshair within reach */
+  target(): Placed | null { return (this.selected && this.layout.items.find((p) => p.id === this.selected)) || this.lookedAt() }
+  private glow(): void {
+    const look = this.selected ? null : this.lookedAt()
+    for (const [id, g] of this.meshes) {
+      const e = id === this.selected ? 0.35 : look && id === look.id ? 0.12 : 0
+      g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) for (const mm of (Array.isArray(m.material) ? m.material : [m.material]) as THREE.MeshStandardMaterial[]) mm.emissive.setRGB(0, e, e * 0.62) })
+    }
   }
   swap(step: number): void {
     if (!this.library.length) return
@@ -244,8 +272,10 @@ export class ArtSystem {
   update(): void {
     const active = this.mode === 'hang' && this.walker.state.locked
     this.guideLines.visible = this.mode === 'hang' && this.layout.guides.show
+    if (active) this.glow()
     if (!this.ghost || !this.held) { this.preview = { hit: null, u0: 0, top: 0, ok: false, why: '' }; return }
     const hit = active ? this.hitWall() : null
+    if (this.handMesh) this.handMesh.visible = active && this.hands && !hit
     if (!hit) { this.ghost.visible = false; this.preview = { hit: null, u0: 0, top: 0, ok: false, why: '' }; return }
     const pv = this.plan(this.held, hit, this.walker.state.level)
     this.preview = pv
@@ -268,7 +298,7 @@ export class ArtSystem {
   /** the placed work under the crosshair */
   lookedAt(): Placed | null {
     const rc = new THREE.Raycaster(); const dir = new THREE.Vector3(); this.camera.getWorldDirection(dir)
-    rc.set(this.camera.position, dir); rc.far = 12
+    rc.set(this.camera.position, dir); rc.far = ArtSystem.REACH
     this.group.updateMatrixWorld(true)   // a work hung this frame has not been rendered yet
     const hit = rc.intersectObjects(this.group.children, true)[0]
     if (!hit) return null
@@ -276,7 +306,8 @@ export class ArtSystem {
     return o ? this.layout.items.find((p) => p.id === o!.userData.placed) ?? null : null
   }
   pickup(): boolean {
-    const p = this.lookedAt(); if (!p) return false
+    const p = this.target(); if (!p) return false
+    this.selected = null
     const a = this.library.find((x) => x.id === p.art); if (!a) return false
     this.commit()
     this.layout.items = this.layout.items.filter((x) => x.id !== p.id)
@@ -284,12 +315,13 @@ export class ArtSystem {
     return true
   }
   remove(): boolean {
-    const p = this.lookedAt(); if (!p) return false
+    const p = this.target(); if (!p) return false
+    this.selected = null
     this.commit(); this.layout.items = this.layout.items.filter((x) => x.id !== p.id); this.rebuild(); this.autosave(); this.onChange?.(); return true
   }
   /** arrows: slide the looked-at work along its wall or up, in cm */
   nudge(du: number, dy: number): boolean {
-    const p = this.lookedAt(); if (!p) return false
+    const p = this.target(); if (!p) return false
     this.commit(); p.u += du / 100; p.topY += dy / 100; if (dy) p.snap = null
     this.rebuild(); this.autosave(); this.onChange?.(); return true
   }

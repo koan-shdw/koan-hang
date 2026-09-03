@@ -25,14 +25,17 @@ const HELP = `<h3>KOAN.hang · keys</h3>
 </table>
 <h3>hang mode</h3>
 <table>
-<tr><td>click a thumbnail</td><td>hold that work</td></tr>
-<tr><td>scroll · [ ]</td><td>swap what you hold · 1-9 pick by place</td></tr>
-<tr><td>click</td><td>hang it where you look · or pick up the work you look at</td></tr>
-<tr><td>e</td><td>pick up the work you look at</td></tr>
+<tr><td>click a thumbnail</td><td>hold that work · it sits in your hands until a wall takes it</td></tr>
+<tr><td>scroll · , . · [ ]</td><td>swap what you hold · 1-9 and 0 pick by place</td></tr>
+<tr><td>click</td><td>hang it where you look · or take the work you look at (within 3 m)</td></tr>
+<tr><td>tab</td><td>select the next hung work (it glows) · delete, arrows, e act on it</td></tr>
+<tr><td>e</td><td>take the selected or looked-at work into your hands</td></tr>
 <tr><td>q</td><td>put the held work down (back to the library)</td></tr>
-<tr><td>arrows</td><td>nudge the looked-at work 1 cm · shift = 10 cm</td></tr>
-<tr><td>delete</td><td>take the looked-at work off the wall</td></tr>
+<tr><td>h</td><td>hands view on / off</td></tr>
+<tr><td>arrows</td><td>nudge 1 cm · shift = 10 cm</td></tr>
+<tr><td>delete</td><td>take it off the wall</td></tr>
 <tr><td>ctrl z · ctrl shift z</td><td>undo · redo</td></tr>
+<tr><td>esc</td><td>mouse back · esc again = back to walk</td></tr>
 </table>
 <div class="dim">level mode arrives later. click anywhere to close.</div>`
 
@@ -52,6 +55,7 @@ async function main(): Promise<void> {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(0xbfd9f2) // plain sky until the street backdrop lands (P3)
   const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 200)
+  scene.add(camera)   // the held work rides on the camera
   scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8078, 0.55))
   const sun = new THREE.DirectionalLight(0xfff4e0, 1.2); sun.position.set(6, 10, -4); scene.add(sun)
   const resize = () => {
@@ -266,9 +270,11 @@ async function main(): Promise<void> {
     if (isTyping(e)) return
     if (mode === 'hang') {
       if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') { e.preventDefault(); shell.toast((e.shiftKey ? art.doRedo() : art.doUndo()) ? (e.shiftKey ? 'redo' : 'undo') : 'nothing to undo', 'ok'); return }
-      if (e.code === 'BracketLeft') { art.swap(-1); return }
-      if (e.code === 'BracketRight') { art.swap(1); return }
-      if (/^Digit[1-9]$/.test(e.code)) { const a = art.library[Number(e.code.slice(5)) - 1]; if (a) art.hold(a); return }
+      if (e.code === 'BracketLeft' || e.code === 'Comma') { art.swap(-1); return }
+      if (e.code === 'BracketRight' || e.code === 'Period') { art.swap(1); return }
+      if (/^Digit[0-9]$/.test(e.code)) { const n = Number(e.code.slice(5)); const a = art.library[n === 0 ? 9 : n - 1]; if (a) art.hold(a); return }
+      if (e.code === 'Tab') { e.preventDefault(); const p = art.selectNext(); shell.toast(p ? `selected ${art.library.find((x) => x.id === p.art)?.title ?? 'work'} · delete, arrows, e` : 'nothing selected'); return }
+      if (e.code === 'KeyH') { art.hands = !art.hands; shell.toast(art.hands ? 'hands view on' : 'hands view off'); return }
       if (e.code === 'KeyQ') { art.hold(null); return }
       if (e.code === 'Delete' || e.code === 'Backspace') { if (art.remove()) shell.toast('taken down'); return }
       if (e.code.startsWith('Arrow')) { const st = e.shiftKey ? 10 : 1; const du = e.code === 'ArrowLeft' ? -st : e.code === 'ArrowRight' ? st : 0; const dy = e.code === 'ArrowUp' ? st : e.code === 'ArrowDown' ? -st : 0; if (art.nudge(du, dy)) e.preventDefault(); return }
@@ -276,7 +282,13 @@ async function main(): Promise<void> {
     }
     if (e.code === 'KeyM' || e.key === 'm' || e.key === 'M') { big.hidden = !big.hidden; if (!big.hidden) walker.release() }
     else if (e.code === 'KeyE' || e.key === 'e' || e.key === 'E') toggleDoor()
-    else if (e.code === 'Escape') { if (!big.hidden) big.hidden = true; else if (!shell.hideHelp()) walker.release() }
+    else if (e.code === 'Escape') {
+      if (!big.hidden) big.hidden = true
+      else if (!shell.hideHelp()) {
+        if (walker.state.locked) walker.release()
+        else if (mode === 'hang') { mode = 'walk'; modes.set('walk'); art.mode = 'walk'; art.hold(null); art.selected = null; shell.toast('walk') }
+      }
+    }
     else if (e.key === '?') shell.toggleHelp(HELP)
   })
 
@@ -300,7 +312,8 @@ async function main(): Promise<void> {
     if (mode === 'hang' && walker.state.locked) {
       const pv = art.preview
       const look = !art.held ? art.lookedAt() : null
-      const txt = art.held ? (pv.hit ? (pv.ok ? `click · hang ${art.held.title} here` : `can't hang here · ${pv.why}`) : `holding ${art.held.title} · look at a hang wall`) : (look ? 'click or e · pick it up · delete · arrows nudge' : 'click a thumbnail or scroll to hold a work')
+      const sel = art.selected ? art.layout.items.find((p) => p.id === art.selected) : null
+      const txt = art.held ? (pv.hit ? (pv.ok ? `click · hang ${art.held.title} here` : `can't hang here · ${pv.why}`) : `holding ${art.held.title} · look at a hang wall`) : sel ? `selected · e take · delete · arrows nudge · tab next` : (look ? 'click or e · take it · delete · arrows nudge' : 'click a thumbnail, scroll, or tab to select a hung work')
       if (hangTip.textContent !== txt) hangTip.textContent = txt
       hangTip.hidden = false
     } else hangTip.hidden = true
