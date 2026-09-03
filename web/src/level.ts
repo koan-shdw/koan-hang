@@ -38,6 +38,7 @@ export type LevelObject =
   | { kind: 'pipe'; wall: string; u: number; y0: number; y1: number; r: number; d: number; material?: string }
   | { kind: 'pavegrid'; name?: string; area: [[number, number], [number, number]]; skip?: [[number, number], [number, number]]; cell: number; edge: number; lift: number; tileEvery?: number; material?: string; tileMaterial?: string }
   | { kind: 'hedge'; name?: string; along: [[number, number], [number, number]]; y: number; r: number; step: number; material?: string }
+  | { kind: 'cells'; name?: string; edge: number; lift: number; cells: { box: [[number, number], [number, number]]; material: string }[] }
 export interface LevelFloor { id: string; name: string; floorY: number; ceilY: number; slab?: number; roof?: number }
 export interface Ceiling extends Surface { draw?: boolean }
 export interface Level {
@@ -149,6 +150,7 @@ const PALETTE: Record<string, { color: number; rough?: number; metal?: number; o
   'aircon': { color: 0xf4f4f2, rough: 0.6, emissive: 0x3a3a38 },
   'rib': { color: 0xc8c6c0, rough: 0.6, metal: 0.3 },
   'gravel': { color: 0x8a8a86, rough: 1 },
+  'slate': { color: 0x6f6d74, rough: 1 },
   'concrete-path': { color: 0xb5b2aa, rough: 0.9 },
   'red-tile': { color: 0xa5563a, rough: 0.8 },
   'dirt': { color: 0x6e5a42, rough: 1 },
@@ -433,6 +435,18 @@ export function buildLevel(lv: Level): Built {
         const e2 = new THREE.Mesh(new THREE.BoxGeometry(o.edge, o.lift, o.cell), mat(o.material ?? 'concrete')); e2.position.set(x0 + i * o.cell, y + o.lift / 2, czp); group.add(e2)
         if (o.tileEvery && (k++ % o.tileEvery) === 1) {
           const tl = new THREE.Mesh(new THREE.BoxGeometry(o.cell - o.edge, o.lift * 0.8, o.cell - o.edge), mat(o.tileMaterial ?? 'red-tile')); tl.position.set(cxp, y + o.lift * 0.4, czp); group.add(tl)
+        }
+      }
+    } else if (o.kind === 'cells') {
+      // explicit paving cells: a filled box each, concrete edge strips around every cell
+      const y = floorOf(lv, 'ground').floorY
+      for (const c of o.cells) {
+        const [[x0, z0], [x1, z1]] = c.box
+        const fill = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, o.lift * 0.7, z1 - z0), mat(c.material)); fill.position.set((x0 + x1) / 2, y + o.lift * 0.35, (z0 + z1) / 2); group.add(fill)
+        for (const [ex0, ez0, ex1, ez1] of [[x0, z0, x1, z0], [x0, z1, x1, z1], [x0, z0, x0, z1], [x1, z0, x1, z1]]) {
+          const along = Math.abs(ex1 - ex0) > 0
+          const e = new THREE.Mesh(new THREE.BoxGeometry(along ? ex1 - ex0 + o.edge : o.edge, o.lift, along ? o.edge : ez1 - ez0 + o.edge), mat('concrete'))
+          e.position.set((ex0 + ex1) / 2, y + o.lift / 2, (ez0 + ez1) / 2); group.add(e)
         }
       }
     } else if (o.kind === 'hedge') {

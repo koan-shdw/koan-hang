@@ -1,0 +1,15 @@
+{
+ "red_intro_wall": {
+  "z": -3.12,
+  "x0": 0.6,
+  "x1": 3.5,
+  "height": 1.75,
+  "source": "scan/measure3.py rust faces 2026-09-03 + owner's blue lines"
+ },
+ "figure": {
+  "x": 0.45,
+  "z": -2.75,
+  "height": 1.25,
+  "source": "scan/measure3.py grey faces"
+ }
+}

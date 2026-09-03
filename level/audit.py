@@ -93,6 +93,21 @@ for s_ in stairs:
     rooms = [f for f in floors if f["level"] == s_["to"] and "room" in (f.get("name") or "")]
     ok(any(abs(min(p[0] for p in f["poly"]) - edge) < TOL for f in rooms), f"room floor of {s_['to']} starts at the flight edge {edge}")
 
+# 5c. courtyard items against the scan measurements (scan/measured.json)
+import os
+if os.path.exists("scan/measured.json"):
+    mz = json.load(open("scan/measured.json"))
+    rw = next((w for w in walls if w["id"] == "c-5"), None); m = mz["red_intro_wall"]
+    if rw:
+        xs = sorted([rw["a"][0], rw["b"][0]])
+        ok(abs(xs[0] - m["x0"]) < 0.05 and abs(xs[1] - m["x1"]) < 0.05, f"red intro wall ends {xs} = scan {m['x0']}..{m['x1']}")
+        ok(abs(rw["a"][1] - m["z"]) < 0.05, f"red intro wall line z {rw['a'][1]} = scan {m['z']}")
+        ok(abs((rw["topY"] - rw["baseY"]) - m["height"]) < 0.05, f"red intro wall height {round(rw['topY']-rw['baseY'],3)} = scan {m['height']}")
+    fig = next((o for o in lv["objects"] if o["kind"] == "slab" and "figure" in (o.get("name") or "")), None); f_ = mz["figure"]
+    if fig:
+        cx = (fig["box"][0][0] + fig["box"][1][0]) / 2; cz = (fig["box"][0][2] + fig["box"][1][2]) / 2; h = fig["box"][1][1] - fig["box"][0][1]
+        ok(abs(cx - f_["x"]) < 0.05 and abs(cz - f_["z"]) < 0.05 and abs(h - f_["height"]) < 0.05, f"stone figure at {cx:.2f},{cz:.2f} h {h:.2f} = scan {f_['x']},{f_['z']} h {f_['height']}")
+
 # 6. reachability: spawn level -> every level via stairs with matching floors
 reach = {lv["spawn"]["level"]}; changed = True
 while changed:
