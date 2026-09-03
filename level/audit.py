@@ -138,7 +138,7 @@ if os.path.exists("scan/measured.json") and "yard" in mz:
     ok(any(same(slab_xz(o), Y["dirt"]["box"]) and o["material"] == "dirt" for o in slabs), f"dirt bed {Y['dirt']['box']} in level")
     ok(any(same(slab_xz(o), Y["passage"]["box"]) for o in slabs), f"passage floor {Y['passage']['box']} in level")
     ok(any(same(slab_xz(o), Y["rack"]["box"]) for o in slabs), f"door step grating {Y['rack']['box']} in level")
-    ok(any(same(slab_xz(o), Y["counter"]["box"]) for o in slabs), f"counter inside {Y['counter']['box']} in level")
+    ok(not any(same(slab_xz(o), Y["counter"]["box"]) for o in slabs), f"counter {Y['counter']['box']} is OFF (owner 2026-09-03: desk option later, white)")
     yard_floor = next((f for f in floors if f.get("name") == "courtyard"), None)
     ok(yard_floor is not None and yard_floor["poly"] == Y["outline"], "courtyard walk outline = measured outline")
     # no two drawn yard boxes overlap in plan (cells inside their zone excepted)

@@ -2120,24 +2120,6 @@
    "src": "scan/measured.json yard"
   },
   {
-   "kind": "slab",
-   "name": "counter inside by the front glass (measured; what it is: OPEN)",
-   "box": [
-    [
-     -1.25,
-     -5.54,
-     -2.3
-    ],
-    [
-     0.13,
-     -4.56,
-     -1.46
-    ]
-   ],
-   "material": "plywood",
-   "src": "scan/measured.json yard"
-  },
-  {
    "kind": "hedge",
    "name": "plants behind the red intro wall, spilling over its top",
    "along": [

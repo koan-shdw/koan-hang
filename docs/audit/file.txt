@@ -142,7 +142,7 @@ PASS  apron 'apron wide part bottom' [[4.84, 2.3], [6.84, 3.62]] in level (x0 cl
 PASS  dirt bed [[3.7, -4.49], [4.4, -0.45]] in level
 PASS  passage floor [[5.53, 3.62], [6.84, 5.0]] in level
 PASS  door step grating [[0.42, -2.36], [0.77, -1.48]] in level
-PASS  counter inside [[-1.25, -2.3], [0.13, -1.46]] in level
+PASS  counter [[-1.25, -2.3], [0.13, -1.46]] is OFF (owner 2026-09-03: desk option later, white)
 PASS  courtyard walk outline = measured outline
 PASS  one skin: line (-7.08, 2.72)->(-7.08, -2.37) has 1 drawn wall(s) of 3: ['g-west']
 PASS  one skin: g-west spans -5.54..3.97 = the line's full height
@@ -205,7 +205,6 @@ PASS  source on object paving 'side strip': scan/measured.json yard
 PASS  source on object slab 'dirt bed along the fence': scan/measured.json yard
 PASS  source on object slab 'passage floor off the far corner': scan/measured.json yard
 PASS  source on object slab 'grating on the door step': scan/measured.json yard
-PASS  source on object slab 'counter inside by the front glass (measured; what it is: OPEN)': scan/measured.json yard
 PASS  source on object hedge 'plants behind the red intro wall, spilling over its top': owner photos 2026-09-03 (plants: forget for now)
 PASS  source on object hedge 'plants, front fringe over the wall top': owner photos 2026-09-03 (plants: forget for now)
 PASS  source on object slab 'stone figure (measured x 0.45 z -2.75, 1.25 tall)': scan/measured.json yard
