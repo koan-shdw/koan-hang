@@ -1,6 +1,6 @@
 # Audit report
 
-2026-09-03 17:55, commit 6cfefec
+2026-09-03 18:15, commit 7482518
 
 **PASS** (0 fails)
 
@@ -36,6 +36,7 @@ NOT AUDITED: flood walk not built yet.
 
 Sheets to look at by hand (one line each goes in the commit message):
 
+- docs/sheet\art-views.jpg
 - docs/sheet\back-views-1.jpg
 - docs/sheet\back-views-2.jpg
 - docs/sheet\ceil-views.jpg
@@ -55,7 +56,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 
 ## Stage 6 notes ledger
 
-44 notes, 12 open:
+46 notes, 13 open:
 
 - there's stairs, windows and doors which need a clean up -> built
 - textures generated or expanded from the scan, on my ComfyUI -> open
@@ -69,6 +70,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 - drop the walls opposite the entrance door, the one behind the red intro wall, and these ones (the yard boundary) -> built 09-03
 - just remove this bar (the strip at the fence's foot) and I believe you've finally got it -> built 09-03
 - the box by the front glass: make it white and remove it, maybe add it later as a desk option -> built 09-03; desk option OPEN
+- sculptures on a plinth; recolour, texture, then place; picker for plinth and sculpture colour, texture choices -> OPEN, next
 
 ## Not audited
 

@@ -6,6 +6,7 @@ import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, meshAudit, s
 import { Walker, isTyping } from './walk'
 import { Minimap } from './minimap'
 import { Shell, chips, el, emptyState, row, type Mode } from './ui'
+import { ArtSystem, readImage, type SnapLine } from './art'
 
 const BASE = import.meta.env.BASE_URL
 const DATA = `${BASE}data/`
@@ -22,7 +23,18 @@ const HELP = `<h3>KOAN.hang · keys</h3>
 <tr><td>esc</td><td>give the mouse back · close overlays</td></tr>
 <tr><td>?</td><td>this</td></tr>
 </table>
-<div class="dim">hang and level modes arrive later. click anywhere to close.</div>`
+<h3>hang mode</h3>
+<table>
+<tr><td>click a thumbnail</td><td>hold that work</td></tr>
+<tr><td>scroll · [ ]</td><td>swap what you hold · 1-9 pick by place</td></tr>
+<tr><td>click</td><td>hang it where you look · or pick up the work you look at</td></tr>
+<tr><td>e</td><td>pick up the work you look at</td></tr>
+<tr><td>q</td><td>put the held work down (back to the library)</td></tr>
+<tr><td>arrows</td><td>nudge the looked-at work 1 cm · shift = 10 cm</td></tr>
+<tr><td>delete</td><td>take the looked-at work off the wall</td></tr>
+<tr><td>ctrl z · ctrl shift z</td><td>undo · redo</td></tr>
+</table>
+<div class="dim">level mode arrives later. click anywhere to close.</div>`
 
 applyTheme(currentTheme())
 
@@ -85,10 +97,12 @@ async function main(): Promise<void> {
   // ---- walk ---------------------------------------------------------------------
   const walker = new Walker(level, camera, renderer.domElement)
   walker.doors = built.doors
+  const art = new ArtSystem(level, scene, walker, camera, DATA)
   const hint = el('div', 'hint'); hint.innerHTML = 'click to walk<small>w a s d · shift run · e door · m plan · esc lets go</small>'
   const cross = el('div', 'crosshair'); cross.hidden = true
   const doorTip = el('div', 'doortip'); doorTip.hidden = true
-  shell.viewport.append(hint, cross, doorTip)
+  const hangTip = el('div', 'hangtip'); hangTip.hidden = true
+  shell.viewport.append(hint, cross, doorTip, hangTip)
 
   // ---- minimap ------------------------------------------------------------------
   const small = el('canvas', 'minimap'); const big = el('canvas', 'bigmap'); big.hidden = true
@@ -104,9 +118,10 @@ async function main(): Promise<void> {
   // ---- top strip -----------------------------------------------------------------
   const modes = chips<Mode>([
     { id: 'walk', label: 'walk', tip: 'walk the room · click = take mouse, wasd = move' },
-    { id: 'hang', label: 'hang', tip: 'place art on walls', disabled: 'arrives in P4' },
+    { id: 'hang', label: 'hang', tip: 'hold a work, walk, look at a wall, click' },
     { id: 'level', label: 'level', tip: 'fix walls, doors, stairs', disabled: 'arrives in P5' },
-  ], 'walk', () => { /* only walk for now */ })
+  ], 'walk', (m) => { mode = m; modes.set(m); art.mode = m; if (m !== 'hang') art.hold(null); shell.toast(m === 'hang' ? 'hang: click a thumbnail, look at a wall, click' : 'walk') })
+  let mode: Mode = 'walk'
   shell.top.appendChild(modes.root)
   const readout = el('span', 'readout'); shell.top.appendChild(readout)
   shell.spacer()
@@ -127,12 +142,118 @@ async function main(): Promise<void> {
   const where = el('div', 'note', ''); levelCard.body.append(where)
   levelCard.body.append(el('div', 'note', `${level.walls.filter((w) => w.hang !== false).length} hang walls · ${level.stairs.length} stairs · ${built.doors.length} doors · ${level.levels.length} floors`))
 
+  // ---- INVENTORY: drop images, type h w d, click = hold ---------------------------------------
   const inv = shell.card('inventory', 'inventory', { x: 12, y: 280 })
-  inv.body.append(emptyState('no art yet', 'P4 brings the inventory: drop images here, set cm sizes, hang them.'))
+  const drop = el('div', 'drop'); drop.innerHTML = 'drop images here<small>or click · then type h w d in cm</small>'
+  const pick = el('input'); pick.type = 'file'; pick.accept = 'image/*'; pick.multiple = true; pick.hidden = true
+  drop.addEventListener('click', () => pick.click())
+  const grid = el('div', 'thumbs')
+  const pending = el('div', 'pending')
+  inv.body.append(drop, pick, pending, grid)
+  const addForm = async (f: File) => {
+    let img: { data: string; w: number; h: number }
+    try { img = await readImage(f) } catch { shell.toast(`${f.name}: not an image`, 'warn'); return }
+    const rowEl = el('div', 'addrow')
+    const th = el('img', 'thumb') as HTMLImageElement; th.src = img.data
+    const title = el('input'); title.type = 'text'; title.value = f.name.replace(/\.[a-z0-9]+$/i, ''); title.placeholder = 'title'
+    const hI = el('input'); hI.type = 'number'; hI.placeholder = 'h cm'; hI.value = '90'
+    const wI = el('input'); wI.type = 'number'; wI.placeholder = 'w cm'; wI.value = String(Math.round(90 * img.w / img.h))
+    const dI = el('input'); dI.type = 'number'; dI.placeholder = 'd cm'; dI.value = '4'
+    hI.addEventListener('input', () => { wI.value = String(Math.round(Number(hI.value) * img.w / img.h)) })
+    const edge = el('select'); for (const o of ['wrap', 'white']) { const op = el('option', undefined, o); op.value = o; edge.appendChild(op) }
+    const ok = el('button', 'chip', 'add'); const no = el('button', 'chip', '×')
+    const commit = async () => {
+      const h = Number(hI.value), w = Number(wI.value), d = Number(dI.value)
+      if (!(h > 0 && w > 0 && d >= 0)) { shell.toast('h w d in cm, please', 'warn'); return }
+      const a = await art.addLocal({ title: title.value || f.name, data: img.data, h, w, d, edge: edge.value })
+      rowEl.remove(); shell.toast(`${a.title} · ${a.w} × ${a.h} × ${a.d} cm in the library`)
+    }
+    ok.addEventListener('click', () => void commit()); no.addEventListener('click', () => rowEl.remove())
+    for (const i of [title, hI, wI, dI]) i.addEventListener('keydown', (e) => { if (e.key === 'Enter') void commit() })
+    const fields = el('div', 'fields'); fields.append(title, hI, wI, dI, edge, ok, no)
+    rowEl.append(th, fields); pending.appendChild(rowEl); title.focus()
+  }
+  const takeFiles = (files: FileList | null) => { if (files) for (const f of Array.from(files)) void addForm(f) }
+  pick.addEventListener('change', () => { takeFiles(pick.files); pick.value = '' })
+  for (const target of [drop, shell.viewport]) {
+    target.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over') })
+    target.addEventListener('dragleave', () => drop.classList.remove('over'))
+    target.addEventListener('drop', (e) => {
+      e.preventDefault(); drop.classList.remove('over')
+      const fs = e.dataTransfer?.files ?? null
+      const jsons = fs ? Array.from(fs).filter((f) => f.name.endsWith('.json')) : []
+      if (jsons.length) { void loadLayoutFile(jsons[0]); return }
+      takeFiles(fs)
+    })
+  }
+  const drawGrid = () => {
+    grid.innerHTML = ''
+    if (!art.library.length) { grid.appendChild(emptyState('no art yet', 'drop images above, type h w d in cm, click one to hold it')); return }
+    art.library.forEach((a, i) => {
+      const t = el('div', 'thumbwrap' + (art.held?.id === a.id ? ' held' : '')); t.title = `${a.title} · click = hold · ${i + 1}`
+      const im = el('img', 'thumb') as HTMLImageElement; im.src = a.data ?? `${DATA}art/${a.file}`
+      const cap = el('div', 'cap'); cap.innerHTML = `${a.title}<small>${a.w} × ${a.h} × ${a.d}${art.placedCount(a.id) ? ` · <b>on wall ×${art.placedCount(a.id)}</b>` : ''}</small>`
+      const rm = el('button', 'x', '×'); rm.title = 'remove from the library (and the walls)'
+      rm.addEventListener('click', (e) => { e.stopPropagation(); if (confirm(`remove ${a.title} from the library?`)) void art.removeLocal(a.id) })
+      t.append(im, cap); if (a.data) t.appendChild(rm)
+      t.addEventListener('click', () => { if (mode !== 'hang') { mode = 'hang'; modes.set('hang'); art.mode = 'hang' } art.hold(art.held?.id === a.id ? null : a); shell.toast(art.held ? `holding ${a.title} · look at a wall, click` : 'put down') })
+      grid.appendChild(t)
+    })
+  }
+  // ---- HANG: the widget ---------------------------------------------------------------------
   const hang = shell.card('hang', 'hang', { x: 12, y: 52, anchor: 'right' })
-  hang.body.append(emptyState('nothing to snap', 'P4 brings the hang widget: top / centre / bottom line, height in cm, gap.'))
-  const file = shell.card('file', 'file', { x: 12, y: 200, anchor: 'right' })
-  file.body.append(emptyState('no layouts', 'P4 brings save and load. P5 brings exports and the repo save.'))
+  const holding = el('div', 'note', 'holding nothing')
+  const snapChips = chips<SnapLine>([
+    { id: 'top', label: 'top', tip: 'the top edge sits on the line' }, { id: 'centre', label: 'centre', tip: 'the centre sits on the line' },
+    { id: 'bottom', label: 'bottom', tip: 'the bottom edge sits on the line' }, { id: 'free', label: 'free', tip: 'hang it where the crosshair is' },
+  ], art.layout.guides.snap, (v) => { art.setGuides({ snap: v }); syncHang() })
+  const height = el('input'); height.type = 'number'; height.min = '0'; height.max = '400'; height.step = '1'
+  const slider = el('input'); slider.type = 'range'; slider.min = '0'; slider.max = '400'; slider.step = '1'
+  const setHeight = (v: number) => { const g = art.layout.guides; if (g.snap === 'free') return; art.setGuides({ [g.snap]: v } as Partial<typeof g>); syncHang() }
+  height.addEventListener('change', () => setHeight(Number(height.value))); slider.addEventListener('input', () => setHeight(Number(slider.value)))
+  const gapI = el('input'); gapI.type = 'number'; gapI.min = '0'; gapI.max = '200'; gapI.step = '1'
+  gapI.addEventListener('change', () => { art.setGuides({ gap: Number(gapI.value) }); syncHang() })
+  const guideT = el('input'); guideT.type = 'checkbox'
+  guideT.addEventListener('change', () => { art.setGuides({ show: guideT.checked }) })
+  const snapWall = el('button', 'chip', 'snap all on this wall'); snapWall.addEventListener('click', () => { const h = art.hitWall(); if (!h) { shell.toast('look at a wall first', 'warn'); return } shell.toast(`${art.snapAll(h.wall.id)} snapped`) })
+  const snapAllB = el('button', 'chip', 'snap all'); snapAllB.addEventListener('click', () => shell.toast(`${art.snapAll()} snapped`))
+  const applyRow = el('div', 'chips'); applyRow.append(snapWall, snapAllB)
+  const wallNote = el('div', 'note', '')
+  hang.body.append(holding, el('div', 'legend', 'snap line'), snapChips.root, row('height cm', height, 'the line, in cm above this floor'), slider, row('gap cm', gapI, 'edge-to-edge snap distance between neighbours'), row('show guide', guideT), applyRow, wallNote)
+  const syncHang = () => {
+    const g = art.layout.guides; snapChips.set(g.snap)
+    const v = g.snap === 'free' ? 0 : g[g.snap]; height.value = String(v); slider.value = String(v); height.disabled = slider.disabled = g.snap === 'free'
+    gapI.value = String(g.gap); guideT.checked = g.show
+    holding.textContent = art.held ? `holding ${art.held.title} · ${art.held.w} × ${art.held.h} cm` : 'holding nothing · click a thumbnail'
+    hang.setStatus(`${art.layout.items.length} on walls`)
+  }
+  // ---- FILE: layouts ------------------------------------------------------------------------
+  const file = shell.card('file', 'file', { x: 12, y: 300, anchor: 'right' })
+  const nameI = el('input'); nameI.type = 'text'; nameI.placeholder = 'layout name'
+  nameI.addEventListener('change', () => { art.layout.name = nameI.value || 'draft'; art.autosave(); syncFile() })
+  const saveB = el('button', 'chip', 'save file'); saveB.title = 'download this layout as a .json (send it, drop it back here)'
+  saveB.addEventListener('click', () => {
+    const f = art.exportFile(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([f.json], { type: 'application/json' })); a.download = f.name; a.click()
+    shell.toast(f.skipped.length ? `saved · ${f.skipped.length} image(s) too big to travel: ${f.skipped.join(', ')}` : `saved ${f.name}`, f.skipped.length ? 'warn' : 'ok')
+  })
+  const loadI = el('input'); loadI.type = 'file'; loadI.accept = '.json'; loadI.hidden = true
+  const loadB = el('button', 'chip', 'load file'); loadB.addEventListener('click', () => loadI.click())
+  const loadLayoutFile = async (f: File) => {
+    const text = await f.text()
+    if (art.layout.items.length && !confirm(`replace the draft (${art.layout.items.length} works) with ${f.name}? undoable`)) return
+    try { const r = await art.importFile(text); shell.toast(`loaded ${f.name} · ${r.works} works · ${r.art} new images`); syncAll() } catch (e) { shell.toast((e as Error).message, 'bad') }
+  }
+  loadI.addEventListener('change', () => { if (loadI.files?.[0]) void loadLayoutFile(loadI.files[0]); loadI.value = '' })
+  const clearB = el('button', 'chip', 'clear'); clearB.addEventListener('click', () => { if (confirm('take every work off the walls? undoable')) art.clearDraft() })
+  const fileRow = el('div', 'chips'); fileRow.append(saveB, loadB, clearB)
+  const fileNote = el('div', 'note', '')
+  file.body.append(row('name', nameI), fileRow, loadI, fileNote)
+  const syncFile = () => { nameI.value = art.layout.name; fileNote.textContent = `draft autosaved in this browser · ${art.layout.items.length} works · save file to send it`; file.setStatus('draft') }
+  const syncAll = () => { drawGrid(); syncHang(); syncFile() }
+  art.onChange = syncAll
+  await art.load()
+  syncAll()
+  walker.onChange = () => art.onLevelChange()
 
   // ---- keys ------------------------------------------------------------------------
   const toggleDoor = () => {
@@ -143,11 +264,30 @@ async function main(): Promise<void> {
   }
   window.addEventListener('keydown', (e) => {
     if (isTyping(e)) return
+    if (mode === 'hang') {
+      if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') { e.preventDefault(); shell.toast((e.shiftKey ? art.doRedo() : art.doUndo()) ? (e.shiftKey ? 'redo' : 'undo') : 'nothing to undo', 'ok'); return }
+      if (e.code === 'BracketLeft') { art.swap(-1); return }
+      if (e.code === 'BracketRight') { art.swap(1); return }
+      if (/^Digit[1-9]$/.test(e.code)) { const a = art.library[Number(e.code.slice(5)) - 1]; if (a) art.hold(a); return }
+      if (e.code === 'KeyQ') { art.hold(null); return }
+      if (e.code === 'Delete' || e.code === 'Backspace') { if (art.remove()) shell.toast('taken down'); return }
+      if (e.code.startsWith('Arrow')) { const st = e.shiftKey ? 10 : 1; const du = e.code === 'ArrowLeft' ? -st : e.code === 'ArrowRight' ? st : 0; const dy = e.code === 'ArrowUp' ? st : e.code === 'ArrowDown' ? -st : 0; if (art.nudge(du, dy)) e.preventDefault(); return }
+      if (e.code === 'KeyE') { if (art.pickup()) { shell.toast(`holding ${art.held?.title}`); return } }
+    }
     if (e.code === 'KeyM' || e.key === 'm' || e.key === 'M') { big.hidden = !big.hidden; if (!big.hidden) walker.release() }
     else if (e.code === 'KeyE' || e.key === 'e' || e.key === 'E') toggleDoor()
     else if (e.code === 'Escape') { if (!big.hidden) big.hidden = true; else if (!shell.hideHelp()) walker.release() }
     else if (e.key === '?') shell.toggleHelp(HELP)
   })
+
+  renderer.domElement.addEventListener('mousedown', (e) => {
+    if (mode !== 'hang' || !walker.state.locked || e.button !== 0) return
+    const r = art.place()
+    if (r === 'placed') shell.toast(`hung ${art.held?.title}`)
+    else if (r === 'refused') shell.toast(art.preview.why || 'look at a hang wall', 'warn')
+    else if (r === 'picked') shell.toast(`holding ${art.held?.title}`)
+  })
+  renderer.domElement.addEventListener('wheel', (e) => { if (mode === 'hang' && walker.state.locked) { art.swap(e.deltaY > 0 ? 1 : -1); e.preventDefault() } }, { passive: false })
 
   // ---- loop --------------------------------------------------------------------------
   const clock = new THREE.Clock()
@@ -156,6 +296,14 @@ async function main(): Promise<void> {
     const dt = Math.min(0.05, clock.getDelta())
     walker.update(dt)
     updateDoors(built.doors, dt)
+    art.update()
+    if (mode === 'hang' && walker.state.locked) {
+      const pv = art.preview
+      const look = !art.held ? art.lookedAt() : null
+      const txt = art.held ? (pv.hit ? (pv.ok ? `click · hang ${art.held.title} here` : `can't hang here · ${pv.why}`) : `holding ${art.held.title} · look at a hang wall`) : (look ? 'click or e · pick it up · delete · arrows nudge' : 'click a thumbnail or scroll to hold a work')
+      if (hangTip.textContent !== txt) hangTip.textContent = txt
+      hangTip.hidden = false
+    } else hangTip.hidden = true
     hint.hidden = walker.state.locked; cross.hidden = !walker.state.locked
     const near = walker.state.locked ? walker.nearestDoor() : null
     doorTip.hidden = !near
@@ -193,7 +341,7 @@ async function main(): Promise<void> {
   const view = (lvl: string, x: number, z: number, yawDeg: number, pitchDeg = 0): void => {
     walker.teleport(lvl, x, z); walker.state.yaw = THREE.MathUtils.degToRad(yawDeg); walker.state.pitch = THREE.MathUtils.degToRad(pitchDeg); walker.update(0.016)
   }
-  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, plan, view, THREE, built, toggleDoor, meshAudit: () => meshAudit(level, built.group), skyLeakAudit: () => skyLeakAudit(level, built.group, built.doors) }
+  ;(window as unknown as { koanHang: unknown }).koanHang = { walker, level, scene, renderer, camera, shot, plan, view, THREE, built, toggleDoor, art, setMode: (m: Mode) => { mode = m; modes.set(m); art.mode = m }, meshAudit: () => meshAudit(level, built.group), skyLeakAudit: () => skyLeakAudit(level, built.group, built.doors) }
 }
 
 main().catch((e) => { console.error(e); alert(`KOAN.hang failed: ${(e as Error).message}`) })

@@ -91,6 +91,7 @@ Anything it does not cover it names as not audited. A fail blocks the push.
 | 4 sky + walk | sky from 35 points IN; stair exit at any frame size IN (walk.ts); grid sky, flood walk: NOT YET |
 | 5 visual | shot sheets in docs/sheet, looked at by hand; fixed shot list + photo pairing: NOT YET |
 | 6 ledger | IN (docs/NOTES.md) |
+| 9 art | NOT YET: placed works on hang walls / off openings / no overlap, plinths on floors, layout round trip (docs/ART.md §7). The app refuses bad placements live; the file check comes with gate 2. |
 | 7 report + gate | level/run_audit.py writes docs/audit/REPORT.md; push gate script: NOT YET |
 
 Run: `python level/run_audit.py` after the browser audits have posted mesh.txt and sky.txt (koanHang.meshAudit / skyLeakAudit -> /__audit).
