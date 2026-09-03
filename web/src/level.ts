@@ -57,6 +57,7 @@ export interface Level {
   blockers: Blocker[]
   objects: LevelObject[]
   sky?: { file?: string; fallback?: string }
+  fog?: { color: string; near: number; far: number }
 }
 
 export async function loadLevel(url: string): Promise<Level> {
@@ -147,7 +148,7 @@ const PALETTE: Record<string, { color: number; rough?: number; metal?: number; o
   'glass': { color: 0xa8c8e8, rough: 0.1, metal: 0.1, opacity: 0.18 },
   'block': { color: 0xb9b6b0, rough: 0.95 },
   'road': { color: 0x6f6d6a, rough: 0.95 },
-  'ground-plate': { color: 0x9a968f, rough: 1.0 },
+  'ground-plate': { color: 0x232325, rough: 1.0 },
   'glass-frosted': { color: 0xe6e9ea, rough: 0.6, metal: 0.0, opacity: 0.93, emissive: 0x3a3c3e },
   'door-slide': { color: 0xe8e8e4, rough: 0.8 },
   'door-metal': { color: 0x8a8c8f, rough: 0.5, metal: 0.5 },

@@ -64,6 +64,7 @@ async function main(): Promise<void> {
   loading.remove()
   // sky: an equirectangular panorama from the repo (textures/sky-tokyo.jpg) when present, else the flat fallback colour
   if (level.sky?.fallback) scene.background = new THREE.Color(level.sky.fallback)
+  if (level.fog) scene.fog = new THREE.Fog(new THREE.Color(level.fog.color), level.fog.near, level.fog.far)   // the smokey void
   if (level.sky?.file) {
     new THREE.TextureLoader().load(`${DATA}textures/${level.sky.file}`, (tex) => {
       tex.mapping = THREE.EquirectangularReflectionMapping; tex.colorSpace = THREE.SRGBColorSpace

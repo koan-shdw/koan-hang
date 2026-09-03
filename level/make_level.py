@@ -216,13 +216,12 @@ level = dict(
         dict(kind="slab", name="stone figure (measured x 0.45 z -2.75, 1.25 tall)", box=[[round(YARD["figure"]["x"] - 0.17, 3), round(G0 + YH["slate"], 3), round(YARD["figure"]["z"] - 0.17, 3)], [round(YARD["figure"]["x"] + 0.17, 3), round(G0 + YARD["figure"]["height"], 3), round(YARD["figure"]["z"] + 0.17, 3)]], material="stone"),
 
     ],
-    sky=dict(file="sky-tokyo.jpg", fallback="#bfd9f2"),
+    sky=dict(fallback="#232325"),                                  # the void: same grey as the fog, no horizon
+    fog=dict(color="#232325", near=6.0, far=26.0),                  # owner 2026-09-03: only the building and the courtyard, the rest a smokey void
     source=dict(made="level/make_level.py v3 2026-09-02", from_="docs/CHECK-SHEET.md + owner answers"),
 )
-CTX = json.load(open("level/context.json", encoding="utf-8")) if __import__("os").path.exists("level/context.json") else None
-if CTX:
-    level["objects"] += CTX["blocks"] + CTX["roads"] + [CTX["ground"]]
-    level["context"] = dict(source=CTX["source"], blocks=len(CTX["blocks"]), roads=len(CTX["roads"]))
+# context blocks (level/context.json, OSM) are OFF: owner 2026-09-03 "only the courtyard and the building, the rest a smokey void"
+level["objects"].append(dict(kind="ground", r=80.0, y=round(G0 - 0.02, 3), src="void floor: a disc the colour of the fog under the building"))
 SRC = dict(ribs="docs/CHECK-SHEET.md ceiling", track="scan/measure2.py lights", light="docs/CHECK-SHEET.md", aircon="scan/measure2.py hanging boxes",
            wallbox="docs/CHECK-SHEET.md meter wall", pipe="docs/CHECK-SHEET.md meter wall", hedge="owner photos 2026-09-03 (plants: forget for now)",
            paving="scan/measured.json yard", slab="scan/measured.json yard", block="osm", road="osm")
