@@ -1,12 +1,12 @@
 # Audit report
 
-2026-09-03 13:56, commit a13c238
+2026-09-03 15:01, commit 614a8eb
 
 **PASS** (0 fails)
 
 ## Stage 1 file audit (level/audit.py)
 
-PASS: 237 pass, 0 fail
+PASS: 224 pass, 0 fail
 
 
 ## Stage 2 fit to the scan
@@ -39,6 +39,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 - docs/sheet\context-views-2.jpg
 - docs/sheet\fix-views.jpg
 - docs/sheet\front-fix-views.jpg
+- docs/sheet\open-yard-views.jpg
 - docs/sheet\skin-views-1.jpg
 - docs/sheet\skin-views-2.jpg
 - docs/sheet\void-views.jpg
@@ -47,7 +48,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 
 ## Stage 6 notes ledger
 
-38 notes, 9 open:
+39 notes, 10 open:
 
 - there's stairs, windows and doors which need a clean up -> built
 - textures generated or expanded from the scan, on my ComfyUI -> open
@@ -58,6 +59,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 - back grid rows -> OPEN, not measured
 - the notch inside by the front glass -> OPEN, his answer
 - yard is 10 cm above the gallery floor in the scan; walker stands low out there -> OPEN
+- drop the walls opposite the entrance door, the one behind the red intro wall, and these ones (the yard boundary) -> built 09-03
 
 ## Not audited
 

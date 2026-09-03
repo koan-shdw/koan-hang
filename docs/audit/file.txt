@@ -144,7 +144,6 @@ PASS  passage floor [[5.53, 3.62], [6.84, 5.0]] in level
 PASS  door step grating [[0.42, -2.36], [0.77, -1.48]] in level
 PASS  counter inside [[-1.25, -2.3], [0.13, -1.46]] in level
 PASS  courtyard walk outline = measured outline
-PASS  corrugated building ends at the dirt 3.7
 PASS  one skin: line (-7.08, 2.72)->(-7.08, -2.37) has 1 drawn wall(s) of 3: ['g-west']
 PASS  one skin: g-west spans -5.54..3.97 = the line's full height
 PASS  one skin: line (-5.87, 2.72)->(-5.87, -2.37) has 1 drawn wall(s) of 1: ['g-stair-room']
@@ -154,26 +153,14 @@ PASS  one skin: line (-7.08, -2.37)->(0.22, -2.37) has 1 drawn wall(s) of 3: ['g
 PASS  one skin: g-south spans -5.54..3.97 = the line's full height
 PASS  one skin: line (0.22, 2.72)->(-7.08, 2.72) has 1 drawn wall(s) of 3: ['g-north']
 PASS  one skin: g-north spans -5.54..3.97 = the line's full height
-PASS  one skin: line (4.49, -4.49)->(4.49, -0.32) has 1 drawn wall(s) of 1: ['c-1']
-PASS  one skin: line (6.84, 0.66)->(6.84, 4.94) has 1 drawn wall(s) of 1: ['c-2']
-PASS  one skin: line (5.53, 3.62)->(-0.21, 3.62) has 1 drawn wall(s) of 1: ['c-3']
-PASS  one skin: line (4.63, -0.4)->(7.03, -0.4) has 1 drawn wall(s) of 1: ['c-4']
 PASS  one skin: line (0.6, -3.12)->(3.5, -3.12) has 1 drawn wall(s) of 1: ['c-5']
-PASS  one skin: line (0.22, -3.5)->(3.7, -3.5) has 1 drawn wall(s) of 1: ['c-8']
-PASS  one skin: line (3.71, 4.25)->(-0.56, 4.25) has 1 drawn wall(s) of 1: ['c-6']
 PASS  no slab bands left
 PASS  source on wall g-west: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall g-stair-room: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall g-east: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall g-south: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall g-north: docs/CHECK-SHEET.md + owner notes
-PASS  source on wall c-1: docs/CHECK-SHEET.md + owner notes
-PASS  source on wall c-2: docs/CHECK-SHEET.md + owner notes
-PASS  source on wall c-3: docs/CHECK-SHEET.md + owner notes
-PASS  source on wall c-4: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall c-5: docs/CHECK-SHEET.md + owner notes
-PASS  source on wall c-8: docs/CHECK-SHEET.md + owner notes
-PASS  source on wall c-6: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall f-west: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall f-east: docs/CHECK-SHEET.md + owner notes
 PASS  source on wall f-south: docs/CHECK-SHEET.md + owner notes

@@ -148,7 +148,7 @@ if os.path.exists("scan/measured.json") and "yard" in mz:
             (na, A_), (nb, B_) = tops[i], tops[j]
             ov = min(A_[1][0], B_[1][0]) - max(A_[0][0], B_[0][0]) > 0.011 and min(A_[1][1], B_[1][1]) - max(A_[0][1], B_[0][1]) > 0.011
             if ov: ok(False, f"yard boxes overlap: '{na}' and '{nb}'")
-    b8 = next((w for w in walls if w["id"] == "c-8"), None)
+    b8 = next((w for w in walls if w["id"] == "c-8"), None)   # dropped by the owner 2026-09-03; the check stays for the day it comes back
     if b8: ok(abs(max(b8["a"][0], b8["b"][0]) - Y["building_end_x"]) < 0.011, f"corrugated building ends at the dirt {Y['building_end_x']}")
 
 # 5e. one skin: walls on one line = exactly one drawn, from the lowest base to the highest top; upper entries walk-only

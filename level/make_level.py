@@ -92,14 +92,10 @@ walls = [
          openings=[panel(0.0, round(SW - W, 3), 0.0, GH, "corrugated")], note="hallway end wall: corrugated, gas meter, boxes, pipes"),
     wall("g-north", "north", "ground", [E, NG], [W, NG], "-z", G0, G1),
     # courtyard (plain for now, textures later)
-    wall("c-1", "courtyard fence, straight ahead of the door", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
-    wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
-    wall("c-3", "courtyard low wall, far end", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
-    wall("c-4", "courtyard wall", "ground", [4.63, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
+    # yard boundary walls c-1 fence, c-2 east fence, c-3 far low wall, c-4, c-6 neighbour, c-8 corrugated: DROPPED by the owner 2026-09-03
+    # ("drop these walls opposite the entrance door, the one behind the red intro wall, and these ones"): the yard floats in the void
     wall("c-5", "red intro wall (measured: z -3.12, x 0.60..3.50, 1.75 m)", "ground",
          [0.60, -3.12], [3.50, -3.12], "+z", G0, round(G0 + 1.75, 3), hang=True, material="corten", note="signage wall"),
-    wall("c-8", "white corrugated building behind the red intro wall (measured z -3.50)", "ground", [E, -3.50], [YARD["building_end_x"], -3.50], "+z", G0, 0.15, hang=False, material="corrugated-white"),
-    wall("c-6", "neighbour wall, far end", "ground", [3.71, 4.25], [-0.56, 4.25], "-z", -3.87, -0.81, hang=False, material="render"),
 ]
 # ---------------- second + third (identical) ----------------
 def upper(level, base, top, tag, with_door=True):
