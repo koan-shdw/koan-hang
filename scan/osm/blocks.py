@@ -18,7 +18,7 @@ DEFAULT_LEVELS = 3
 RADIUS = 220                               # metres kept around the gallery
 PLOT = box(-7.30, -4.60, 7.00, 5.20)       # our building + yard in level coords (x, z), nothing else goes here
 STREET = box(-12.8, -45, -7.8, 45)         # the back street: not in OSM; street-view photo shows a ~5 m lane along our back face (manual)
-KEEP_OUT = unary_union([PLOT.buffer(0.3), STREET])
+KEEP_OUT = unary_union([PLOT.buffer(1.0), STREET])
 def to_map(lat, lon): return ((lon - LON0) * math.cos(math.radians(LAT0)) * 111320, (lat - LAT0) * 110540)
 xa = (math.sin(math.radians(XB)), math.cos(math.radians(XB)))
 za = (math.sin(math.radians(ZB)), math.cos(math.radians(ZB)))
@@ -27,6 +27,7 @@ def to_level(e, n):
     return (round(e * xa[0] + n * xa[1], 2), round(e * za[0] + n * za[1], 2))
 d = json.load(open("scan/osm/raw.json", encoding="utf-8"))
 blocks, roads = [], []
+taken = Polygon()
 for el in d["elements"]:
     t = el.get("tags", {})
     pts = [to_level(*to_map(p["lat"], p["lon"])) for p in el.get("geometry", [])]
@@ -40,10 +41,15 @@ for el in d["elements"]:
         if poly.intersects(KEEP_OUT):
             poly = poly.difference(KEEP_OUT)
         if poly.is_empty: continue
+        # no two blocks overlap in plan, and every block stands 3 cm clear of its neighbours: no crossing or shared faces
+        poly = poly.difference(taken).buffer(-0.03)
+        if poly.is_empty or poly.area < 4: continue
+        taken = unary_union([taken, Polygon(pts).buffer(0)])
         h = float(t["height"]) if t.get("height", "").replace(".", "").isdigit() else None
         if h is None:
             lv = t.get("building:levels", "")
             h = (float(lv) if lv.replace(".", "").isdigit() else DEFAULT_LEVELS) * LEVEL_H
+        h += (el["id"] % 17) * 0.01                       # roofs never on one plane
         geoms = [poly] if poly.geom_type == "Polygon" else list(poly.geoms)
         for g in geoms:
             blocks.append(dict(kind="block", name=t.get("name", t.get("building", "building")), poly=[[round(x, 2), round(z, 2)] for x, z in g.exterior.coords[:-1]],

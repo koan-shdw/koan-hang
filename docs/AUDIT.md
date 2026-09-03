@@ -87,8 +87,8 @@ Anything it does not cover it names as not audited. A fail blocks the push.
 | 0 truth | ledger + measured.json + src on every wall and object: IN. Photos folder: waiting on the owner's files. |
 | 1 file | IN: audit.py incl. one skin, provenance, back grid, yard, context blocks |
 | 2 fit | plan overlay IN (yard, docs/sheet/yard-blend.jpg); elevations, sections, objects: NOT YET |
-| 3 mesh | IN: stairs, floors, slabs, every window built and uncovered, blocks on the ground. NOT YET: generic floating, overlap, openings' frames, doors clear |
-| 4 sky + walk | sky from 35 points IN; grid sky, flood walk: NOT YET |
+| 3 mesh | IN: stairs, floors, slabs, every window built and uncovered, blocks on the ground, NO TWO FACES ON ONE PLANE (every axis-aligned box pair). NOT YET: generic floating, angled faces, doors clear |
+| 4 sky + walk | sky from 35 points IN; stair exit at any frame size IN (walk.ts); grid sky, flood walk: NOT YET |
 | 5 visual | shot sheets in docs/sheet, looked at by hand; fixed shot list + photo pairing: NOT YET |
 | 6 ledger | IN (docs/NOTES.md) |
 | 7 report + gate | level/run_audit.py writes docs/audit/REPORT.md; push gate script: NOT YET |

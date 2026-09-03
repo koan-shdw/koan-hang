@@ -75,9 +75,9 @@ for s in stairs:
         if abs(az - bz) < 1e-6 and zb + TOL < az < zt - TOL and max(ax, bx) > fx - hw and min(ax, bx) < fx + hw:
             ok(False, f"wall {w['id']} crosses stair {s['id']}")
     # slider leaves clear of the stringer: leaves sit 5 cm off the hallway face; stringer at the flight edge
-    hall = next((w for w in walls if w["id"] == "g-stair-hall"), None)
+    hall = next((w for w in walls if w["id"] == "g-stair-room"), None)
     if hall and s["level"] == "ground":
-        leaf_x = hall["a"][0] - 0.05 - 0.02
+        leaf_x = hall["a"][0] - hall["thickness"] - 0.05 - 0.02   # leaves on the back (hallway) face of the one wall
         ok(leaf_x > fx + hw + 0.02, f"slider leaf ({round(leaf_x,3)}) clear of the stringer edge ({round(fx+hw,3)})")
 
 # 5. floors of a level share edges with each other or with walls (no islands)
@@ -133,7 +133,8 @@ if os.path.exists("scan/measured.json") and "yard" in mz:
         ok(len(dr) == 2 and sorted(round(c["box"][0][1], 2) for c in dr) == [-2.27, -0.8], f"door patch reds in row 2 and row 4: {[c['box'] for c in dr]}")
     slabs = [o for o in objs if o["kind"] == "slab"]
     def slab_xz(o): return [[o["box"][0][0], o["box"][0][2]], [o["box"][1][0], o["box"][1][2]]]
-    for a_ in Y["apron"]: ok(any(same(slab_xz(o), a_["box"]) for o in slabs), f"apron '{a_['name']}' {a_['box']} in level")
+    def clamped(b): return [[max(b[0][0], 0.22 + 0.14), b[0][1]], b[1]]   # an apron starts at the front wall's outer face, never inside the wall body
+    for a_ in Y["apron"]: ok(any(same(slab_xz(o), clamped(a_["box"])) for o in slabs), f"apron '{a_['name']}' {a_['box']} in level (x0 clamped to the wall face)")
     ok(any(same(slab_xz(o), Y["dirt"]["box"]) and o["material"] == "dirt" for o in slabs), f"dirt bed {Y['dirt']['box']} in level")
     ok(any(same(slab_xz(o), Y["passage"]["box"]) for o in slabs), f"passage floor {Y['passage']['box']} in level")
     ok(any(same(slab_xz(o), Y["rack"]["box"]) for o in slabs), f"door step grating {Y['rack']['box']} in level")
@@ -196,7 +197,7 @@ for w in walls:
         if o["kind"] == "door":
             d = o["door"]
             if d["open"] and d.get("toggle", True): ok(o["h"] >= 1.9, f"door tall enough to walk: {w['id']} u {o['u']} h {o['h']}")
-            if d["type"] == "slide": ok((w["id"] == "g-stair-hall") == d["leaf"], f"slider leaf on the hallway side only: {w['id']} u {o['u']} leaf={d['leaf']}")
+            if d["type"] == "slide": ok(d["leaf"] and d.get("leafSide") == "back", f"slider leaf on the hallway face: {w['id']} u {o['u']} leafSide={d.get('leafSide')}")
 
 print(f"\n{fails} FAIL" if fails else "\nALL PASS")
 sys.exit(1 if fails else 0)

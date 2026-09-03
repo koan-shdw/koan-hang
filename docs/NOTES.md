@@ -39,3 +39,6 @@ A note without a check, or with a failing check, fails the audit. Repeated notes
 | 09-03 | back grid rows | street photo estimate: frosted to 1.74, bar 2.58, thirds above | OPEN, not measured |
 | 09-03 | the notch inside by the front glass | counter box 0.98 m, what it is | OPEN, his answer |
 | 09-03 | yard is 10 cm above the gallery floor in the scan; walker stands low out there | walk | OPEN |
+| 09-03 | glitching around the street door, the stair door and the upper door (striped flicker) | mesh: no two faces share a plane (0 pairs) | built 09-03 |
+| 09-03 | off the top of the stairs you drop to the floor below, 2nd and 3rd floor | walk: 90 cm steps land on the upper floor; dt capped | built 09-03 |
+| 09-03 | geometry overlaps outside, block by the yard; "all you did was cross these two shapes"; "I thought you said you audited" | blocks dissolved (no overlaps), 3 cm apart, 1 m off the plot; audit 5h cell grid | built 09-03 |

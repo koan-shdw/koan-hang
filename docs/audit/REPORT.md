@@ -1,12 +1,12 @@
 # Audit report
 
-2026-09-03 11:46, commit 786491d
+2026-09-03 13:42, commit e8e1eb4
 
 **PASS** (0 fails)
 
 ## Stage 1 file audit (level/audit.py)
 
-PASS: 1014 pass, 0 fail
+PASS: 996 pass, 0 fail
 
 
 ## Stage 2 fit to the scan
@@ -15,7 +15,7 @@ NOT AUDITED except the yard plan overlay (docs/sheet/yard-blend.jpg, checked by 
 
 ## Stage 3 mesh audit (koanHang.meshAudit)
 
-PASS: 629 pass, 0 fail
+PASS: 625 pass, 0 fail
 
 
 ## Stage 4 sky audit (koanHang.skyLeakAudit)
@@ -37,6 +37,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 - docs/sheet\context-plan-small.jpg
 - docs/sheet\context-views-1.jpg
 - docs/sheet\context-views-2.jpg
+- docs/sheet\fix-views.jpg
 - docs/sheet\front-fix-views.jpg
 - docs/sheet\skin-views-1.jpg
 - docs/sheet\skin-views-2.jpg
@@ -45,7 +46,7 @@ Sheets to look at by hand (one line each goes in the commit message):
 
 ## Stage 6 notes ledger
 
-34 notes, 9 open:
+37 notes, 9 open:
 
 - there's stairs, windows and doors which need a clean up -> built
 - textures generated or expanded from the scan, on my ComfyUI -> open

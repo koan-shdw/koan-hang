@@ -49,6 +49,7 @@ export class Walker {
   }
 
   update(dt: number): void {
+    dt = Math.min(dt, 0.05)   // a hitch must not turn into a 2 m step that skips the stair top
     const s = this.state
     if (s.locked) {
       let fwd = 0, side = 0
@@ -100,6 +101,11 @@ export class Walker {
         if (r) { px = r[0]; pz = r[1]; moved = true }
       }
       if (!moved) break
+    }
+    // leaving a stair: the level is the end you leave from, whatever the frame size was
+    if (s.onStair && !this.stairHere(px, pz)) {
+      const st = this.lv.stairs.find((t) => t.id === s.onStair)
+      if (st) { const p = stairProgress(st, s.x, s.z); const lvl = p > 0.5 && st.to ? st.to : st.level; if (lvl !== s.level) { s.level = lvl; s.feetY = floorOf(this.lv, lvl).floorY } }
     }
     for (const b of this.lv.blockers) if (b.level === s.level && pointInPoly(px, pz, b.poly)) return false
     if (!this.onGround(px, pz)) return false

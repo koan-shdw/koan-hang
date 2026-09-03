@@ -20,6 +20,7 @@ E = 0.22
 SG, NG = -2.37, 2.72      # ground floor south / north
 SF, NF = -2.44, 2.69      # second + third floor south / north
 GH, FH, TH = G1 - G0, F1 - F0, T1 - T0
+WALL_T = 0.14              # wall thickness everywhere
 GAP = 0.15                # slider gap between the hallway face and the stringer
 STAIR_W = round(SWH - GAP - W, 2)          # 0.92
 STAIR_X = round(W + STAIR_W / 2, 3)        # centre
@@ -33,10 +34,10 @@ def wall(id, name, level, a, b, facing, baseY, topY, openings=(), noHang=(), han
     if note: d["note"] = note
     d["src"] = src
     return d
-def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False, frame=True, hinge="a",
+def door(u, w, h, type, open, toggle=True, leaf=True, face="steel", swingOut=False, frame=True, hinge="a", leafSide="front",
          jambW=0.05, frameMaterial=None, panelAbove=0.0, recess=0.0, leafH=None):
     return dict(kind="door", u=u, w=w, bottom=0, h=h, door=dict(type=type, open=open, toggle=toggle, leaf=leaf, face=face,
-                swingOut=swingOut, frame=frame, hinge=hinge, jambW=jambW, frameMaterial=frameMaterial, panelAbove=panelAbove,
+                swingOut=swingOut, frame=frame, hinge=hinge, leafSide=leafSide, jambW=jambW, frameMaterial=frameMaterial, panelAbove=panelAbove,
                 recess=recess, leafH=leafH))
 def window(u, w, bottom, h, frame, uprights=(), bars=(), cross=(), crossAll=False):
     return dict(kind="window", u=u, w=w, bottom=bottom, h=h, frame=frame,
@@ -77,13 +78,10 @@ g_west_openings = [
 walls = [
     wall("g-west", "back wall of the building, ground (window, street door, meter panel)", "ground", [W, NG], [W, SG], "+x", G0, G1,
          hang=False, openings=g_west_openings),
-    wall("g-stair-room", "gallery back wall, room side", "ground", [SW, NG], [SW, SG], "+x", G0, G1,
-         openings=[door(round(NG - 2.60, 3), 0.85, 2.00, "slide", True, leaf=False, frame=False),
-                   door(round(NG - (-1.52), 3), 0.85, 2.00, "slide", True, leaf=False, frame=False)],
+    wall("g-stair-room", "gallery back wall (one wall, both faces): room face hangs, leaves slide on the hallway face", "ground", [SW, NG], [SW, SG], "+x", G0, G1,
+         openings=[door(round(NG - 2.60, 3), 0.85, 2.00, "slide", True, frame=False, leafSide="back"),
+                   door(round(NG - (-1.52), 3), 0.85, 2.00, "slide", True, frame=False, leafSide="back")],
          note="two identical doors 85x200: left (north) and right (south, at the stair foot); leaves live on the hallway face"),
-    wall("g-stair-hall", "gallery back wall, hallway side", "ground", [SWH, SG], [SWH, NG], "-x", G0, G1, hang=False,
-         openings=[door(round(-1.52 - SG - 0.85, 3), 0.85, 2.00, "slide", True, frame=False),   # south door, leaf slides north
-                   door(round(1.75 - SG, 3), 0.85, 2.00, "slide", True, frame=False)]),          # north door, leaf slides south
     wall("g-east", "glass front", "ground", [E, SG], [E, NG], "-x", G0, G1, hang=False,
          openings=[window(0.07, round(0.25 - SG - 0.07, 3), 0, GH, GREY, uprights=[round(-1.55 - SG - 0.07, 3), round(-0.87 - SG - 0.07, 3), round(-0.15 - SG - 0.07, 3)], bars=[0.9], cross=[1]),
                    door(round(0.40 - SG, 3), 0.85, round(GH - 0.05, 3), "swing", True, toggle=True, face="steel", swingOut=True, hinge="b",
@@ -97,7 +95,7 @@ walls = [
     wall("c-1", "courtyard fence, straight ahead of the door", "ground", [4.49, -4.49], [4.49, -0.32], "-x", G0, -2.37, hang=False, material="corrugated"),
     wall("c-2", "courtyard fence east", "ground", [6.84, 0.66], [6.84, 4.94], "-x", G0, -0.54, hang=False, material="corrugated"),
     wall("c-3", "courtyard low wall, far end", "ground", [5.53, 3.62], [-0.21, 3.62], "-z", G0, -3.97, hang=False, material="concrete"),
-    wall("c-4", "courtyard wall", "ground", [4.49, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
+    wall("c-4", "courtyard wall", "ground", [4.63, -0.40], [7.03, -0.40], "+z", G0, -1.16, hang=False, material="concrete"),
     wall("c-5", "red intro wall (measured: z -3.12, x 0.60..3.50, 1.75 m)", "ground",
          [0.60, -3.12], [3.50, -3.12], "+z", G0, round(G0 + 1.75, 3), hang=True, material="corten", note="signage wall"),
     wall("c-8", "white corrugated building behind the red intro wall (measured z -3.50)", "ground", [E, -3.50], [YARD["building_end_x"], -3.50], "+z", G0, 0.15, hang=False, material="corrugated-white"),
@@ -190,10 +188,10 @@ level = dict(
         dict(kind="light", level="ground", at=[STAIR_X, 0.6], size=[0, 0], y=-3.4),
         dict(kind="light", level="ground", at=[STAIR_X, 2.3], size=[0, 0], y=-2.6),
         dict(kind="light", level="first", at=[STAIR_X, 0.6], size=[0, 0], y=-0.1),
-        dict(kind="slab", name="bridge floor", box=[[E, F0 - 0.12, round(SF + 2.05, 3)], [4.2, F0, round(SF + 2.95, 3)]], material="concrete"),
-        dict(kind="slab", name="bridge roof", box=[[E, F0 + 2.05, round(SF + 2.05, 3)], [4.2, F0 + 2.20, round(SF + 2.95, 3)]], material="concrete"),
-        dict(kind="slab", name="bridge wall a", box=[[E, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.2, F0 + 2.20, round(SF + 2.05, 3)]], material="render"),
-        dict(kind="slab", name="bridge wall b", box=[[E, F0 - 0.12, round(SF + 2.95, 3)], [4.2, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
+        dict(kind="slab", name="bridge floor", box=[[E + WALL_T, F0 - 0.12, round(SF + 2.05, 3)], [4.2, F0, round(SF + 2.95, 3)]], material="concrete"),
+        dict(kind="slab", name="bridge roof", box=[[E + WALL_T, F0 + 2.05, round(SF + 2.05, 3)], [4.2, F0 + 2.20, round(SF + 2.95, 3)]], material="concrete"),
+        dict(kind="slab", name="bridge wall a", box=[[E + WALL_T, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.2, F0 + 2.20, round(SF + 2.05, 3)]], material="render"),
+        dict(kind="slab", name="bridge wall b", box=[[E + WALL_T, F0 - 0.12, round(SF + 2.95, 3)], [4.2, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
         dict(kind="slab", name="bridge end", box=[[4.2, F0 - 0.12, round(SF + 2.05 - 0.10, 3)], [4.3, F0 + 2.20, round(SF + 2.95 + 0.10, 3)]], material="render"),
         dict(kind="aircon", level="ground", at=[-2.25, 0.25], size=[0.95, 0.25, 0.95]),
         dict(kind="aircon", level="first", at=[-2.75, 0.25], size=[0.95, 0.25, 0.95]),
@@ -205,7 +203,7 @@ level = dict(
         dict(kind="pipe", wall="g-south", u=0.62, y0=0.05, y1=1.85, r=0.012, d=0.04, material="pipe-white"),
         dict(kind="pipe", wall="g-south", u=0.30, y0=0.05, y1=2.60, r=0.010, d=0.04, material="pipe-white"),
         # ---- courtyard floor, every box measured (scan/measured.json yard) ----
-        *[dict(kind="slab", name=a_["name"], box=[[a_["box"][0][0], G0 - 0.20, a_["box"][0][1]], [a_["box"][1][0], round(G0 + YH["apron"], 3), a_["box"][1][1]]], material="concrete-path") for a_ in YARD["apron"]],
+        *[dict(kind="slab", name=a_["name"], box=[[max(a_["box"][0][0], E + WALL_T), G0 - 0.20, a_["box"][0][1]], [a_["box"][1][0], round(G0 + YH["apron"], 3), a_["box"][1][1]]], material="concrete-path") for a_ in YARD["apron"]],
         *[dict(kind="paving", name=p_["name"], zone=p_["zone"], zoneTop=round(G0 + YH["paving"], 3), base=G0 - 0.20,
                cells=[dict(box=c_["box"], material=c_["material"], top=round(G0 + (YH["red"] if c_["material"] == "red-tile" else YH["slate"]), 3)) for c_ in p_["cells"]]) for p_ in YARD["patches"]],
         dict(kind="slab", name="dirt bed along the fence", box=[[YARD["dirt"]["box"][0][0], G0 - 0.20, YARD["dirt"]["box"][0][1]], [YARD["dirt"]["box"][1][0], round(G0 + YH["dirt"], 3), YARD["dirt"]["box"][1][1]]], material="dirt"),

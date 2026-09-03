@@ -7,7 +7,7 @@ export type Facing = '+x' | '-x' | '+z' | '-z'
 export type Dir = Facing
 export interface DoorSpec {
   type: 'slide' | 'swing' | 'metal'; open: boolean; toggle: boolean; leaf: boolean
-  face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean; frame?: boolean; hinge?: 'a' | 'b'
+  face?: 'steel' | 'glass' | 'mesh'; swingOut?: boolean; frame?: boolean; hinge?: 'a' | 'b'; leafSide?: 'front' | 'back'
   jambW?: number; frameMaterial?: string | null; panelAbove?: number; recess?: number; leafH?: number | null
 }
 export interface GridSpec { uprights?: number[]; cols?: number; bars: number[]; cross: number[]; crossAll?: boolean; frostBelow?: number }
@@ -213,6 +213,7 @@ export function buildLevel(lv: Level): Built {
     if (w.draw === false) continue   // walk-only entry of a merged line (one skin)
     const L = wallLength(w), H = w.topY - w.baseY, t = w.thickness
     const material = w.material ?? 'wall-white'
+    const tag = <M extends THREE.Object3D>(m: M, kind: string): M => { m.userData = { ...m.userData, kind, wall: w.id }; return m }
     // wall columns between openings; boxes below / above each opening
     const cuts = [0, L]
     for (const o of w.openings) cuts.push(Math.max(0, o.u), Math.min(L, o.u + o.w))
@@ -228,29 +229,32 @@ export function buildLevel(lv: Level): Built {
       for (const op of over) { if (op.bottom - yCur > 1e-3) spans.push([yCur, op.bottom]); yCur = Math.max(yCur, op.bottom + op.h) }
       if (H - yCur > 1e-3) spans.push([yCur, H])
       for (const [y0, y1] of spans) {
-        const m = wallBox(w, u1 - u0, y1 - y0, t, um, w.baseY + (y0 + y1) / 2, -t / 2, material)
-        m.userData.wall = w.id; group.add(m); addWire(m.geometry, m)
+        const m = tag(wallBox(w, u1 - u0, y1 - y0, t, um, w.baseY + (y0 + y1) / 2, -t / 2, material), 'wall')
+        group.add(m); addWire(m.geometry, m)
       }
     }
     // corner posts: where a window or door reaches a wall end, fill the corner volume behind the neighbouring wall's face
     const ops = w.openings.filter((o) => o.kind !== 'panel')
-    if (ops.some((o) => o.u < t + 0.011)) { const m = wallBox(w, t, H, t, -t / 2, w.baseY + H / 2, -t / 2, material); m.userData.wall = w.id; group.add(m) }
-    if (ops.some((o) => o.u + o.w > L - t - 0.011)) { const m = wallBox(w, t, H, t, L + t / 2, w.baseY + H / 2, -t / 2, material); m.userData.wall = w.id; group.add(m) }
+    const ps = t - 0.02
+    if (ops.some((o) => o.u < t + 0.011)) group.add(tag(wallBox(w, ps, H - 0.02, ps, -t / 2, w.baseY + H / 2, -t / 2, material), 'post'))
+    if (ops.some((o) => o.u + o.w > L - t - 0.011)) group.add(tag(wallBox(w, ps, H - 0.02, ps, L + t / 2, w.baseY + H / 2, -t / 2, material), 'post'))
     for (const o of w.openings) {
       const uc = o.u + o.w / 2, yc = w.baseY + o.bottom + o.h / 2
       if (o.kind === 'panel') {
         group.add(wallBox(w, o.w, o.h, t, uc, yc, -t / 2, o.material ?? 'corrugated'))
       } else if (o.kind === 'window') {
         const frame = o.frame ?? 'steel-grey', bar = 0.05, deep = 0.08
-        group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + bar / 2 - (o.bottom < 0.001 ? 0.01 : 0), -t / 2, frame)) // sill sinks 1 cm into the floor
-        group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + o.bottom + o.h - bar / 2, -t / 2, frame))
-        group.add(wallBox(w, bar, o.h, deep, o.u + bar / 2, yc, -t / 2, frame))
-        group.add(wallBox(w, bar, o.h, deep, o.u + o.w - bar / 2, yc, -t / 2, frame))
+        const topShy = 0.01, sillDrop = o.bottom < 0.001 ? 0.01 : 0
+        const y0 = w.baseY + o.bottom - sillDrop, y1 = w.baseY + o.bottom + o.h - topShy
+        group.add(tag(wallBox(w, o.w, bar, deep, uc, y0 + bar / 2, -t / 2, frame), 'frame')) // sill sinks 1 cm into the floor
+        group.add(tag(wallBox(w, o.w, bar, deep, uc, y1 - bar / 2, -t / 2, frame), 'frame'))
+        group.add(tag(wallBox(w, bar, y1 - y0 - 2 * bar, deep, o.u + bar / 2, (y0 + y1) / 2, -t / 2, frame), 'frame'))
+        group.add(tag(wallBox(w, bar, y1 - y0 - 2 * bar, deep, o.u + o.w - bar / 2, (y0 + y1) / 2, -t / 2, frame), 'frame'))
         const g = o.grid ?? { bars: [], cross: [] }
         const ups: number[] = g.uprights ? g.uprights.slice() : []
         if (!g.uprights && g.cols) for (let c = 1; c < g.cols; c++) ups.push((o.w * c) / g.cols)
-        for (const uu of ups) group.add(wallBox(w, bar, o.h, deep, o.u + uu, yc, -t / 2, frame))
-        for (const hb of g.bars) if (hb > o.bottom && hb < o.bottom + o.h) group.add(wallBox(w, o.w, bar, deep, uc, w.baseY + hb, -t / 2, frame))
+        for (const uu of ups) group.add(tag(wallBox(w, bar, y1 - y0 - 2 * bar, deep, o.u + uu, (y0 + y1) / 2, -t / 2, frame), 'frame'))
+        for (const hb of g.bars) if (hb > o.bottom && hb < o.bottom + o.h) group.add(tag(wallBox(w, o.w - 2 * bar, bar, deep - 0.01, uc, w.baseY + hb, -t / 2, frame), 'frame'))
         // cross bars: an X over a pane (index into the pane list) or over the whole opening
         const edges = [0, ...ups.sort((p, q) => p - q), o.w]
         const lowest = g.bars.length ? Math.max(o.bottom, Math.min(...g.bars.filter((b) => b > o.bottom))) : o.bottom
@@ -258,7 +262,7 @@ export function buildLevel(lv: Level): Built {
         for (const [c0, c1] of crosses) {
           const cw = c1 - c0, cu = o.u + c0 + cw / 2, h = o.bottom + o.h - lowest, yy = w.baseY + lowest + h / 2
           const len = Math.hypot(cw, h), ang = Math.atan2(h, cw)
-          for (const sgn of [1, -1]) { const m = wallBox(w, len, 0.03, 0.03, cu, yy, -t / 2 + 0.06, frame); m.rotateZ(sgn * ang); group.add(m) }
+          for (const sgn of [1, -1]) { const m = tag(wallBox(w, len, 0.03, 0.03, cu, yy, -t / 2 + 0.06, frame), 'cross'); m.rotateZ(sgn * ang); group.add(m) }
         }
         if (g.frostBelow && g.frostBelow > o.bottom && g.frostBelow < o.bottom + o.h) {
           // frosted panes below a height (the ground floor of the back grid), clear above
@@ -270,22 +274,22 @@ export function buildLevel(lv: Level): Built {
         const d = o.door
         const frameM = d.frameMaterial ?? (d.type === 'metal' || w.level === 'ground' ? 'steel-grey' : 'steel-black')
         const jamb = d.frame === false ? 0.005 : (d.jambW ?? 0.05)
-        const leafH = d.leafH ?? Math.min(o.h, 2.05)
+        const leafH = Math.min(d.leafH ?? Math.min(o.h, 2.05), d.frame === false ? o.h : o.h - 0.055)   // the leaf stops under the frame head
         if (d.frame !== false) {
-          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + jamb / 2, yc, -t / 2, frameM))
-          group.add(wallBox(w, jamb, o.h, t + 0.04, o.u + o.w - jamb / 2, yc, -t / 2, frameM))
-          group.add(wallBox(w, o.w, 0.05, t + 0.04, uc, w.baseY + o.bottom + o.h - 0.025, -t / 2, frameM))
+          group.add(tag(wallBox(w, jamb, o.h - 0.05, t + 0.04, o.u + jamb / 2, yc - 0.025, -t / 2, frameM), 'frame'))
+          group.add(tag(wallBox(w, jamb, o.h - 0.05, t + 0.04, o.u + o.w - jamb / 2, yc - 0.025, -t / 2, frameM), 'frame'))
+          group.add(tag(wallBox(w, o.w, 0.05, t + 0.04, uc, w.baseY + o.bottom + o.h - 0.025, -t / 2, frameM), 'frame'))
         }
-        if (d.panelAbove && d.panelAbove > 0.01) {
+        if (d.panelAbove && d.panelAbove > 0.01 && o.h - leafH > 0.011) {
           // a metal panel filling the opening above the leaf
-          const ph = Math.min(d.panelAbove, o.h - leafH)
-          group.add(wallBox(w, o.w - jamb * 2, ph, 0.05, uc, w.baseY + o.bottom + leafH + ph / 2, -t / 2 - (d.recess ?? 0), 'door-metal'))
+          const ph = Math.min(d.panelAbove, o.h - leafH - 0.06)
+          if (ph > 0.01) group.add(tag(wallBox(w, o.w - jamb * 2, ph, 0.05, uc, w.baseY + o.bottom + leafH + ph / 2, -t / 2 - (d.recess ?? 0), 'door-metal'), 'panel-above'))
         }
         if (d.leaf) {
           const pivot = new THREE.Object3D()
           const leafW = o.w - jamb * 2
           if (d.type === 'slide') {
-            pivot.add(wallBox(w, leafW, leafH - 0.01, 0.04, uc, w.baseY + o.bottom + (leafH - 0.01) / 2, 0.05, 'door-slide'))
+            pivot.add(tag(wallBox(w, leafW, leafH - 0.01, 0.04, uc, w.baseY + o.bottom + (leafH - 0.01) / 2, d.leafSide === 'back' ? -(t + 0.05) : 0.05, 'door-slide'), 'leaf'))
           } else if (d.type === 'swing') {
             const hb = d.hinge === 'b' ? -1 : 1
             pivot.position.copy(wallPoint(w, hb > 0 ? o.u + jamb : o.u + o.w - jamb, w.baseY + o.bottom, 0))
@@ -293,22 +297,22 @@ export function buildLevel(lv: Level): Built {
             pivot.rotation.y = Math.atan2(-dz, dx)
             const lx = hb * leafW / 2
             if (d.face === 'glass') {
-              const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.04), mat('steel-grey')); fr.position.set(lx, leafH / 2, 0)
+              const fr = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH - 0.005, 0.04), mat('steel-grey')); fr.position.set(lx, leafH / 2 + 0.0025, 0)
               const gl = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.16, leafH - 0.16, 0.01), mat('glass')); gl.position.set(lx, leafH / 2, 0)
               pivot.add(fr, gl)
             } else {
-              const leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.05), mat('door-metal')); leaf.position.set(lx, leafH / 2, 0)
+              const leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH - 0.005, 0.05), mat('door-metal')); leaf.position.set(lx, leafH / 2 + 0.0025, 0)
               const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.12, 10), mat('steel-grey')); handle.rotation.z = Math.PI / 2; handle.position.set(hb * (leafW - 0.1), 1.0, 0.05)
               pivot.add(leaf, handle)
             }
           } else {
-            if (d.recess) group.add(wallBox(w, o.w, 0.06, (d.recess ?? 0) + t, uc, w.baseY + o.bottom + 0.03 - 0.01, -((d.recess ?? 0) + t) / 2, 'concrete')) // threshold under a recessed door
-            pivot.add(wallBox(w, leafW, leafH, 0.05, uc, w.baseY + o.bottom + leafH / 2, -t / 2 - (d.recess ?? 0), 'door-metal'))
+            if (d.recess) group.add(tag(wallBox(w, o.w - 2 * jamb - 0.01, 0.06, (d.recess ?? 0) + t, uc, w.baseY + o.bottom + 0.03 - 0.01, -((d.recess ?? 0) + t) / 2, 'concrete'), 'threshold')) // threshold under a recessed door
+            pivot.add(tag(wallBox(w, leafW, leafH - 0.005, 0.05, uc, w.baseY + o.bottom + leafH / 2 + 0.0025, -t / 2 - (d.recess ?? 0), 'door-metal'), 'leaf'))
             if (d.face === 'mesh') pivot.add(wallBox(w, 0.18, leafH * 0.55, 0.06, uc, w.baseY + o.bottom + leafH * 0.55, -t / 2 - (d.recess ?? 0), 'steel-black'))
             const lock = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.03, 10), mat('steel-grey'))
             lock.rotation.x = Math.PI / 2; lock.position.copy(wallPoint(w, o.u + o.w - 0.12, w.baseY + o.bottom + 1.0, -t / 2 - (d.recess ?? 0) + 0.04)); pivot.add(lock)
           }
-          group.add(pivot)
+          pivot.userData = { kind: 'door-pivot', wall: w.id }; pivot.traverse((c) => { if (c !== pivot) c.userData = { kind: c.userData.kind ?? 'leaf', wall: w.id } }); group.add(pivot)
           const slideDir: 1 | -1 = o.u + o.w / 2 < L / 2 ? 1 : -1
           doors.push({ id: `${w.id}:${o.u.toFixed(2)}`, wall: w, opening: o, open: d.open, t: d.open ? 1 : 0, pivot, type: d.type, slideDir })
         }
@@ -369,8 +373,9 @@ export function buildLevel(lv: Level): Built {
     const a0 = along ? r.x0 : r.z0 // start of the width
     const bodyMesh = new THREE.Mesh(place(body, a0 + st.thickness), mat(s.riserMaterial ?? 'plywood'))
     bodyMesh.userData = { kind: 'stair-body', stair: s.id }; group.add(bodyMesh)
+    const inset = lv.stairs.some((q) => q.to === s.level) ? 0.001 : 0
     for (const off of [0, fullW - st.thickness]) {
-      const pm = new THREE.Mesh(place(plate(), a0 + off), mat(st.material ?? 'stringer-blue'))
+      const pm = new THREE.Mesh(place(plate(), a0 + off + (off ? -inset : inset)), mat(st.material ?? 'stringer-blue'))
       pm.userData = { kind: 'stringer', stair: s.id }; group.add(pm)
     }
     // checker plates: 1 cm thick, 2 mm above each tread top, the body width
@@ -419,8 +424,8 @@ export function buildLevel(lv: Level): Built {
       const [[x0, z0], [x1, z1]] = o.rect
       for (const [ax, az, bx, bz] of [[x0, z0, x1, z0], [x0, z1, x1, z1], [x0, z0, x0, z1], [x1, z0, x1, z1]]) {
         const alongX = ax !== bx
-        const r = new THREE.Mesh(new THREE.BoxGeometry(alongX ? bx - ax + 0.03 : 0.03, 0.03, alongX ? 0.03 : bz - az + 0.03), mat('steel-black'))
-        r.position.set((ax + bx) / 2, cy - 0.065, (az + bz) / 2); group.add(r)
+        const r = new THREE.Mesh(new THREE.BoxGeometry(alongX ? bx - ax + 0.03 : 0.022, alongX ? 0.03 : 0.022, alongX ? 0.03 : bz - az), mat('steel-black'))
+        r.position.set((ax + bx) / 2, cy - 0.065, (az + bz) / 2); r.userData = { kind: 'track' }; group.add(r)
       }
       const cxm = (x0 + x1) / 2, czm = (z0 + z1) / 2
       for (const [sx, sz] of o.spots) {
@@ -484,7 +489,7 @@ export function buildLevel(lv: Level): Built {
       zone.position.set((zx0 + zx1) / 2, (o.zoneTop + o.base) / 2, (zz0 + zz1) / 2); group.add(zone)
       for (const c of o.cells) {
         const [[x0, z0], [x1, z1]] = c.box, h = Math.max(0.01, c.top - o.zoneTop + 0.02)
-        const fill = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, h, z1 - z0), mat(c.material)); fill.position.set((x0 + x1) / 2, c.top - h / 2, (z0 + z1) / 2)
+        const fill = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0 - 0.01, h, z1 - z0 - 0.01), mat(c.material)); fill.position.set((x0 + x1) / 2, c.top - h / 2, (z0 + z1) / 2)
         fill.userData = { kind: 'cell', material: c.material }; group.add(fill)
       }
     } else if (o.kind === 'block') {
@@ -553,6 +558,32 @@ export function meshAudit(lv: Level, group: THREE.Group): string[] {
       const covered = kids.filter((k) => k.userData.wall === w.id && !k.userData.kind).some((k) => box(k).expandByScalar(-0.005).containsPoint(c))
       ok(!covered, `window ${w.id} u ${o.u} y ${o.bottom}: no solid wall over it`)
     }
+  }
+  // no two same-facing faces on one plane with overlapping area (that is the striped flicker the owner sees)
+  {
+    const items: { o: THREE.Object3D; b: THREE.Box3; tag: string }[] = []
+    group.traverse((o) => {
+      if (!(o as THREE.Mesh).isMesh || (o as THREE.InstancedMesh).isInstancedMesh || !((o as THREE.Mesh).geometry instanceof THREE.BoxGeometry)) return
+      const r = o.rotation
+      const axisAligned = Math.abs((r.y / (Math.PI / 2)) % 1) < 1e-3 && Math.abs(r.x) < 1e-3 && Math.abs(r.z) < 1e-3
+      const k = o.userData.kind
+      if (!axisAligned || k === 'block' || k === 'road' || k === 'ground' || k === 'glass' || k === 'floor' || k === 'ceiling') return
+      items.push({ o, b: new THREE.Box3().setFromObject(o), tag: `${k ?? 'mesh'} ${o.userData.wall ?? o.userData.name ?? o.userData.stair ?? ''}`.trim() })
+    })
+    const eps = 2e-3, ov = (a0: number, a1: number, b0: number, b1: number) => Math.min(a1, b1) - Math.max(a0, b0) > 0.01
+    const fights: string[] = []
+    for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+      const A = items[i].b, B = items[j].b
+      if (A.max.x < B.min.x - eps || B.max.x < A.min.x - eps || A.max.y < B.min.y - eps || B.max.y < A.min.y - eps || A.max.z < B.min.z - eps || B.max.z < A.min.z - eps) continue
+      for (const ax of ['x', 'y', 'z'] as const) {
+        const o1 = ax === 'x' ? 'y' : 'x', o2 = ax === 'z' ? 'y' : 'z'
+        for (const side of ['min', 'max'] as const) {
+          if (Math.abs(A[side][ax] - B[side][ax]) < eps && ov(A.min[o1], A.max[o1], B.min[o1], B.max[o1]) && ov(A.min[o2], A.max[o2], B.min[o2], B.max[o2]))
+            fights.push(`${items[i].tag} | ${items[j].tag} ${ax}${side} at ${A[side][ax].toFixed(2)}`)
+        }
+      }
+    }
+    ok(fights.length === 0, `no two faces share a plane: ${fights.length} pairs` + (fights.length ? ' e.g. ' + fights.slice(0, 12).join('; ') : ''))
   }
   // nothing floats: every context block and slab bottom sits on the ground plate or another mesh top (within 2 cm)
   const gY = floorOf(lv, 'ground').floorY
