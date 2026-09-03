@@ -74,7 +74,7 @@ async function main(): Promise<void> {
   }
 
   let look: Look = 'textured'   // highest quality is the default; clean and wire are the dials
-  try { look = (localStorage.getItem(LOOK_KEY) as Look) || 'textured' } catch { /* private */ }
+  try { const saved = localStorage.getItem(LOOK_KEY); if (saved === 'clean' || saved === 'wire' || saved === 'textured') look = saved } catch { /* private */ }   // an old saved value ('both') fell through and showed flat: only the three known looks count
   const applyLook = () => {
     built.wire.visible = look === 'wire'
     applyTextures(look === 'textured', DATA, renderer.capabilities.getMaxAnisotropy())
