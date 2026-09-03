@@ -1,0 +1,161 @@
+scan: 428675 faces, 8 atlases, tracer RayMeshIntersector, 0.4s
+walls
+  g-west front                           wall-white         5.09x9.51 m  cover  24.3%
+  g-west back                            wall-white         5.09x9.51 m  cover   0.1%
+  g-stair-room front                     wall-white         5.09x3.24 m  cover  94.9%
+  g-stair-room back                      wall-white         5.09x3.24 m  cover  32.4%
+  g-east front                           wall-white         5.09x9.51 m  cover  46.4%
+  g-east back                            wall-white         5.09x9.51 m  cover  12.4%
+  g-south front                          wall-white         7.30x9.51 m  cover  31.4%
+  g-south back                           wall-white         7.30x9.51 m  cover   1.9%
+  g-north front                          wall-white         7.30x9.51 m  cover  33.6%
+  g-north back                           wall-white         7.30x9.51 m  cover   2.4%
+  c-5 front                              corten             2.90x1.75 m  cover  68.0%
+  c-5 back                               corten             2.90x1.75 m  cover   0.2%
+floors and ceilings
+  floor ground gallery                   concrete-polished  6.09x5.09 m  cover  92.9%
+  floor ground hallway                   concrete-grey      1.21x5.09 m  cover  14.6%
+  floor first second room                concrete-bare      6.38x5.13 m  cover  84.7%
+  floor first second landing             concrete-bare      0.92x0.47 m  cover  46.2%
+  floor first second stair foot          concrete-bare      0.92x0.89 m  cover  83.4%
+  floor third third room                 concrete-bare      6.38x5.13 m  cover   1.7%
+  floor third third landing              concrete-bare      0.92x0.47 m  cover   0.0%
+  ceiling third                          corrugated-ceiling 7.58x5.41 m  cover   0.0%
+  ceiling under first second room        corrugated-ceiling 6.38x5.13 m  cover  88.9%
+  ceiling under first second landing     corrugated-ceiling 0.92x0.47 m  cover   0.0%
+  ceiling under first second stair foot  corrugated-ceiling 0.92x0.89 m  cover  64.9%
+  ceiling under third third room         corrugated-ceiling 6.38x5.13 m  cover  92.5%
+  ceiling under third third landing      corrugated-ceiling 0.92x0.47 m  cover  47.2%
+yard, slabs, stairs
+  slab bridge floor top                  concrete           3.84x0.90 m  cover   5.8%
+  slab bridge floor bottom               concrete           3.84x0.90 m  cover  44.7%
+  slab bridge roof top                   concrete           3.84x0.90 m  cover   0.6%
+  slab bridge roof bottom                concrete           3.84x0.90 m  cover   0.7%
+  slab bridge wall a top                 render             3.84x0.10 m  cover   0.1%
+  slab bridge wall a bottom              render             3.84x0.10 m  cover   8.6%
+  slab bridge wall b top                 render             3.84x0.10 m  cover   3.9%
+  slab bridge wall b bottom              render             3.84x0.10 m  cover 100.0%
+  slab bridge end top                    render             0.10x1.10 m  cover   0.0%
+  slab bridge end bottom                 render             0.10x1.10 m  cover  49.6%
+  slab apron by the glass top            concrete-path      1.69x2.26 m  cover  96.3%
+  slab apron beside row 4 top            concrete-path      1.65x0.40 m  cover 100.0%
+  slab apron middle top                  concrete-path      2.79x2.61 m  cover  99.6%
+  slab apron wide part top top           concrete-path      2.00x0.45 m  cover  85.8%
+  slab apron beside the side strip top   concrete-path      0.49x2.30 m  cover  68.2%
+  slab apron wide part bottom top        concrete-path      2.00x1.32 m  cover  98.8%
+  paving zone door patch                 concrete           3.38x2.27 m  cover  95.8%
+  cell door patch 0                      slate              0.38x0.72 m  cover  69.0%
+  cell door patch 1                      slate              1.05x0.72 m  cover  97.9%
+  cell door patch 2                      slate              0.95x0.72 m  cover  98.6%
+  cell door patch 3                      slate              0.38x0.64 m  cover  93.6%
+  cell door patch 4                      slate              1.05x0.64 m  cover 100.0%
+  cell door patch 5                      red-tile           0.95x0.64 m  cover 100.0%
+  cell door patch 6                      slate              0.24x0.64 m  cover 100.0%
+  cell door patch 7                      slate              0.38x0.63 m  cover  97.9%
+  cell door patch 8                      slate              1.05x0.63 m  cover 100.0%
+  cell door patch 9                      slate              0.95x0.63 m  cover 100.0%
+  cell door patch 10                     slate              0.24x0.63 m  cover 100.0%
+  paving zone door patch row 4           concrete           1.73x0.75 m  cover  98.8%
+  cell door patch row 4 0                slate              0.38x0.63 m  cover  98.6%
+  cell door patch row 4 1                red-tile           1.05x0.63 m  cover 100.0%
+  paving zone far patch                  concrete           4.62x1.46 m  cover  98.3%
+  cell far patch 0                       slate              0.35x0.67 m  cover  95.1%
+  cell far patch 1                       slate              0.97x0.67 m  cover  97.4%
+  cell far patch 2                       slate              1.01x0.67 m  cover 100.0%
+  cell far patch 3                       slate              0.96x0.67 m  cover 100.0%
+  cell far patch 4                       slate              0.75x0.67 m  cover 100.0%
+  cell far patch 5                       slate              0.35x0.63 m  cover  99.2%
+  cell far patch 6                       slate              0.97x0.63 m  cover 100.0%
+  cell far patch 7                       red-tile           1.01x0.63 m  cover 100.0%
+  cell far patch 8                       slate              0.96x0.63 m  cover 100.0%
+  paving zone side strip                 concrete           1.51x2.30 m  cover 100.0%
+  cell side strip 0                      red-tile           0.45x1.98 m  cover 100.0%
+  cell side strip 1                      slate              0.86x0.60 m  cover 100.0%
+  cell side strip 2                      slate              0.86x0.63 m  cover 100.0%
+  cell side strip 3                      slate              0.86x0.66 m  cover 100.0%
+  slab dirt bed along the fence top      dirt               0.70x4.04 m  cover  87.2%
+  slab passage floor off the far corner top concrete           1.31x1.38 m  cover  55.0%
+  slab grating on the door step top      steel-black        0.35x0.88 m  cover  88.8%
+  slab counter inside by the front glass (measured; what it is: OPEN) top plywood            1.38x0.84 m  cover  74.4%
+  slab stone figure (measured x 0.45 z -2.75, 1.25 tall) top stone              0.34x0.34 m  cover  13.6%
+  s1 tread 0                             checker            0.92x0.22 m  cover  51.5%
+  s1 riser 0                             plywood            0.92x0.20 m  cover  16.6%
+  s1 tread 1                             checker            0.92x0.22 m  cover  49.5%
+  s1 riser 1                             plywood            0.92x0.20 m  cover  24.6%
+  s1 tread 2                             checker            0.92x0.22 m  cover  34.1%
+  s1 riser 2                             plywood            0.92x0.20 m  cover  22.2%
+  s1 tread 3                             checker            0.92x0.22 m  cover  32.8%
+  s1 riser 3                             plywood            0.92x0.20 m  cover  21.5%
+  s1 tread 4                             checker            0.92x0.22 m  cover  31.8%
+  s1 riser 4                             plywood            0.92x0.20 m  cover   0.0%
+  s1 tread 5                             checker            0.92x0.22 m  cover  33.7%
+  s1 riser 5                             plywood            0.92x0.20 m  cover   0.0%
+  s1 tread 6                             checker            0.92x0.22 m  cover  32.9%
+  s1 riser 6                             plywood            0.92x0.20 m  cover   0.0%
+  s1 tread 7                             checker            0.92x0.22 m  cover  29.0%
+  s1 riser 7                             plywood            0.92x0.20 m  cover   0.2%
+  s1 tread 8                             checker            0.92x0.22 m  cover  32.8%
+  s1 riser 8                             plywood            0.92x0.20 m  cover   2.0%
+  s1 tread 9                             checker            0.92x0.22 m  cover  40.9%
+  s1 riser 9                             plywood            0.92x0.20 m  cover   1.0%
+  s1 tread 10                            checker            0.92x0.22 m  cover  33.9%
+  s1 riser 10                            plywood            0.92x0.20 m  cover   0.4%
+  s1 tread 11                            checker            0.92x0.22 m  cover  27.3%
+  s1 riser 11                            plywood            0.92x0.20 m  cover   1.7%
+  s1 tread 12                            checker            0.92x0.22 m  cover  19.2%
+  s1 riser 12                            plywood            0.92x0.20 m  cover   0.9%
+  s1 tread 13                            checker            0.92x0.22 m  cover  15.8%
+  s1 riser 13                            plywood            0.92x0.20 m  cover   2.5%
+  s1 tread 14                            checker            0.92x0.22 m  cover  12.9%
+  s1 riser 14                            plywood            0.92x0.20 m  cover   5.4%
+  s1 tread 15                            checker            0.92x0.22 m  cover 100.0%
+  s1 riser 15                            plywood            0.92x0.20 m  cover   1.6%
+  s2 tread 0                             checker            0.92x0.22 m  cover  91.2%
+  s2 riser 0                             plywood            0.92x0.18 m  cover  56.3%
+  s2 tread 1                             checker            0.92x0.22 m  cover  71.7%
+  s2 riser 1                             plywood            0.92x0.18 m  cover  67.4%
+  s2 tread 2                             checker            0.92x0.22 m  cover  73.7%
+  s2 riser 2                             plywood            0.92x0.18 m  cover  80.9%
+  s2 tread 3                             checker            0.92x0.22 m  cover  66.4%
+  s2 riser 3                             plywood            0.92x0.18 m  cover  83.7%
+  s2 tread 4                             checker            0.92x0.22 m  cover  67.0%
+  s2 riser 4                             plywood            0.92x0.18 m  cover  60.4%
+  s2 tread 5                             checker            0.92x0.22 m  cover  69.6%
+  s2 riser 5                             plywood            0.92x0.18 m  cover  58.5%
+  s2 tread 6                             checker            0.92x0.22 m  cover  66.9%
+  s2 riser 6                             plywood            0.92x0.18 m  cover  51.4%
+  s2 tread 7                             checker            0.92x0.22 m  cover  63.0%
+  s2 riser 7                             plywood            0.92x0.18 m  cover  55.6%
+  s2 tread 8                             checker            0.92x0.22 m  cover  49.3%
+  s2 riser 8                             plywood            0.92x0.18 m  cover  49.8%
+  s2 tread 9                             checker            0.92x0.22 m  cover  49.9%
+  s2 riser 9                             plywood            0.92x0.18 m  cover  48.3%
+  s2 tread 10                            checker            0.92x0.22 m  cover  33.7%
+  s2 riser 10                            plywood            0.92x0.18 m  cover  33.1%
+  s2 tread 11                            checker            0.92x0.22 m  cover   3.2%
+  s2 riser 11                            plywood            0.92x0.18 m  cover  28.7%
+  s2 tread 12                            checker            0.92x0.22 m  cover   0.0%
+  s2 riser 12                            plywood            0.92x0.18 m  cover  14.8%
+  s2 tread 13                            checker            0.92x0.22 m  cover   1.1%
+  s2 riser 13                            plywood            0.92x0.18 m  cover   0.9%
+  s2 tread 14                            checker            0.92x0.22 m  cover   0.0%
+  s2 riser 14                            plywood            0.92x0.18 m  cover   0.0%
+  s2 tread 15                            checker            0.92x0.22 m  cover   0.0%
+  s2 riser 15                            plywood            0.92x0.18 m  cover   0.2%
+checker            2048x196  32 faces  coverage  40.2%
+concrete           2048x1086  9 faces  coverage  61.8%
+concrete-bare      2048x2064  5 faces  coverage  43.4%
+concrete-grey      2048x1026  1 faces  coverage  14.6%
+concrete-path      2048x614  6 faces  coverage  95.8%
+concrete-polished  2048x1026  1 faces  coverage  92.9%
+corrugated-ceiling 2048x3150  6 faces  coverage  55.6%
+corten             2048x358  2 faces  coverage  34.1%
+dirt               2048x816  1 faces  coverage  87.2%
+plywood            2048x302  33 faces  coverage  32.5%
+red-tile           2048x404  4 faces  coverage 100.0%
+render             2048x252  6 faces  coverage  27.7%
+slate              2048x300  22 faces  coverage  98.4%
+steel-black        2048x184  1 faces  coverage  88.8%
+stone              2048x76  1 faces  coverage  13.6%
+wall-white         2048x12092  10 faces  coverage  21.6%
+done 65s

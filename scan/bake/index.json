@@ -1,0 +1,1702 @@
+{
+ "checker": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   196
+  ],
+  "coverage": 40.2,
+  "faces": [
+   {
+    "face": "s1 tread 0",
+    "x": 4,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 1",
+    "x": 192,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 2",
+    "x": 380,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 3",
+    "x": 568,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 4",
+    "x": 756,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 5",
+    "x": 944,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 6",
+    "x": 1132,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 7",
+    "x": 1320,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 8",
+    "x": 1508,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 9",
+    "x": 1696,
+    "y": 4,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 10",
+    "x": 4,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 11",
+    "x": 192,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 12",
+    "x": 380,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 13",
+    "x": 568,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 14",
+    "x": 756,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s1 tread 15",
+    "x": 944,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 0",
+    "x": 1132,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 1",
+    "x": 1320,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 2",
+    "x": 1508,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 3",
+    "x": 1696,
+    "y": 52,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 4",
+    "x": 4,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 5",
+    "x": 192,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 6",
+    "x": 380,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 7",
+    "x": 568,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 8",
+    "x": 756,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 9",
+    "x": 944,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 10",
+    "x": 1132,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 11",
+    "x": 1320,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 12",
+    "x": 1508,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 13",
+    "x": 1696,
+    "y": 100,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 14",
+    "x": 4,
+    "y": 148,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   },
+   {
+    "face": "s2 tread 15",
+    "x": 192,
+    "y": 148,
+    "w": 184,
+    "h": 44,
+    "metres": [
+     0.92,
+     0.222
+    ]
+   }
+  ]
+ },
+ "concrete": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   1086
+  ],
+  "coverage": 61.8,
+  "faces": [
+   {
+    "face": "paving zone door patch",
+    "x": 4,
+    "y": 4,
+    "w": 676,
+    "h": 454,
+    "metres": [
+     3.38,
+     2.27
+    ]
+   },
+   {
+    "face": "paving zone far patch",
+    "x": 684,
+    "y": 4,
+    "w": 924,
+    "h": 292,
+    "metres": [
+     4.62,
+     1.46
+    ]
+   },
+   {
+    "face": "paving zone side strip",
+    "x": 1612,
+    "y": 4,
+    "w": 302,
+    "h": 460,
+    "metres": [
+     1.51,
+     2.3
+    ]
+   },
+   {
+    "face": "slab bridge floor top",
+    "x": 4,
+    "y": 468,
+    "w": 768,
+    "h": 180,
+    "metres": [
+     3.84,
+     0.9
+    ]
+   },
+   {
+    "face": "slab bridge floor bottom",
+    "x": 776,
+    "y": 468,
+    "w": 768,
+    "h": 180,
+    "metres": [
+     3.84,
+     0.9
+    ]
+   },
+   {
+    "face": "slab bridge roof top",
+    "x": 4,
+    "y": 652,
+    "w": 768,
+    "h": 180,
+    "metres": [
+     3.84,
+     0.9
+    ]
+   },
+   {
+    "face": "slab bridge roof bottom",
+    "x": 776,
+    "y": 652,
+    "w": 768,
+    "h": 180,
+    "metres": [
+     3.84,
+     0.9
+    ]
+   },
+   {
+    "face": "slab passage floor off the far corner top",
+    "x": 1548,
+    "y": 652,
+    "w": 262,
+    "h": 276,
+    "metres": [
+     1.31,
+     1.38
+    ]
+   },
+   {
+    "face": "paving zone door patch row 4",
+    "x": 4,
+    "y": 932,
+    "w": 346,
+    "h": 150,
+    "metres": [
+     1.73,
+     0.75
+    ]
+   }
+  ]
+ },
+ "concrete-bare": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   2064
+  ],
+  "coverage": 43.4,
+  "faces": [
+   {
+    "face": "floor first second room",
+    "x": 4,
+    "y": 4,
+    "w": 1276,
+    "h": 1026,
+    "metres": [
+     6.38,
+     5.13
+    ]
+   },
+   {
+    "face": "floor third third room",
+    "x": 4,
+    "y": 1034,
+    "w": 1276,
+    "h": 1026,
+    "metres": [
+     6.38,
+     5.13
+    ]
+   },
+   {
+    "face": "floor first second stair foot",
+    "x": 1284,
+    "y": 1034,
+    "w": 184,
+    "h": 178,
+    "metres": [
+     0.92,
+     0.89
+    ]
+   },
+   {
+    "face": "floor first second landing",
+    "x": 1472,
+    "y": 1034,
+    "w": 184,
+    "h": 94,
+    "metres": [
+     0.92,
+     0.47
+    ]
+   },
+   {
+    "face": "floor third third landing",
+    "x": 1660,
+    "y": 1034,
+    "w": 184,
+    "h": 94,
+    "metres": [
+     0.92,
+     0.47
+    ]
+   }
+  ]
+ },
+ "concrete-grey": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   1026
+  ],
+  "coverage": 14.6,
+  "faces": [
+   {
+    "face": "floor ground hallway",
+    "x": 4,
+    "y": 4,
+    "w": 242,
+    "h": 1018,
+    "metres": [
+     1.21,
+     5.09
+    ]
+   }
+  ]
+ },
+ "concrete-path": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   614
+  ],
+  "coverage": 95.8,
+  "faces": [
+   {
+    "face": "slab apron middle top",
+    "x": 4,
+    "y": 4,
+    "w": 558,
+    "h": 522,
+    "metres": [
+     2.79,
+     2.61
+    ]
+   },
+   {
+    "face": "slab apron by the glass top",
+    "x": 566,
+    "y": 4,
+    "w": 338,
+    "h": 452,
+    "metres": [
+     1.69,
+     2.26
+    ]
+   },
+   {
+    "face": "slab apron wide part bottom top",
+    "x": 908,
+    "y": 4,
+    "w": 400,
+    "h": 264,
+    "metres": [
+     2.0,
+     1.32
+    ]
+   },
+   {
+    "face": "slab apron beside the side strip top",
+    "x": 1312,
+    "y": 4,
+    "w": 98,
+    "h": 460,
+    "metres": [
+     0.49,
+     2.3
+    ]
+   },
+   {
+    "face": "slab apron wide part top top",
+    "x": 1414,
+    "y": 4,
+    "w": 400,
+    "h": 90,
+    "metres": [
+     2.0,
+     0.45
+    ]
+   },
+   {
+    "face": "slab apron beside row 4 top",
+    "x": 4,
+    "y": 530,
+    "w": 330,
+    "h": 80,
+    "metres": [
+     1.65,
+     0.4
+    ]
+   }
+  ]
+ },
+ "concrete-polished": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   1026
+  ],
+  "coverage": 92.9,
+  "faces": [
+   {
+    "face": "floor ground gallery",
+    "x": 4,
+    "y": 4,
+    "w": 1218,
+    "h": 1018,
+    "metres": [
+     6.09,
+     5.09
+    ]
+   }
+  ]
+ },
+ "corrugated-ceiling": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   3150
+  ],
+  "coverage": 55.6,
+  "faces": [
+   {
+    "face": "ceiling third",
+    "x": 4,
+    "y": 4,
+    "w": 1516,
+    "h": 1082,
+    "metres": [
+     7.58,
+     5.41
+    ]
+   },
+   {
+    "face": "ceiling under first second room",
+    "x": 4,
+    "y": 1090,
+    "w": 1276,
+    "h": 1026,
+    "metres": [
+     6.38,
+     5.13
+    ]
+   },
+   {
+    "face": "ceiling under third third room",
+    "x": 4,
+    "y": 2120,
+    "w": 1276,
+    "h": 1026,
+    "metres": [
+     6.38,
+     5.13
+    ]
+   },
+   {
+    "face": "ceiling under first second stair foot",
+    "x": 1284,
+    "y": 2120,
+    "w": 184,
+    "h": 178,
+    "metres": [
+     0.92,
+     0.89
+    ]
+   },
+   {
+    "face": "ceiling under first second landing",
+    "x": 1472,
+    "y": 2120,
+    "w": 184,
+    "h": 94,
+    "metres": [
+     0.92,
+     0.47
+    ]
+   },
+   {
+    "face": "ceiling under third third landing",
+    "x": 1660,
+    "y": 2120,
+    "w": 184,
+    "h": 94,
+    "metres": [
+     0.92,
+     0.47
+    ]
+   }
+  ]
+ },
+ "corten": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   358
+  ],
+  "coverage": 34.1,
+  "faces": [
+   {
+    "face": "c-5 front",
+    "x": 4,
+    "y": 4,
+    "w": 580,
+    "h": 350,
+    "metres": [
+     2.9,
+     1.75
+    ]
+   },
+   {
+    "face": "c-5 back",
+    "x": 588,
+    "y": 4,
+    "w": 580,
+    "h": 350,
+    "metres": [
+     2.9,
+     1.75
+    ]
+   }
+  ]
+ },
+ "dirt": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   816
+  ],
+  "coverage": 87.2,
+  "faces": [
+   {
+    "face": "slab dirt bed along the fence top",
+    "x": 4,
+    "y": 4,
+    "w": 140,
+    "h": 808,
+    "metres": [
+     0.7,
+     4.04
+    ]
+   }
+  ]
+ },
+ "plywood": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   302
+  ],
+  "coverage": 32.5,
+  "faces": [
+   {
+    "face": "slab counter inside by the front glass (measured; what it is: OPEN) top",
+    "x": 4,
+    "y": 4,
+    "w": 276,
+    "h": 168,
+    "metres": [
+     1.38,
+     0.84
+    ]
+   },
+   {
+    "face": "s1 riser 0",
+    "x": 284,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 1",
+    "x": 472,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 2",
+    "x": 660,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 3",
+    "x": 848,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 4",
+    "x": 1036,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 5",
+    "x": 1224,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 6",
+    "x": 1412,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 7",
+    "x": 1600,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 8",
+    "x": 1788,
+    "y": 4,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 9",
+    "x": 4,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 10",
+    "x": 192,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 11",
+    "x": 380,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 12",
+    "x": 568,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 13",
+    "x": 756,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 14",
+    "x": 944,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s1 riser 15",
+    "x": 1132,
+    "y": 176,
+    "w": 184,
+    "h": 40,
+    "metres": [
+     0.92,
+     0.2
+    ]
+   },
+   {
+    "face": "s2 riser 0",
+    "x": 1320,
+    "y": 176,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 1",
+    "x": 1508,
+    "y": 176,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 2",
+    "x": 1696,
+    "y": 176,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 3",
+    "x": 4,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 4",
+    "x": 192,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 5",
+    "x": 380,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 6",
+    "x": 568,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 7",
+    "x": 756,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 8",
+    "x": 944,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 9",
+    "x": 1132,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 10",
+    "x": 1320,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 11",
+    "x": 1508,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 12",
+    "x": 1696,
+    "y": 220,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 13",
+    "x": 4,
+    "y": 261,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 14",
+    "x": 192,
+    "y": 261,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   },
+   {
+    "face": "s2 riser 15",
+    "x": 380,
+    "y": 261,
+    "w": 184,
+    "h": 37,
+    "metres": [
+     0.92,
+     0.184
+    ]
+   }
+  ]
+ },
+ "red-tile": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   404
+  ],
+  "coverage": 100.0,
+  "faces": [
+   {
+    "face": "cell side strip 0",
+    "x": 4,
+    "y": 4,
+    "w": 90,
+    "h": 396,
+    "metres": [
+     0.45,
+     1.98
+    ]
+   },
+   {
+    "face": "cell door patch row 4 1",
+    "x": 98,
+    "y": 4,
+    "w": 210,
+    "h": 126,
+    "metres": [
+     1.05,
+     0.63
+    ]
+   },
+   {
+    "face": "cell far patch 7",
+    "x": 312,
+    "y": 4,
+    "w": 202,
+    "h": 126,
+    "metres": [
+     1.01,
+     0.63
+    ]
+   },
+   {
+    "face": "cell door patch 5",
+    "x": 518,
+    "y": 4,
+    "w": 190,
+    "h": 128,
+    "metres": [
+     0.95,
+     0.64
+    ]
+   }
+  ]
+ },
+ "render": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   252
+  ],
+  "coverage": 27.7,
+  "faces": [
+   {
+    "face": "slab bridge wall a top",
+    "x": 4,
+    "y": 4,
+    "w": 768,
+    "h": 20,
+    "metres": [
+     3.84,
+     0.1
+    ]
+   },
+   {
+    "face": "slab bridge wall a bottom",
+    "x": 776,
+    "y": 4,
+    "w": 768,
+    "h": 20,
+    "metres": [
+     3.84,
+     0.1
+    ]
+   },
+   {
+    "face": "slab bridge wall b top",
+    "x": 4,
+    "y": 28,
+    "w": 768,
+    "h": 20,
+    "metres": [
+     3.84,
+     0.1
+    ]
+   },
+   {
+    "face": "slab bridge wall b bottom",
+    "x": 776,
+    "y": 28,
+    "w": 768,
+    "h": 20,
+    "metres": [
+     3.84,
+     0.1
+    ]
+   },
+   {
+    "face": "slab bridge end top",
+    "x": 1548,
+    "y": 28,
+    "w": 20,
+    "h": 220,
+    "metres": [
+     0.1,
+     1.1
+    ]
+   },
+   {
+    "face": "slab bridge end bottom",
+    "x": 1572,
+    "y": 28,
+    "w": 20,
+    "h": 220,
+    "metres": [
+     0.1,
+     1.1
+    ]
+   }
+  ]
+ },
+ "slate": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   300
+  ],
+  "coverage": 98.4,
+  "faces": [
+   {
+    "face": "cell door patch 1",
+    "x": 4,
+    "y": 4,
+    "w": 210,
+    "h": 144,
+    "metres": [
+     1.05,
+     0.72
+    ]
+   },
+   {
+    "face": "cell door patch 2",
+    "x": 218,
+    "y": 4,
+    "w": 190,
+    "h": 144,
+    "metres": [
+     0.95,
+     0.72
+    ]
+   },
+   {
+    "face": "cell far patch 2",
+    "x": 412,
+    "y": 4,
+    "w": 202,
+    "h": 134,
+    "metres": [
+     1.01,
+     0.67
+    ]
+   },
+   {
+    "face": "cell door patch 4",
+    "x": 618,
+    "y": 4,
+    "w": 210,
+    "h": 128,
+    "metres": [
+     1.05,
+     0.64
+    ]
+   },
+   {
+    "face": "cell door patch 8",
+    "x": 832,
+    "y": 4,
+    "w": 210,
+    "h": 126,
+    "metres": [
+     1.05,
+     0.63
+    ]
+   },
+   {
+    "face": "cell far patch 1",
+    "x": 1046,
+    "y": 4,
+    "w": 194,
+    "h": 134,
+    "metres": [
+     0.97,
+     0.67
+    ]
+   },
+   {
+    "face": "cell far patch 3",
+    "x": 1244,
+    "y": 4,
+    "w": 192,
+    "h": 134,
+    "metres": [
+     0.96,
+     0.67
+    ]
+   },
+   {
+    "face": "cell far patch 6",
+    "x": 1440,
+    "y": 4,
+    "w": 194,
+    "h": 126,
+    "metres": [
+     0.97,
+     0.63
+    ]
+   },
+   {
+    "face": "cell far patch 8",
+    "x": 1638,
+    "y": 4,
+    "w": 192,
+    "h": 126,
+    "metres": [
+     0.96,
+     0.63
+    ]
+   },
+   {
+    "face": "cell door patch 9",
+    "x": 1834,
+    "y": 4,
+    "w": 190,
+    "h": 126,
+    "metres": [
+     0.95,
+     0.63
+    ]
+   },
+   {
+    "face": "cell side strip 3",
+    "x": 4,
+    "y": 152,
+    "w": 172,
+    "h": 132,
+    "metres": [
+     0.86,
+     0.66
+    ]
+   },
+   {
+    "face": "cell side strip 2",
+    "x": 180,
+    "y": 152,
+    "w": 172,
+    "h": 126,
+    "metres": [
+     0.86,
+     0.63
+    ]
+   },
+   {
+    "face": "cell side strip 1",
+    "x": 356,
+    "y": 152,
+    "w": 172,
+    "h": 120,
+    "metres": [
+     0.86,
+     0.6
+    ]
+   },
+   {
+    "face": "cell far patch 4",
+    "x": 532,
+    "y": 152,
+    "w": 150,
+    "h": 134,
+    "metres": [
+     0.75,
+     0.67
+    ]
+   },
+   {
+    "face": "cell door patch 0",
+    "x": 686,
+    "y": 152,
+    "w": 76,
+    "h": 144,
+    "metres": [
+     0.38,
+     0.72
+    ]
+   },
+   {
+    "face": "cell door patch 3",
+    "x": 766,
+    "y": 152,
+    "w": 76,
+    "h": 128,
+    "metres": [
+     0.38,
+     0.64
+    ]
+   },
+   {
+    "face": "cell door patch 7",
+    "x": 846,
+    "y": 152,
+    "w": 76,
+    "h": 126,
+    "metres": [
+     0.38,
+     0.63
+    ]
+   },
+   {
+    "face": "cell door patch row 4 0",
+    "x": 926,
+    "y": 152,
+    "w": 76,
+    "h": 126,
+    "metres": [
+     0.38,
+     0.63
+    ]
+   },
+   {
+    "face": "cell far patch 0",
+    "x": 1006,
+    "y": 152,
+    "w": 70,
+    "h": 134,
+    "metres": [
+     0.35,
+     0.67
+    ]
+   },
+   {
+    "face": "cell far patch 5",
+    "x": 1080,
+    "y": 152,
+    "w": 70,
+    "h": 126,
+    "metres": [
+     0.35,
+     0.63
+    ]
+   },
+   {
+    "face": "cell door patch 6",
+    "x": 1154,
+    "y": 152,
+    "w": 48,
+    "h": 128,
+    "metres": [
+     0.24,
+     0.64
+    ]
+   },
+   {
+    "face": "cell door patch 10",
+    "x": 1206,
+    "y": 152,
+    "w": 48,
+    "h": 126,
+    "metres": [
+     0.24,
+     0.63
+    ]
+   }
+  ]
+ },
+ "steel-black": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   184
+  ],
+  "coverage": 88.8,
+  "faces": [
+   {
+    "face": "slab grating on the door step top",
+    "x": 4,
+    "y": 4,
+    "w": 70,
+    "h": 176,
+    "metres": [
+     0.35,
+     0.88
+    ]
+   }
+  ]
+ },
+ "stone": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   76
+  ],
+  "coverage": 13.6,
+  "faces": [
+   {
+    "face": "slab stone figure (measured x 0.45 z -2.75, 1.25 tall) top",
+    "x": 4,
+    "y": 4,
+    "w": 68,
+    "h": 68,
+    "metres": [
+     0.34,
+     0.34
+    ]
+   }
+  ]
+ },
+ "wall-white": {
+  "ppc": 2.0,
+  "size": [
+   2048,
+   12092
+  ],
+  "coverage": 21.6,
+  "faces": [
+   {
+    "face": "g-south front",
+    "x": 4,
+    "y": 4,
+    "w": 1460,
+    "h": 1902,
+    "metres": [
+     7.3,
+     9.51
+    ]
+   },
+   {
+    "face": "g-south back",
+    "x": 4,
+    "y": 1910,
+    "w": 1460,
+    "h": 1902,
+    "metres": [
+     7.3,
+     9.51
+    ]
+   },
+   {
+    "face": "g-north front",
+    "x": 4,
+    "y": 3816,
+    "w": 1460,
+    "h": 1902,
+    "metres": [
+     7.3,
+     9.51
+    ]
+   },
+   {
+    "face": "g-north back",
+    "x": 4,
+    "y": 5722,
+    "w": 1460,
+    "h": 1902,
+    "metres": [
+     7.3,
+     9.51
+    ]
+   },
+   {
+    "face": "g-west front",
+    "x": 4,
+    "y": 7628,
+    "w": 1018,
+    "h": 1902,
+    "metres": [
+     5.09,
+     9.51
+    ]
+   },
+   {
+    "face": "g-west back",
+    "x": 1026,
+    "y": 7628,
+    "w": 1018,
+    "h": 1902,
+    "metres": [
+     5.09,
+     9.51
+    ]
+   },
+   {
+    "face": "g-east front",
+    "x": 4,
+    "y": 9534,
+    "w": 1018,
+    "h": 1902,
+    "metres": [
+     5.09,
+     9.51
+    ]
+   },
+   {
+    "face": "g-east back",
+    "x": 1026,
+    "y": 9534,
+    "w": 1018,
+    "h": 1902,
+    "metres": [
+     5.09,
+     9.51
+    ]
+   },
+   {
+    "face": "g-stair-room front",
+    "x": 4,
+    "y": 11440,
+    "w": 1018,
+    "h": 648,
+    "metres": [
+     5.09,
+     3.24
+    ]
+   },
+   {
+    "face": "g-stair-room back",
+    "x": 1026,
+    "y": 11440,
+    "w": 1018,
+    "h": 648,
+    "metres": [
+     5.09,
+     3.24
+    ]
+   }
+  ]
+ }
+}

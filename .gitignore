@@ -4,3 +4,4 @@ level/scan.clean.glb
 scan/__pycache__/
 scan/*.npy
 *.pyc
+scan/bake/*.png

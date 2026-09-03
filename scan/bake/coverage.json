@@ -1,0 +1,18 @@
+{
+ "checker": 40.2,
+ "concrete": 61.8,
+ "concrete-bare": 43.4,
+ "concrete-grey": 14.6,
+ "concrete-path": 95.8,
+ "concrete-polished": 92.9,
+ "corrugated-ceiling": 55.6,
+ "corten": 34.1,
+ "dirt": 87.2,
+ "plywood": 32.5,
+ "red-tile": 100.0,
+ "render": 27.7,
+ "slate": 98.4,
+ "steel-black": 88.8,
+ "stone": 13.6,
+ "wall-white": 21.6
+}
