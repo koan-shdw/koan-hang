@@ -35,13 +35,13 @@ Every line below is **PROVEN** (read from their build or ours), **PLAN** (what w
 | quality | `QUALITY` tiers, `setPixelRatio` by tier, `matchMedia` probes | counts |
 | talk | characters speak in emoji, no strings to translate | `character_emoji_display` |
 
-What we do NOT copy: planets, gravity, quests, NPCs, the game. We copy the shape of the machine.
+**Owner, 2026-09-05: "use everything they're using."** The whole stack above is ours. What we do NOT copy: planets, gravity, quests, NPCs, the game itself.
 
 ---
 
 ## 2. Our remake, the shape (PLAN)
 
-Same stack as today, arranged like theirs. We are already on Vite + three.js (r170 today, r180 in the remake).
+Their stack, whole: Vite, three.js r180, Svelte 5, Tweakpane, three-mesh-bvh, Draco, KTX2, workers, composer, MSDF, WebAudio, embed API.
 
 ```
 web/
@@ -58,9 +58,12 @@ web/
       walk.ts               capsule walker on a BVH of the room (today's walk.ts, collisions via three-mesh-bvh)
       looks/                lut.ts, sky.ts, plants.ts, glass.ts, surface.ts (shaders, §4)
       anchors.ts            world points the UI may follow (HANG widget, hung-work labels)
-    ui/                     DOM only. Never touches three.js
-      shell.ts, cards.ts, hud.ts, widget.ts (HANG), keys.ts
-  public/data/              level, textures (ktx2), art index
+    ui/                     Svelte 5 only. Never touches three.js
+      App.svelte, Cards (Inventory, Hang, File), Hud, Widget (HANG), Keys, Debug (Tweakpane)
+    text/                   MSDF font atlas + glyph worker, labels in the world
+    audio/                  WebAudio, positional, driven by bus events
+    embed.ts                window.__koanHang.start({cnt, relativePath}): mounts the room into any container
+  public/data/              level, textures (ktx2), art index, font atlas
 ```
 
 Rules of the shape:
@@ -70,9 +73,7 @@ Rules of the shape:
 4. Looks come from shaders and one LUT, not bigger images.
 5. Highest quality is the default. Lower tiers are visible dials, never chosen for him ([[highest-quality-default]]).
 
-**UI layer: OPEN.** Messenger uses Svelte 5. Ours today is hand DOM (`ui.ts`, 129 lines). Two ways:
-- **vanilla**: keep our DOM code, restructure into `ui/`. No new stack. My pick.
-- **svelte**: adopt Svelte 5 like them. Cleaner state, one more build step, KOAN bible chrome must be re-expressed.
+**UI layer: Svelte 5** (owner, 2026-09-05). Today's hand DOM (`ui.ts`, 129 lines) is rewritten as Svelte components. Same cards, same words, same KOAN bible chrome (one var contract, mono, drawn icons) expressed as component CSS. Tweakpane debug panel: off by default, backtick opens it, never in the shipped look.
 
 ---
 
@@ -104,11 +105,19 @@ In his order:
 5. **Plants**: card sprites, wind shader (vertex sway by noise), instanced.
 6. **Glass**: fresnel shader for the street windows, tinted reflection of the sky dome, no reflection geometry.
 
-Also from the pattern, OPEN for him: **outline** (toon edges, theirs), **dither** (theirs). Not asked, not built unless named.
+7. **Outline** (toon edges) and **dither**, theirs: yes (owner). Each a visible dial, on by default.
 
-Post stack order: render → LUT → SMAA. SMAA on by default (highest quality), a dial to turn off.
+Post stack order: render (depth texture) → outline → dither → LUT → SMAA. All on by default (highest quality), dials to turn off.
+
+**LUT**: a neutral LUT ships first (owner). He grades later, drops a `.cube` in `textures/`, the tile step makes `lut.ktx2`.
 
 ---
+
+## 4b. Text, audio, embed (PLAN, "everything")
+
+- **MSDF text**: one font atlas (the KOAN mono), glyph geometry built in a worker. Used for labels in the world: the hung work's title when looked at, the height readout at the guide line. HTML text stays in the cards.
+- **Audio**: WebAudio, positional. Footsteps on concrete and stair, the door. Nothing else unless he names it. `audio_mute_toggle` on the bus, M is taken (map), so the mute lives on the HUD.
+- **Embed API**: `window.__koanHang.start({ cnt, relativePath })` mounts the whole room into a container. The KOAN site can carry the gallery on a page.
 
 ## 5. UI anchored to the world (PLAN)
 
@@ -141,21 +150,21 @@ Each gate is live on the site and tested before the next. Old app stays live unt
 | **R3 anchors** | HANG widget and work labels follow the world | he hangs with the widget on the wall |
 | **R4 sculpture** | ART gate 2 from the old plan, on the new loader (Draco if a mesh ships) | his words when we get there |
 
-Where the code lives: OPEN.
-- **branch**: build in `web/` on branch `remake`, main stays live, merge at R1 parity. My pick.
-- **folder**: `web2/` next to `web/`, both deployable.
+Where the code lives: **branch** (owner). `web/` on branch `remake`, main stays live, merge at R1 parity. Pages deploys main only, the branch is previewed on localhost until parity.
 
 ---
 
-## 8. Open for him (answer before R1 code)
+## 8. Answered (owner, 2026-09-05)
 
-1. UI layer: vanilla or svelte.
-2. Where: branch or folder.
-3. Outline and dither from their look: yes or no.
-4. The LUT: he grades it, or a neutral one ships until he does.
+1. UI layer: Svelte 5, and everything else they use.
+2. Where: branch `remake`.
+3. Outline and dither: yes.
+4. LUT: neutral first, he grades later.
+
+Nothing open. R1 starts on GO.
 
 ---
 
 ## 9. Not in the remake
 
-Planets, gravity, NPC dialog, quests, emoji speech, audio, MSDF text, the embed API. If any is wanted later, it is a new spec line in his words.
+Planets, gravity, NPC dialog, quests, emoji speech. If any is wanted later, it is a new spec line in his words.
