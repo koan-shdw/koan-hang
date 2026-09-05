@@ -124,6 +124,7 @@ export class ArtSystem {
 
   // ---- layout --------------------------------------------------------------------------------
   rebuild(): void {
+    this.layout.items = this.layout.items.filter((p) => this.library.some((a) => a.id === p.art))   // an item whose work is gone is dropped, never crashes the room
     this.group.clear()   // every placed mesh, whatever the map says
     this.meshes.clear()
     for (const p of this.layout.items) {
@@ -245,7 +246,7 @@ export class ArtSystem {
     let top = g.snap === 'free' ? hit.y + H / 2 : floorY + this.topFor(g.snap, a.h)
     // gap snap: an edge `gap` from a neighbour on this wall, and the wall's centre
     const gap = g.gap / 100
-    const others = this.layout.items.filter((p) => p.wall === w.id).map((p) => { const b = this.library.find((x) => x.id === p.art)!; return { u0: p.u, u1: p.u + b.w / 100 } })
+    const others = this.layout.items.filter((p) => p.wall === w.id).flatMap((p) => { const b = this.library.find((x) => x.id === p.art); return b ? [{ u0: p.u, u1: p.u + b.w / 100 }] : [] })
     for (const o of others) {
       if (Math.abs(u0 - (o.u1 + gap)) < 0.15) u0 = o.u1 + gap
       if (Math.abs(u0 + W - (o.u0 - gap)) < 0.15) u0 = o.u0 - gap - W
@@ -261,7 +262,8 @@ export class ArtSystem {
       for (const o of w.openings) if (o.kind !== 'panel' && u1 > o.u && u0 < o.u + o.w && tp > o.bottom && bt < o.bottom + o.h) { why = `over the ${o.kind}`; break }
       if (!why) for (const s of w.noHang) if (u1 > s.u && u0 < s.u + s.w) { why = 'no-hang strip'; break }
       if (!why) for (const p of this.layout.items.filter((p) => p.wall === w.id)) {
-        const b = this.library.find((x) => x.id === p.art)!; const pf = floorOf(this.lv, p.level).floorY
+        const b = this.library.find((x) => x.id === p.art); if (!b) continue
+        const pf = floorOf(this.lv, p.level).floorY
         const ptop = pf + p.topY, pbot = ptop - b.h / 100
         if (u1 > p.u && u0 < p.u + b.w / 100 && top > pbot && bottom < ptop) { why = 'over another work'; break }
       }

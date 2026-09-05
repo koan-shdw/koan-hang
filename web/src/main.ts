@@ -102,11 +102,14 @@ async function main(): Promise<void> {
   const walker = new Walker(level, camera, renderer.domElement)
   walker.doors = built.doors
   const art = new ArtSystem(level, scene, walker, camera, DATA)
+  const nameOf = (id: string): string => art.library.find((x) => x.id === id)?.title ?? 'work'
   const hint = el('div', 'hint'); hint.innerHTML = 'click to walk<small>w a s d · shift run · e door · m plan · esc lets go</small>'
   const cross = el('div', 'crosshair'); cross.hidden = true
   const doorTip = el('div', 'doortip'); doorTip.hidden = true
   const hangTip = el('div', 'hangtip'); hangTip.hidden = true
-  shell.viewport.append(hint, cross, doorTip, hangTip)
+  const hangHint = el('div', 'hint'); hangHint.hidden = true
+  hangHint.innerHTML = 'click to hang<small>click a thumbnail, or 1-9 · then look at a wall, click<br>tab picks a hung work · delete takes it down · e takes it in hand<br>arrows nudge · , . swap · q puts it down · h hands · esc twice = walk</small>'
+  shell.viewport.append(hint, cross, doorTip, hangTip, hangHint)
 
   // ---- minimap ------------------------------------------------------------------
   const small = el('canvas', 'minimap'); const big = el('canvas', 'bigmap'); big.hidden = true
@@ -276,9 +279,9 @@ async function main(): Promise<void> {
       if (e.code === 'Tab') { e.preventDefault(); const p = art.selectNext(); shell.toast(p ? `selected ${art.library.find((x) => x.id === p.art)?.title ?? 'work'} · delete, arrows, e` : 'nothing selected'); return }
       if (e.code === 'KeyH') { art.hands = !art.hands; shell.toast(art.hands ? 'hands view on' : 'hands view off'); return }
       if (e.code === 'KeyQ') { art.hold(null); return }
-      if (e.code === 'Delete' || e.code === 'Backspace') { if (art.remove()) shell.toast('taken down'); return }
+      if (e.code === 'Delete' || e.code === 'Backspace') { const t = art.target(); if (t && art.remove()) shell.toast(`${nameOf(t.art)} taken down · ctrl z brings it back`); else shell.toast('look at a hung work, or tab to select one', 'warn'); return }
       if (e.code.startsWith('Arrow')) { const st = e.shiftKey ? 10 : 1; const du = e.code === 'ArrowLeft' ? -st : e.code === 'ArrowRight' ? st : 0; const dy = e.code === 'ArrowUp' ? st : e.code === 'ArrowDown' ? -st : 0; if (art.nudge(du, dy)) e.preventDefault(); return }
-      if (e.code === 'KeyE') { if (art.pickup()) { shell.toast(`holding ${art.held?.title}`); return } }
+      if (e.code === 'KeyE') { if (art.pickup()) { shell.toast(`${art.held?.title} in your hands · look at a wall, click · q puts it back`); return } }
     }
     if (e.code === 'KeyM' || e.key === 'm' || e.key === 'M') { big.hidden = !big.hidden; if (!big.hidden) walker.release() }
     else if (e.code === 'KeyE' || e.key === 'e' || e.key === 'E') toggleDoor()
@@ -295,9 +298,9 @@ async function main(): Promise<void> {
   renderer.domElement.addEventListener('mousedown', (e) => {
     if (mode !== 'hang' || !walker.state.locked || e.button !== 0) return
     const r = art.place()
-    if (r === 'placed') shell.toast(`hung ${art.held?.title}`)
+    if (r === 'placed') shell.toast(`hung ${art.held?.title} · ctrl z undoes · look at it and press delete to take it down`)
     else if (r === 'refused') shell.toast(art.preview.why || 'look at a hang wall', 'warn')
-    else if (r === 'picked') shell.toast(`holding ${art.held?.title}`)
+    else if (r === 'picked') shell.toast(`${art.held?.title} in your hands · look at a wall, click · q puts it back`)
   })
   renderer.domElement.addEventListener('wheel', (e) => { if (mode === 'hang' && walker.state.locked) { art.swap(e.deltaY > 0 ? 1 : -1); e.preventDefault() } }, { passive: false })
 
@@ -313,11 +316,11 @@ async function main(): Promise<void> {
       const pv = art.preview
       const look = !art.held ? art.lookedAt() : null
       const sel = art.selected ? art.layout.items.find((p) => p.id === art.selected) : null
-      const txt = art.held ? (pv.hit ? (pv.ok ? `click · hang ${art.held.title} here` : `can't hang here · ${pv.why}`) : `holding ${art.held.title} · look at a hang wall`) : sel ? `selected · e take · delete · arrows nudge · tab next` : (look ? 'click or e · take it · delete · arrows nudge' : 'click a thumbnail, scroll, or tab to select a hung work')
+      const txt = art.held ? (pv.hit ? (pv.ok ? `click hangs ${art.held.title} here · q puts it down` : `can't hang here · ${pv.why}`) : `${art.held.title} in your hands · look at a hang wall · q puts it down`) : sel ? `${nameOf(sel.art)} selected · delete takes it down · e takes it in hand · arrows nudge · tab next` : (look ? `looking at ${nameOf(look.art)} · delete takes it down · click or e takes it in hand · arrows nudge` : 'click a thumbnail or press 1-9 to hold a work · tab selects a hung work')
       if (hangTip.textContent !== txt) hangTip.textContent = txt
       hangTip.hidden = false
     } else hangTip.hidden = true
-    hint.hidden = walker.state.locked; cross.hidden = !walker.state.locked
+    hint.hidden = walker.state.locked || mode === 'hang'; hangHint.hidden = walker.state.locked || mode !== 'hang'; cross.hidden = !walker.state.locked
     const near = walker.state.locked ? walker.nearestDoor() : null
     doorTip.hidden = !near
     if (near) doorTip.textContent = near.opening.door?.toggle ? (near.open ? 'e · close door' : 'e · open door') : 'door · closed'
