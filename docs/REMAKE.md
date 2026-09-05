@@ -146,6 +146,8 @@ Each gate is live on the site and tested before the next. Old app stays live unt
 | gate | builds | done when |
 |---|---|---|
 | **R1 shell** | the shape (§2), bus, loader with workers (§3), room and walk and ART moved in, KTX2 tiles | he walks and hangs a show, sees no difference except loading. Script tests from gate 1 pass |
+
+**R1 BUILT 2026-09-05** on branch `remake`, not merged, not live. PROVEN by script on localhost (dev and the `vite build` under `/koan-hang/`): room, 278 materials on KTX2 CompressedTexture, 4 bitmap workers, hang, gap, refuse over a work, hands view, reach, select, pick up, undo, file round trip, every card control through the Svelte UI, Esc twice, theme, debug panel on backtick. OPEN: his walk. One departure to decide: the walker still moves on the level's nav data (walls, openings, doors, stairs), as today, so the feel is identical; three-mesh-bvh is used for the room's occlusion ray (a work behind a wall is not looked at). A capsule-on-BVH walker changes how stairs and doors feel, so it waits for his word.
 | **R2 looks** | LUT, sky shader, plants, glass, SMAA, dials | he says the room looks right. Screenshots in `docs/sheet/` |
 | **R3 anchors** | HANG widget and work labels follow the world | he hangs with the widget on the wall |
 | **R4 sculpture** | ART gate 2 from the old plan, on the new loader (Draco if a mesh ships) | his words when we get there |

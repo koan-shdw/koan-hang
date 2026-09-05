@@ -141,3 +141,9 @@ input:focus, select:focus { outline: none; border-color: var(--focus); }
 .viewport .hangtip { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); background: rgba(0,0,0,.55); border: 1px solid var(--line2); border-radius: 4px; padding: 4px 10px; font-size: 12px; color: var(--txt-hi); pointer-events: none; white-space: nowrap; }
 input[type='range'] { width: 100%; accent-color: var(--accent); }
 input[type='text'] { background: var(--bg0); border: 1px solid var(--line); color: var(--txt); border-radius: 4px; padding: 3px 6px; font: inherit; font-size: 12px; }
+
+/* remake: loader bar, debug panel */
+.viewport .loadbar { position: absolute; left: 50%; top: 48px; transform: translateX(-50%); width: 220px; height: 14px; background: rgba(0,0,0,.55); border: 1px solid var(--line2); border-radius: 4px; overflow: hidden; pointer-events: none; }
+.viewport .loadbar i { display: block; height: 100%; background: var(--accent); opacity: .6; transition: width .15s; }
+.viewport .loadbar span { position: absolute; inset: 0; font-size: 9px; line-height: 12px; text-align: center; color: var(--txt-hi); letter-spacing: 1px; }
+.debug { position: absolute; right: 12px; top: 52px; width: 280px; z-index: 60; }

@@ -182,20 +182,22 @@ export const MAPS: Record<string, { file: string; tile: number }> = {
 }
 const texCache = new Map<string, THREE.Texture>()
 let texturesOn = false
-/** the textured look: put every baked tile on its material, or take them all off. Missing files = flat colour + a console line. */
-export function applyTextures(on: boolean, base: string, anisotropy = 8): void {
+export type TextureProvider = (file: string) => Promise<THREE.Texture>
+/** the textured look: put every tile on its material, or take them all off. `load` is the world's loader (KTX2 first, jpg fallback).
+ *  A tile that fails = flat colour + a console line. */
+export function applyTextures(on: boolean, load: TextureProvider): void {
   texturesOn = on
   for (const [name, m] of cache) {
     const spec = MAPS[name]; const p = PALETTE[name]
     if (!spec || !p) continue
     if (!on) { m.map = null; m.color.set(p.color); m.needsUpdate = true; continue }
-    let tex = texCache.get(name)
-    if (!tex) {
-      tex = new THREE.TextureLoader().load(`${base}textures/${spec.file}`, undefined, undefined, () => { console.warn(`texture missing: ${spec.file}`); m.map = null; m.color.set(p.color); m.needsUpdate = true })
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = anisotropy
+    const cached = texCache.get(name)
+    if (cached) { m.map = cached; m.color.set(0xffffff); m.needsUpdate = true; continue }
+    load(spec.file).then((tex) => {
       texCache.set(name, tex)
-    }
-    m.map = tex; m.color.set(0xffffff); m.needsUpdate = true
+      if (!texturesOn) return
+      m.map = tex; m.color.set(0xffffff); m.needsUpdate = true
+    }).catch(() => { console.warn(`texture missing: ${spec.file}`); m.map = null; m.color.set(p.color); m.needsUpdate = true })
   }
 }
 export function texturesAreOn(): boolean { return texturesOn }
