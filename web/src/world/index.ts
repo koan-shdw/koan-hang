@@ -5,7 +5,7 @@ import { MeshBVH, acceleratedRaycast, computeBoundsTree, disposeBoundsTree } fro
 import { bus, type Mode, type Look } from '../bus'
 import { Renderer } from './renderer'
 import { Loader } from './loader'
-import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, meshAudit, skyLeakAudit, applyTextures, worldUVs, type Level } from './room/level'
+import { loadLevel, buildLevel, updateDoors, floorOf, setWireColor, meshAudit, skyLeakAudit, applyTextures, worldUVs, MAPS, type Level } from './room/level'
 import { Walker, isTyping } from './walk'
 import { Minimap } from './minimap'
 import { ArtSystem } from './art/art'
@@ -89,6 +89,23 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
   walker.doors = built.doors
   const art = new ArtSystem(level, scene, walker, camera, DATA, loader)
   art.occluder = occluder
+  art.floorRay = (origin, dir, far) => { bvhRay.origin.copy(origin); bvhRay.direction.copy(dir); const h = roomBVH.raycastFirst(bvhRay, THREE.DoubleSide, 0, far); return h && h.face ? { point: h.point, ny: Math.abs(h.face.normal.y), dist: h.distance } : null }
+  art.tileLoader = (name) => { const spec = MAPS[name]; if (!spec) return Promise.reject(new Error(`no tile ${name}`)); return tile(spec.file) }
+  // a sculpture's thumbnail: one small render of the model, stored on the item (local) or kept for the session (repo)
+  art.onModel = (a, g) => { try { a.thumb = thumbnail(g); artSnapshot() } catch (e) { console.warn('thumbnail failed', e) } }
+  const thumbnail = (model: THREE.Group): string => {
+    const sc = new THREE.Scene(); sc.background = new THREE.Color(0x111111)
+    const m = model.clone(true); m.traverse((o) => { const mm = o as THREE.Mesh; if (mm.isMesh) mm.material = new THREE.MeshStandardMaterial({ color: 0xe8e6e0, roughness: 0.8 }) })
+    const box = new THREE.Box3().setFromObject(m); const size = new THREE.Vector3(); box.getSize(size); const c = new THREE.Vector3(); box.getCenter(c)
+    sc.add(m, new THREE.HemisphereLight(0xffffff, 0x666666, 1.2)); const sun = new THREE.DirectionalLight(0xffffff, 1.5); sun.position.set(2, 3, 4); sc.add(sun)
+    const cam = new THREE.PerspectiveCamera(35, 1, 0.01, 100); const r = Math.max(size.x, size.y, size.z)
+    cam.position.set(c.x + r * 1.2, c.y + r * 0.6, c.z + r * 2.2); cam.lookAt(c)
+    const rt = new THREE.WebGLRenderTarget(192, 192); renderer.gl.setRenderTarget(rt); renderer.gl.render(sc, cam)
+    const px = new Uint8Array(192 * 192 * 4); renderer.gl.readRenderTargetPixels(rt, 0, 0, 192, 192, px); renderer.gl.setRenderTarget(null); rt.dispose()
+    const cv = document.createElement('canvas'); cv.width = cv.height = 192; const ctx = cv.getContext('2d')!; const img = ctx.createImageData(192, 192)
+    for (let y = 0; y < 192; y++) img.data.set(px.subarray((191 - y) * 192 * 4, (192 - y) * 192 * 4), y * 192 * 4)
+    ctx.putImageData(img, 0, 0); return cv.toDataURL('image/jpeg', 0.85)
+  }
   const anchors = new Anchors()
   let mode: Mode = 'walk'
   const nameOf = (id: string): string => art.library.find((x) => x.id === id)?.title ?? 'work'
@@ -97,7 +114,8 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
   const artSnapshot = () => {
     const placed: Record<string, number> = {}
     for (const p of art.layout.items) placed[p.art] = (placed[p.art] ?? 0) + 1
-    bus.emit('art_state', { library: art.library, held: art.held?.id ?? null, layout: art.layout, selected: art.selected, placed, hands: art.hands })
+    const f = art.focus()
+    bus.emit('art_state', { library: art.library, held: art.held?.id ?? null, layout: art.layout, selected: art.selected, placed, hands: art.hands, focus: f ? { art: f.art.id, placed: f.placed?.id ?? null, look: art.lookOf(f.art, f.placed) } : null })
   }
   art.onChange = artSnapshot
   await art.load()
@@ -128,6 +146,12 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
     bus.on('add_local', ({ item }) => { void art.addLocal(item).then((a) => bus.toast(`${a.title} · ${a.w} × ${a.h} × ${a.d} cm in the library`)) }),
     bus.on('remove_local', ({ id }) => { void art.removeLocal(id) }),
     bus.on('set_guides', ({ patch }) => art.setGuides(patch)),
+    bus.on('set_sculpt', ({ patch }) => { if (!art.setLook(patch)) bus.toast('hold or look at a sculpture first', 'warn') }),
+    bus.on('rotate', ({ deg }) => { if (!art.rotate(deg)) bus.toast('hold or look at a sculpture first', 'warn'); else artSnapshot() }),
+    bus.on('probe_model', ({ data, key }) => {
+      loader.model(data, 'art').then((g) => { const b = new THREE.Box3().setFromObject(g); const s = new THREE.Vector3(); b.getSize(s); bus.emit('model_probed', { key, w: Math.round(s.x * 100), h: Math.round(s.y * 100), d: Math.round(s.z * 100) }) })
+        .catch((e) => bus.emit('model_probed', { key, w: 0, h: 0, d: 0, error: (e as Error).message }))
+    }),
     bus.on('snap_all', ({ wall }) => {
       if (wall === 'looked') { const h = art.hitWall(); if (!h) { bus.toast('look at a wall first', 'warn'); return } bus.toast(`${art.snapAll(h.wall.id)} snapped`) }
       else bus.toast(`${art.snapAll()} snapped`)
@@ -161,6 +185,7 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
       if (e.code === 'Tab') { e.preventDefault(); const p = art.selectNext(); artSnapshot(); bus.toast(p ? `selected ${nameOf(p.art)} · delete, arrows, e` : 'nothing selected'); return }
       if (e.code === 'KeyH') { art.hands = !art.hands; artSnapshot(); bus.toast(art.hands ? 'hands view on' : 'hands view off'); return }
       if (e.code === 'KeyQ') { art.hold(null); return }
+      if (e.code === 'KeyR') { if (art.rotate(e.shiftKey ? -15 : 15)) { artSnapshot(); bus.toast('turned 15°') } return }
       if (e.code === 'Delete' || e.code === 'Backspace') { const t = art.target(); if (t && art.remove()) bus.toast(`${nameOf(t.art)} taken down · ctrl z brings it back`); else bus.toast('look at a hung work, or tab to select one', 'warn'); return }
       if (e.code.startsWith('Arrow')) { const st = e.shiftKey ? 10 : 1; const du = e.code === 'ArrowLeft' ? -st : e.code === 'ArrowRight' ? st : 0; const dy = e.code === 'ArrowUp' ? st : e.code === 'ArrowDown' ? -st : 0; if (art.nudge(du, dy)) e.preventDefault(); return }
       if (e.code === 'KeyE') { if (art.pickup()) { bus.toast(`${art.held?.title} in your hands · look at a wall, click · q puts it back`); return } }
@@ -189,7 +214,7 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
   renderer.gl.domElement.addEventListener('wheel', onWheel, { passive: false })
 
   // ---- loop --------------------------------------------------------------------------------------------------
-  let lastWalk = '', lastHud = ''
+  let lastWalk = '', lastHud = '', lastFocus = ''
   let elapsed = 0
   renderer.start((dt) => {
     elapsed += dt; looks.update(elapsed)
@@ -203,12 +228,14 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
       const pv = art.preview
       const lookAt = !art.held ? art.lookedAt() : null
       const sel = art.selected ? art.layout.items.find((p) => p.id === art.selected) : null
-      hangTip = art.held ? (pv.hit ? (pv.ok ? `click hangs ${art.held.title} here · q puts it down` : `can't hang here · ${pv.why}`) : `${art.held.title} in your hands · look at a hang wall · q puts it down`) : sel ? `${nameOf(sel.art)} selected · delete takes it down · e takes it in hand · arrows nudge · tab next` : (lookAt ? `looking at ${nameOf(lookAt.art)} · delete takes it down · click or e takes it in hand · arrows nudge` : 'click a thumbnail or press 1-9 to hold a work · tab selects a hung work')
+      hangTip = art.held ? (art.held.kind === 'sculpture' ? (pv.floor ? (pv.ok ? `click places ${art.held.title} here · r turns it · q puts it down` : `can't place here · ${pv.why}`) : `${art.held.title} in your hands · look at the floor · q puts it down`) : pv.hit ? (pv.ok ? `click hangs ${art.held.title} here · q puts it down` : `can't hang here · ${pv.why}`) : `${art.held.title} in your hands · look at a hang wall · q puts it down`) : sel ? `${nameOf(sel.art)} selected · delete takes it down · e takes it in hand · arrows nudge · tab next` : (lookAt ? `looking at ${nameOf(lookAt.art)} · delete takes it down · click or e takes it in hand · arrows nudge` : 'click a thumbnail or press 1-9 to hold a work · tab selects a hung work')
     }
     const near = locked ? walker.nearestDoor() : null
     const doorTip = near ? (near.opening.door?.toggle ? (near.open ? 'e · close door' : 'e · open door') : 'door · closed') : null
     const hudKey = `${locked}|${mode}|${hangTip}|${doorTip}`
     if (hudKey !== lastHud) { lastHud = hudKey; bus.emit('hud', { hint: locked ? null : mode === 'hang' ? 'hang' : 'walk', cross: locked, doorTip, hangTip }) }
+    const fNow = mode === 'hang' && locked ? art.focus() : null; const fKey = fNow ? `${fNow.art.id}|${fNow.placed?.id ?? ''}` : ''
+    if (fKey !== lastFocus) { lastFocus = fKey; artSnapshot() }
     const walkKey = `${s.level}|${s.x.toFixed(2)}|${s.z.toFixed(2)}|${s.onStair}|${locked}`
     if (walkKey !== lastWalk) { lastWalk = walkKey; bus.emit('walk_state', { level: s.level, levelName: floorOf(level, s.level).name, x: s.x, z: s.z, onStair: !!s.onStair, locked }) }
     minimap?.draw(s)

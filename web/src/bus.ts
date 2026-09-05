@@ -1,5 +1,5 @@
 // The event bus (REMAKE.md §2). The only way world/ and ui/ talk. Typed, synchronous, no framework.
-import type { ArtItem, Layout, Guides } from './world/art/art'
+import type { ArtItem, Layout, Guides, SculptLook, Placed } from './world/art/art'
 
 export type Mode = 'walk' | 'hang' | 'level'
 export type Look = 'clean' | 'wire' | 'textured'
@@ -10,7 +10,9 @@ export type FxState = Record<FxKey, boolean>
 
 export interface WalkSnapshot { level: string; levelName: string; x: number; z: number; onStair: boolean; locked: boolean }
 export interface HudSnapshot { hint: 'walk' | 'hang' | null; cross: boolean; doorTip: string | null; hangTip: string | null }
-export interface ArtSnapshot { library: ArtItem[]; held: string | null; layout: Layout; selected: string | null; placed: Record<string, number>; hands: boolean }
+export interface Focus { art: string; placed: string | null; look: SculptLook }
+export interface ArtSnapshot { library: ArtItem[]; held: string | null; layout: Layout; selected: string | null; placed: Record<string, number>; hands: boolean; focus: Focus | null }
+export type { Placed }
 export interface RoomInfo { hangWalls: number; stairs: number; doors: number; floors: number; eyeCm: number; walls: number }
 export interface LoaderState { active: boolean; done: number; total: number; text: string }
 
@@ -40,9 +42,13 @@ export interface Events {
   set_eye: { cm: number }
   accent: { css: string }
   hold: { id: string | null }
-  add_local: { item: Omit<ArtItem, 'id' | 'kind'> & { data: string } }
+  add_local: { item: Omit<ArtItem, 'id' | 'kind'> & { data: string; kind?: 'painting' | 'sculpture' } }
   remove_local: { id: string }
   set_guides: { patch: Partial<Guides> }
+  set_sculpt: { patch: Partial<SculptLook> }
+  rotate: { deg: number }
+  probe_model: { data: string; key: number }
+  model_probed: { key: number; w: number; h: number; d: number; error?: string }
   snap_all: { wall: 'looked' | 'all' }
   set_name: { name: string }
   export_file: Record<string, never>

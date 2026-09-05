@@ -4,6 +4,7 @@
 import * as THREE from 'three'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { bus } from '../bus'
 import type { BitmapDone, BitmapJob } from './workers/bitmap.worker'
 
@@ -15,6 +16,7 @@ interface Job { prio: number; seq: number; run: () => Promise<void> }
 export class Loader {
   readonly ktx2: KTX2Loader
   readonly draco: DRACOLoader
+  readonly gltf: GLTFLoader
   private workers: Worker[] = []
   private idle: Worker[] = []
   private pendingBitmaps = new Map<number, { res: (b: ImageBitmap) => void; rej: (e: Error) => void }>()
@@ -23,12 +25,14 @@ export class Loader {
   private running = 0
   private seq = 0
   private done = 0; private total = 0
+  private inflight = new Map<string, Promise<THREE.Texture>>()   // one fetch per URL, however many materials ask
   private text = ''
   static LANES = 4
 
   constructor(readonly base: string, renderer: THREE.WebGLRenderer) {
     this.ktx2 = new KTX2Loader().setTranscoderPath(`${base}basis/`).detectSupport(renderer)
     this.draco = new DRACOLoader().setDecoderPath(`${base}draco/`)
+    this.gltf = new GLTFLoader().setDRACOLoader(this.draco).setKTX2Loader(this.ktx2)
     const n = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) >> 1))
     for (let i = 0; i < n; i++) {
       const w = new Worker(new URL('./workers/bitmap.worker.ts', import.meta.url), { type: 'module', name: `bitmap-${i}` })
@@ -65,7 +69,8 @@ export class Loader {
 
   /** a KTX2 texture, GPU-compressed, mips baked in. `srgb` for colour maps */
   texture(url: string, prio: Priority, opts: { srgb?: boolean; repeat?: boolean; anisotropy?: number } = {}): Promise<THREE.CompressedTexture> {
-    return this.enqueue(prio, url.split('/').pop() ?? url, () => new Promise<THREE.CompressedTexture>((res, rej) => {
+    const key = `ktx2:${url}`; const have = this.inflight.get(key); if (have) return have as Promise<THREE.CompressedTexture>
+    const p = this.enqueue(prio, url.split('/').pop() ?? url, () => new Promise<THREE.CompressedTexture>((res, rej) => {
       this.ktx2.load(url, (t) => {
         if (opts.srgb !== false) t.colorSpace = THREE.SRGBColorSpace
         if (opts.repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping
@@ -73,6 +78,8 @@ export class Loader {
         t.needsUpdate = true; res(t)
       }, undefined, (e) => rej(e instanceof Error ? e : new Error(`ktx2 failed: ${url}`)))
     }))
+    this.inflight.set(key, p); p.catch(() => this.inflight.delete(key))
+    return p
   }
 
   /** any browser image (jpg, png, data URL) decoded in a worker → a Texture ready to upload. flipY already done in the worker */
@@ -89,6 +96,18 @@ export class Loader {
       t.needsUpdate = true
       return t
     })
+  }
+
+  /** a GLB (Draco, KTX2 inside allowed): url or data URL → its scene group. Decoding runs in Draco's worker pool */
+  model(src: string, prio: Priority): Promise<THREE.Group> {
+    const label = src.startsWith('data:') ? 'model' : (src.split('/').pop() ?? src)
+    return this.enqueue(prio, label, () => new Promise<THREE.Group>((res, rej) => {
+      this.gltf.load(src, (g) => {
+        // a model without normals renders black: give it smooth ones
+        g.scene.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh && !m.geometry.getAttribute('normal')) m.geometry.computeVertexNormals() })
+        res(g.scene)
+      }, undefined, (e) => rej(e instanceof Error ? e : new Error(`glb failed: ${label}`)))
+    }))
   }
 
   private bitmap(src: string): Promise<ImageBitmap> {

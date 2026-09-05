@@ -5,8 +5,18 @@ import type { Walker } from '../walk'
 import type { Loader } from '../loader'
 
 export type SnapLine = 'top' | 'centre' | 'bottom' | 'free'
-export interface ArtItem { id: string; kind: 'painting'; title: string; file?: string; data?: string; w: number; h: number; d: number; edge: string }
-export interface Placed { id: string; art: string; kind: 'painting'; wall: string; level: string; u: number; topY: number; snap: SnapLine | null }
+export type Kind = 'painting' | 'sculpture'
+export interface Plinth { w: number; d: number; h: number; colour: string }
+export interface TexPick { name: string; cm: number }
+/** the look of a sculpture: tint, tile, plinth (null = no plinth). Defaults live on the ArtItem, each placed copy keeps its own */
+export interface SculptLook { colour: string; texture: TexPick | null; plinth: Plinth | null }
+export interface ArtItem { id: string; kind: Kind; title: string; file?: string; data?: string; model?: string; thumb?: string; w: number; h: number; d: number; edge: string; colour?: string; texture?: TexPick | null; plinth?: Plinth | null }
+export interface Placed { id: string; art: string; kind: Kind; wall: string; level: string; u: number; topY: number; snap: SnapLine | null; pos?: [number, number, number]; yaw?: number; colour?: string; texture?: TexPick | null; plinth?: Plinth | null }
+export const TEXTURE_CHIPS: { name: string; tile: string | null }[] = [
+  { name: 'none', tile: null }, { name: 'concrete', tile: 'concrete' }, { name: 'plaster', tile: 'wall-white' }, { name: 'plywood', tile: 'plywood' },
+  { name: 'steel', tile: 'steel-black' }, { name: 'corten', tile: 'corten' }, { name: 'slate', tile: 'slate' }, { name: 'checker', tile: 'checker' },
+]
+export const defaultPlinth = (): Plinth => ({ w: 40, d: 40, h: 100, colour: '#f4f4f0' })
 export interface Guides { snap: SnapLine; top: number; centre: number; bottom: number; gap: number; show: boolean }
 export interface Layout { format: 'koan-hang-layout/2'; name: string; guides: Guides; items: Placed[]; art?: ArtItem[] }
 
@@ -29,7 +39,8 @@ async function idbSet(key: string, val: unknown): Promise<void> {
 }
 
 export interface HangHit { wall: Wall; u: number; y: number; point: THREE.Vector3; dist: number }
-export interface Preview { hit: HangHit | null; u0: number; top: number; ok: boolean; why: string }
+export interface FloorHit { point: THREE.Vector3; dist: number }
+export interface Preview { hit: HangHit | null; floor?: FloorHit | null; u0: number; top: number; ok: boolean; why: string }
 
 const defaultGuides = (): Guides => ({ snap: 'top', top: 200, centre: 150, bottom: 100, gap: 10, show: true })
 
@@ -45,6 +56,15 @@ export class ArtSystem {
   onChange: (() => void) | null = null          // library or layout changed: cards redraw
   /** the room's BVH: distance to the nearest wall along a ray, so a work behind a wall is not 'looked at' */
   occluder: ((origin: THREE.Vector3, dir: THREE.Vector3, far: number) => number | null) | null = null
+  /** the room's BVH again: where the crosshair ray meets a floor (point + face normal y) */
+  floorRay: ((origin: THREE.Vector3, dir: THREE.Vector3, far: number) => { point: THREE.Vector3; ny: number; dist: number } | null) | null = null
+  /** the app's tiles for the texture chips, by MAPS name */
+  tileLoader: ((name: string) => Promise<THREE.Texture>) | null = null
+  heldYaw = 0                                     // R turns the held sculpture 15 degrees
+  private models = new Map<string, THREE.Group>()
+  private modelPending = new Set<string>()
+  private tiles = new Map<string, THREE.Texture>()
+  onModel: ((a: ArtItem, g: THREE.Group) => void) | null = null   // a model landed: thumbnail time
   readonly group = new THREE.Group()              // placed works
   private ghost: THREE.Group | null = null
   private handMesh: THREE.Group | null = null
@@ -64,16 +84,17 @@ export class ArtSystem {
   // ---- library ----------------------------------------------------------------------------
   async load(): Promise<void> {
     let repo: ArtItem[] = []
-    try { const r = await fetch(`${this.base}art/index.json`); if (r.ok) repo = ((await r.json()).items ?? []).map((i: ArtItem) => ({ ...i, kind: 'painting' as const, edge: i.edge ?? 'wrap' })) } catch { /* no repo art yet */ }
+    try { const r = await fetch(`${this.base}art/index.json`); if (r.ok) repo = ((await r.json()).items ?? []).map((i: ArtItem) => ({ ...i, kind: i.kind ?? 'painting', edge: i.edge ?? 'wrap' })) } catch { /* no repo art yet */ }
     this.local = (await idbGet<ArtItem[]>('items')) ?? []
     this.library = [...repo, ...this.local]
     try { const d = localStorage.getItem(DRAFT_KEY); if (d) { const j = JSON.parse(d) as Layout; if (j.format === 'koan-hang-layout/2') this.layout = { ...j, guides: { ...defaultGuides(), ...j.guides } } } } catch { /* fresh */ }
     this.rebuild(); this.onChange?.()
   }
   /** his dropped image: title + h w d in cm; the image travels as a data URL */
-  async addLocal(item: Omit<ArtItem, 'id' | 'kind'> & { data: string }): Promise<ArtItem> {
+  async addLocal(item: Omit<ArtItem, 'id' | 'kind'> & { data: string; kind?: Kind }): Promise<ArtItem> {
     const id = `${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'work'}-${Date.now().toString(36)}`
-    const a: ArtItem = { ...item, id, kind: 'painting', edge: item.edge ?? 'wrap' }
+    const a: ArtItem = { ...item, id, kind: item.kind ?? 'painting', edge: item.edge ?? 'wrap' }
+    if (a.kind === 'sculpture') { a.model = a.data; a.data = undefined; a.colour = a.colour ?? '#f2f2ee'; a.texture = a.texture ?? null; a.plinth = a.plinth === undefined ? defaultPlinth() : a.plinth }
     this.local.push(a); this.library.push(a)
     await idbSet('items', this.local)
     this.onChange?.()
@@ -102,8 +123,59 @@ export class ArtSystem {
     }
     return t
   }
+  /** the prepared GLB for a sculpture, cached; a placeholder box until it lands */
+  private model(a: ArtItem): THREE.Group | null {
+    const g = this.models.get(a.id); if (g) return g
+    if (!this.modelPending.has(a.id)) {
+      this.modelPending.add(a.id)
+      const src = a.model && (a.model.startsWith('data:') || a.model.startsWith('blob:')) ? a.model : `${this.base}art/${a.model}`
+      this.loader.model(src, 'art').then((scene) => { this.models.set(a.id, scene); this.modelPending.delete(a.id); this.onModel?.(a, scene); this.rebuild(); if (this.held?.id === a.id) this.hold(a) })
+        .catch((e) => { console.warn(`model failed: ${a.title}`, e); this.modelPending.delete(a.id) })
+    }
+    return null
+  }
+  private tile(name: string, cm: number): THREE.Texture | null {
+    const chip = TEXTURE_CHIPS.find((c) => c.name === name); if (!chip?.tile || !this.tileLoader) return null
+    let t = this.tiles.get(chip.tile)
+    if (!t) {
+      t = new THREE.Texture(); this.tiles.set(chip.tile, t)
+      const key = chip.tile
+      this.tileLoader(key).then((tex) => { this.tiles.set(key, tex); this.rebuild() }).catch(() => undefined)
+    }
+    const c = t.clone(); c.wrapS = c.wrapT = THREE.RepeatWrapping; c.repeat.setScalar(100 / Math.max(5, cm)); c.needsUpdate = true
+    return c
+  }
+  /** a sculpture: the model tinted and tiled, standing on its plinth (or the floor). Local origin = the plinth's floor centre */
+  private sculptMesh(a: ArtItem, look: SculptLook, ghost = false): THREE.Group {
+    const g = new THREE.Group()
+    const ph = look.plinth ? look.plinth.h / 100 : 0
+    if (look.plinth) {
+      const pm = new THREE.MeshStandardMaterial({ color: new THREE.Color(look.plinth.colour), roughness: 0.9 })
+      const box = new THREE.Mesh(new THREE.BoxGeometry(look.plinth.w / 100, ph, look.plinth.d / 100), pm)
+      box.position.y = ph / 2; box.userData = { kind: 'plinth' }; g.add(box)
+    }
+    const src = this.model(a)
+    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(look.colour), roughness: 0.85, metalness: look.texture?.name === 'steel' || look.texture?.name === 'checker' ? 0.5 : 0 })
+    if (look.texture) { const t = this.tile(look.texture.name, look.texture.cm); if (t) mat.map = t }
+    if (src) {
+      const m = src.clone(true)
+      const box = new THREE.Box3().setFromObject(m); const size = new THREE.Vector3(); box.getSize(size)
+      const k = size.y > 0 ? (a.h / 100) / size.y : 1     // typed height rules, aspect kept
+      m.scale.setScalar(k); m.position.set(-(box.min.x + box.max.x) / 2 * k, ph - box.min.y * k, -(box.min.z + box.max.z) / 2 * k)
+      m.traverse((o) => { const mm = o as THREE.Mesh; if (mm.isMesh) { mm.material = mat; mm.castShadow = true } })
+      g.add(m)
+    } else {
+      const ph2 = new THREE.Mesh(new THREE.BoxGeometry(a.w / 100, a.h / 100, a.d / 100), mat); ph2.position.y = ph + a.h / 200; g.add(ph2)
+    }
+    if (ghost) g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) { const mm = (m.material as THREE.MeshStandardMaterial).clone(); mm.transparent = true; mm.opacity = 0.6; mm.depthWrite = false; m.material = mm } })
+    return g
+  }
+  lookOf(a: ArtItem, p?: Placed | null): SculptLook {
+    return { colour: p?.colour ?? a.colour ?? '#f2f2ee', texture: p?.texture !== undefined ? p.texture : (a.texture ?? null), plinth: p?.plinth !== undefined ? p.plinth : (a.plinth === undefined ? defaultPlinth() : a.plinth) }
+  }
   /** a painting: a box w × h × d, the image on the front, the edge per `edge` */
-  private meshFor(a: ArtItem, ghost = false): THREE.Group {
+  private meshFor(a: ArtItem, ghost = false, p?: Placed | null): THREE.Group {
+    if (a.kind === 'sculpture') return this.sculptMesh(a, this.lookOf(a, p), ghost)
     const w = a.w / 100, h = a.h / 100, d = Math.max(0.005, a.d / 100)
     const tex = this.texture(a)
     const front = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.75 })
@@ -134,8 +206,14 @@ export class ArtSystem {
     this.group.clear()   // every placed mesh, whatever the map says
     this.meshes.clear()
     for (const p of this.layout.items) {
-      const a = this.library.find((x) => x.id === p.art); const w = this.lv.walls.find((x) => x.id === p.wall)
-      if (!a || !w) continue
+      const a = this.library.find((x) => x.id === p.art); if (!a) continue
+      if (a.kind === 'sculpture') {
+        if (!p.pos) continue
+        const g = this.meshFor(a, false, p); g.position.set(p.pos[0], p.pos[1], p.pos[2]); g.rotation.y = p.yaw ?? 0
+        g.userData = { placed: p.id }; this.group.add(g); this.meshes.set(p.id, g); continue
+      }
+      const w = this.lv.walls.find((x) => x.id === p.wall)
+      if (!w) continue
       const g = this.meshFor(a)
       const floorY = floorOf(this.lv, p.level).floorY
       this.placeMesh(g, w, p.u + a.w / 200, floorY + p.topY - a.h / 200)
@@ -154,7 +232,7 @@ export class ArtSystem {
   exportFile(): { name: string; json: string; skipped: string[] } {
     const used = new Set(this.layout.items.map((p) => p.art))
     const skipped: string[] = []
-    const art = this.local.filter((a) => used.has(a.id)).filter((a) => { const ok = (a.data?.length ?? 0) < 2_000_000 * 1.37; if (!ok) skipped.push(a.title); return ok })
+    const art = this.local.filter((a) => used.has(a.id)).filter((a) => { const ok = Math.max(a.data?.length ?? 0, a.model?.length ?? 0) < 2_000_000 * 1.37; if (!ok) skipped.push(a.title); return ok })
     const out: Layout = { ...this.layout, art }
     return { name: `${this.layout.name || 'layout'}.json`, json: JSON.stringify(out, null, 1), skipped }
   }
@@ -166,7 +244,7 @@ export class ArtSystem {
     if (added) await idbSet('items', this.local)
     this.commit()
     const seen = new Set<string>()
-    this.layout = { format: 'koan-hang-layout/2', name: j.name || 'layout', guides: { ...defaultGuides(), ...(j.guides ?? {}) }, items: (j.items ?? []).map((p) => { let id = p.id || `p-${(this.seq++).toString(36)}`; while (seen.has(id)) id = `${id}-${(this.seq++).toString(36)}`; seen.add(id); return { ...p, id, kind: 'painting' as const, level: p.level ?? 'ground', snap: p.snap ?? null } }) }
+    this.layout = { format: 'koan-hang-layout/2', name: j.name || 'layout', guides: { ...defaultGuides(), ...(j.guides ?? {}) }, items: (j.items ?? []).map((p) => { let id = p.id || `p-${(this.seq++).toString(36)}`; while (seen.has(id)) id = `${id}-${(this.seq++).toString(36)}`; seen.add(id); return { ...p, id, kind: p.kind ?? 'painting', level: p.level ?? 'ground', snap: p.snap ?? null } }) }
     this.rebuild(); this.autosave(); this.onChange?.()
     return { works: this.layout.items.length, art: added }
   }
@@ -195,8 +273,8 @@ export class ArtSystem {
     if (a) {
       this.ghost = this.meshFor(a, true); this.ghost.visible = false; this.scene.add(this.ghost)
       // in your hands: lower right of the view, scaled so the long side is 35 cm, tilted a touch
-      const hm = this.meshFor(a); const k = 0.35 / Math.max(a.w, a.h) * 100
-      hm.scale.setScalar(k); hm.position.set(0.26, -0.2, -0.62); hm.rotation.set(-0.12, -0.45, 0.06)
+      const hm = this.meshFor(a); const k = 0.35 / Math.max(a.w, a.h, a.kind === 'sculpture' ? a.h + (this.lookOf(a).plinth?.h ?? 0) : 0) * 100
+      hm.scale.setScalar(k); hm.position.set(0.26, a.kind === 'sculpture' ? -0.32 : -0.2, -0.62); hm.rotation.set(-0.12, -0.45, 0.06)
       hm.visible = false; this.camera.add(hm); this.handMesh = hm
     }
     this.onChange?.()
@@ -215,7 +293,7 @@ export class ArtSystem {
     const look = this.selected ? null : this.lookedAt()
     for (const [id, g] of this.meshes) {
       // the glow sits on the edges and back, never on the image: selected = bright, looked at = faint
-      const e = id === this.selected ? 0.5 : look && id === look.id ? 0.18 : 0
+      const e = id === this.selected ? 0.3 : look && id === look.id ? 0.07 : 0
       g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) for (const mm of (Array.isArray(m.material) ? m.material : [m.material]) as THREE.MeshStandardMaterial[]) { if (mm.map) continue; mm.emissive.setRGB(0, e, e * 0.62) } })
     }
   }
@@ -283,6 +361,7 @@ export class ArtSystem {
     this.guideLines.visible = this.mode === 'hang' && this.layout.guides.show
     if (active) this.glow()
     if (!this.ghost || !this.held) { this.preview = { hit: null, u0: 0, top: 0, ok: false, why: '' }; return }
+    if (this.held.kind === 'sculpture') { this.updateSculpt(active); return }
     const hit = active ? this.hitWall() : null
     if (this.handMesh) this.handMesh.visible = active && this.hands && !hit
     if (!hit) { this.ghost.visible = false; this.preview = { hit: null, u0: 0, top: 0, ok: false, why: '' }; return }
@@ -296,6 +375,15 @@ export class ArtSystem {
   place(): 'placed' | 'refused' | 'picked' | 'nothing' {
     if (!this.held) return this.pickup() ? 'picked' : 'nothing'
     const pv = this.preview
+    if (this.held.kind === 'sculpture') {
+      if (!pv.floor || !pv.ok) return 'refused'
+      this.commit()
+      const look = this.lookOf(this.held)
+      const fp = pv.floor.point
+      this.layout.items.push({ id: `s-${Date.now().toString(36)}-${(this.seq++).toString(36)}`, art: this.held.id, kind: 'sculpture', wall: '', level: this.walker.state.level, u: 0, topY: 0, snap: null, pos: [fp.x, fp.y, fp.z], yaw: this.ghostYaw(), colour: look.colour, texture: look.texture, plinth: look.plinth })
+      this.rebuild(); this.autosave(); this.onChange?.()
+      return 'placed'
+    }
     if (!pv.hit || !pv.ok) return 'refused'
     this.commit()
     const floorY = floorOf(this.lv, this.walker.state.level).floorY
@@ -333,7 +421,13 @@ export class ArtSystem {
   /** arrows: slide the looked-at work along its wall or up, in cm */
   nudge(du: number, dy: number): boolean {
     const p = this.target(); if (!p) return false
-    this.commit(); p.u += du / 100; p.topY += dy / 100; if (dy) p.snap = null
+    this.commit()
+    if (p.kind === 'sculpture' && p.pos) {
+      const yaw = this.walker.state.yaw; const fwd = [-Math.sin(yaw), -Math.cos(yaw)], right = [Math.cos(yaw), -Math.sin(yaw)]
+      p.pos[0] += (right[0] * du + fwd[0] * dy) / 100; p.pos[2] += (right[1] * du + fwd[1] * dy) / 100
+      this.rebuild(); this.autosave(); this.onChange?.(); return true
+    }
+    p.u += du / 100; p.topY += dy / 100; if (dy) p.snap = null
     this.rebuild(); this.autosave(); this.onChange?.(); return true
   }
   /** snap every work on a wall (or all) to the active line */
@@ -341,11 +435,58 @@ export class ArtSystem {
     const g = this.layout.guides; if (g.snap === 'free') return 0
     this.commit(); let n = 0
     for (const p of this.layout.items) {
-      if (wallId && p.wall !== wallId) continue
+      if (p.kind === 'sculpture' || (wallId && p.wall !== wallId)) continue
       const a = this.library.find((x) => x.id === p.art); if (!a) continue
       p.topY = this.topFor(g.snap, a.h); p.snap = g.snap; n++
     }
     this.rebuild(); this.autosave(); this.onChange?.(); return n
+  }
+  // ---- sculptures -----------------------------------------------------------------------------
+  /** the floor under the crosshair on this level, within 6 m, face pointing up */
+  hitFloor(): FloorHit | null {
+    if (!this.floorRay) return null
+    const dir = new THREE.Vector3(); this.camera.getWorldDirection(dir)
+    const h = this.floorRay(this.camera.position, dir, 6)
+    if (!h || h.ny < 0.7) return null
+    const fy = floorOf(this.lv, this.walker.state.level).floorY
+    if (Math.abs(h.point.y - fy) > 0.2) return null
+    return { point: h.point, dist: h.dist }
+  }
+  private ghostYaw(): number { return this.walker.state.yaw + this.heldYaw }
+  private updateSculpt(active: boolean): void {
+    const floor = active ? this.hitFloor() : null
+    if (this.handMesh) this.handMesh.visible = active && this.hands && !floor
+    if (!floor || !this.held || !this.ghost) { if (this.ghost) this.ghost.visible = false; this.preview = { hit: null, floor: null, u0: 0, top: 0, ok: false, why: 'look at the floor' }; return }
+    const look = this.lookOf(this.held)
+    const r = Math.max(look.plinth?.w ?? this.held.w, look.plinth?.d ?? this.held.d) / 200
+    let why = ''
+    for (const p of this.layout.items) {
+      if (p.kind !== 'sculpture' || !p.pos || p.level !== this.walker.state.level) continue
+      const a = this.library.find((x) => x.id === p.art); const r2 = a ? Math.max(p.plinth?.w ?? a.w, p.plinth?.d ?? a.d) / 200 : 0.3
+      if (Math.hypot(p.pos[0] - floor.point.x, p.pos[2] - floor.point.z) < r + r2) { why = 'over another work'; break }
+    }
+    this.preview = { hit: null, floor, u0: 0, top: 0, ok: !why, why }
+    this.ghost.visible = true; this.ghost.position.copy(floor.point); this.ghost.rotation.y = this.ghostYaw()
+    this.ghost.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) { const mm = m.material as THREE.MeshStandardMaterial; mm.emissive.set(why ? 0x331100 : 0x000000) } })
+  }
+  /** R: turn the held sculpture, or the selected / looked-at one, by `deg` */
+  rotate(deg: number): boolean {
+    if (this.held?.kind === 'sculpture') { this.heldYaw += THREE.MathUtils.degToRad(deg); return true }
+    const p = this.target(); if (!p || p.kind !== 'sculpture') return false
+    this.commit(); p.yaw = (p.yaw ?? 0) + THREE.MathUtils.degToRad(deg); this.rebuild(); this.autosave(); this.onChange?.(); return true
+  }
+  /** the sculpture the HANG card's look fields act on: the held one (its defaults) or the targeted placed one */
+  focus(): { art: ArtItem; placed: Placed | null } | null {
+    if (this.held?.kind === 'sculpture') return { art: this.held, placed: null }
+    const p = this.target(); if (!p || p.kind !== 'sculpture') return null
+    const a = this.library.find((x) => x.id === p.art); return a ? { art: a, placed: p } : null
+  }
+  /** picker, texture chips, plinth fields: onto the focused work (and onto the held work's defaults) */
+  setLook(patch: Partial<SculptLook>): boolean {
+    const f = this.focus(); if (!f) return false
+    if (f.placed) { this.commit(); Object.assign(f.placed, patch); this.rebuild(); this.autosave() }
+    else { Object.assign(f.art, patch); if (this.local.includes(f.art)) void idbSet('items', this.local); this.hold(f.art) }
+    this.onChange?.(); return true
   }
   private drawGuides(): void {
     this.guideLines.clear()

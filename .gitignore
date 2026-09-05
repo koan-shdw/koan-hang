@@ -6,3 +6,4 @@ scan/*.npy
 *.pyc
 scan/bake/*.png
 textures/stock/
+art/sculpt/_standin/

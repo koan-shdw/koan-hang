@@ -1,1 +1,23 @@
-{ "format": "koan-hang-art/1", "items": [] }
+{
+ "format": "koan-hang-art/2",
+ "items": [
+  {
+   "id": "standin",
+   "kind": "sculpture",
+   "title": "stand-in figure",
+   "model": "sculpt/standin.glb",
+   "w": 90,
+   "h": 225,
+   "d": 90,
+   "edge": "wrap",
+   "colour": "#f2f2ee",
+   "texture": null,
+   "plinth": {
+    "w": 40,
+    "d": 40,
+    "h": 100,
+    "colour": "#f4f4f0"
+   }
+  }
+ ]
+}
