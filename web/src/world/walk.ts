@@ -1,7 +1,7 @@
 // Walk mode (SPEC s5.2): pointer-lock first person, WASD, collision against the level's nav data only
 // (walls with openings + door state, floors, stairs, blockers). Never the render meshes.
 import * as THREE from 'three'
-import { type Level, type Wall, type Stair, type DoorRuntime, floorOf, pointInPoly, stairRect, stairProgress, inRect, wallLength, wallDir, doorCentre } from './level'
+import { type Level, type Wall, type Stair, type DoorRuntime, floorOf, pointInPoly, stairRect, stairProgress, inRect, wallLength, wallDir, doorCentre } from './room/level'
 
 const RADIUS = 0.25
 const SPEED = 2.2, RUN = 4.2

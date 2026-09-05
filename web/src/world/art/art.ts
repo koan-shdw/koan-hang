@@ -1,7 +1,8 @@
 // P4 gate 1: the library, hold-walk-look-click hanging, the HANG widget, layouts (docs/ART.md §1-4, §6).
 import * as THREE from 'three'
-import { type Level, type Wall, wallLength, wallDir, wallPoint, floorOf } from './level'
-import type { Walker } from './walk'
+import { type Level, type Wall, wallLength, wallDir, wallPoint, floorOf } from '../room/level'
+import type { Walker } from '../walk'
+import type { Loader } from '../loader'
 
 export type SnapLine = 'top' | 'centre' | 'bottom' | 'free'
 export interface ArtItem { id: string; kind: 'painting'; title: string; file?: string; data?: string; w: number; h: number; d: number; edge: string }
@@ -42,6 +43,8 @@ export class ArtSystem {
   mode: 'walk' | 'hang' | 'level' = 'walk'
   preview: Preview = { hit: null, u0: 0, top: 0, ok: false, why: '' }
   onChange: (() => void) | null = null          // library or layout changed: cards redraw
+  /** the room's BVH: distance to the nearest wall along a ray, so a work behind a wall is not 'looked at' */
+  occluder: ((origin: THREE.Vector3, dir: THREE.Vector3, far: number) => number | null) | null = null
   readonly group = new THREE.Group()              // placed works
   private ghost: THREE.Group | null = null
   private handMesh: THREE.Group | null = null
@@ -53,7 +56,7 @@ export class ArtSystem {
   private local: ArtItem[] = []
   private seq = 0
 
-  constructor(private lv: Level, private scene: THREE.Scene, private walker: Walker, private camera: THREE.Camera, base: string) {
+  constructor(private lv: Level, private scene: THREE.Scene, private walker: Walker, private camera: THREE.Camera, base: string, private loader: Loader) {
     this.base = base
     scene.add(this.group, this.guideLines)
   }
@@ -87,12 +90,15 @@ export class ArtSystem {
   }
   placedCount(artId: string): number { return this.layout.items.filter((p) => p.art === artId).length }
 
+  /** the work's image, decoded in the loader's worker; the material gets it the moment it lands, no rebuild */
   private texture(a: ArtItem): THREE.Texture {
     let t = this.textures.get(a.id)
     if (!t) {
-      t = new THREE.TextureLoader().load(a.data ?? `${this.base}art/${a.file}`, () => this.rebuild())   // materials made before the image arrived get remade
-      t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8
-      this.textures.set(a.id, t)
+      const holder = new THREE.Texture(); holder.colorSpace = THREE.SRGBColorSpace; holder.anisotropy = 8; holder.flipY = false
+      this.textures.set(a.id, holder); t = holder
+      this.loader.image(a.data ?? `${this.base}art/${a.file}`, 'art', { anisotropy: 8 }).then((tex) => {
+        holder.image = tex.image; holder.generateMipmaps = true; holder.minFilter = THREE.LinearMipmapLinearFilter; holder.needsUpdate = true
+      }).catch((e) => console.warn(`art image failed: ${a.title}`, e))
     }
     return t
   }
@@ -304,6 +310,8 @@ export class ArtSystem {
     this.group.updateMatrixWorld(true)   // a work hung this frame has not been rendered yet
     const hit = rc.intersectObjects(this.group.children, true)[0]
     if (!hit) return null
+    const wallD = this.occluder?.(this.camera.position, dir, hit.distance)
+    if (wallD !== null && wallD !== undefined && wallD < hit.distance - 0.02) return null
     let o: THREE.Object3D | null = hit.object; while (o && o.userData.placed === undefined) o = o.parent
     return o ? this.layout.items.find((p) => p.id === o!.userData.placed) ?? null : null
   }

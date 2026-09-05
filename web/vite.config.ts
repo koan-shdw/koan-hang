@@ -1,4 +1,5 @@
 import { defineConfig, type Plugin } from 'vite'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, createReadStream, writeFileSync } from 'node:fs'
 import { join, resolve, extname } from 'node:path'
 
@@ -7,7 +8,7 @@ import { join, resolve, extname } from 'node:path'
 const ROOT = resolve(__dirname, '..')
 const DATA_DIRS = ['level', 'art', 'layouts', 'textures']
 const SKIP = new Set(['scan.clean.glb', 'make_level.py'])
-const MIME: Record<string, string> = { '.json': 'application/json', '.glb': 'model/gltf-binary', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' }
+const MIME: Record<string, string> = { '.json': 'application/json', '.glb': 'model/gltf-binary', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.ktx2': 'image/ktx2', '.drc': 'application/octet-stream' }
 
 function copyDir(src: string, dst: string): void {
   if (!existsSync(src)) return
@@ -72,5 +73,6 @@ export default defineConfig({
   // served at koan-shdw.github.io/koan-hang/ in production (CI is set on Actions)
   base: process.env.CI ? '/koan-hang/' : '/',
   server: { port: 5374, strictPort: true },
-  plugins: [dataDirs()],
+  plugins: [svelte(), dataDirs()],
+  worker: { format: 'es' },
 })

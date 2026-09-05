@@ -1,0 +1,68 @@
+// The event bus (REMAKE.md §2). The only way world/ and ui/ talk. Typed, synchronous, no framework.
+import type { ArtItem, Layout, Guides } from './world/art/art'
+
+export type Mode = 'walk' | 'hang' | 'level'
+export type Look = 'clean' | 'wire' | 'textured'
+export type ToastKind = 'ok' | 'warn' | 'bad'
+
+export interface WalkSnapshot { level: string; levelName: string; x: number; z: number; onStair: boolean; locked: boolean }
+export interface HudSnapshot { hint: 'walk' | 'hang' | null; cross: boolean; doorTip: string | null; hangTip: string | null }
+export interface ArtSnapshot { library: ArtItem[]; held: string | null; layout: Layout; selected: string | null; placed: Record<string, number>; hands: boolean }
+export interface RoomInfo { hangWalls: number; stairs: number; doors: number; floors: number; eyeCm: number; walls: number }
+export interface LoaderState { active: boolean; done: number; total: number; text: string }
+
+export interface Events {
+  // world → ui
+  world_ready: RoomInfo
+  world_failed: { message: string }
+  walk_state: WalkSnapshot
+  hud: HudSnapshot
+  art_state: ArtSnapshot
+  mode: { mode: Mode }
+  look: { look: Look }
+  toast: { msg: string; kind?: ToastKind; ms?: number }
+  loader: LoaderState
+  file_ready: { name: string; json: string; skipped: string[] }
+  map_show: { show: boolean }
+  help_toggle: Record<string, never>
+  overlays_close: Record<string, never>
+  anchor: { id: string; x: number; y: number; visible: boolean }          // R3: world points the UI may follow
+  // ui → world
+  set_mode: { mode: Mode }
+  set_look: { look: Look }
+  set_eye: { cm: number }
+  accent: { css: string }
+  hold: { id: string | null }
+  add_local: { item: Omit<ArtItem, 'id' | 'kind'> & { data: string } }
+  remove_local: { id: string }
+  set_guides: { patch: Partial<Guides> }
+  snap_all: { wall: 'looked' | 'all' }
+  set_name: { name: string }
+  export_file: Record<string, never>
+  import_file: { text: string; name: string }
+  clear_draft: Record<string, never>
+  mount_maps: { small: HTMLCanvasElement; big: HTMLCanvasElement }
+  map_click: { px: number; py: number }
+  map_toggle: Record<string, never>
+  render_active: { active: boolean }
+  debug_toggle: Record<string, never>
+}
+
+type Handler<T> = (payload: T) => void
+
+export class Bus {
+  private handlers = new Map<keyof Events, Set<Handler<unknown>>>()
+  on<K extends keyof Events>(name: K, fn: Handler<Events[K]>): () => void {
+    let set = this.handlers.get(name)
+    if (!set) { set = new Set(); this.handlers.set(name, set) }
+    set.add(fn as Handler<unknown>)
+    return () => { set!.delete(fn as Handler<unknown>) }
+  }
+  emit<K extends keyof Events>(name: K, payload: Events[K]): void {
+    const set = this.handlers.get(name); if (!set) return
+    for (const fn of Array.from(set)) { try { fn(payload) } catch (e) { console.error(`bus ${String(name)}:`, e) } }
+  }
+  toast(msg: string, kind: ToastKind = 'ok', ms?: number): void { this.emit('toast', { msg, kind, ms }) }
+}
+
+export const bus = new Bus()

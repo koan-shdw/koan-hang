@@ -1,5 +1,5 @@
 // Minimap (corner, always on) + full plan overlay (M): walls, floors, stairs of the current level, click = teleport.
-import { type Level, floorOf, pointInPoly, stairRect } from './level'
+import { type Level, floorOf, pointInPoly, stairRect } from './room/level'
 import type { WalkState } from './walk'
 
 const cssVar = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim()
