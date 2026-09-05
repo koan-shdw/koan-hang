@@ -212,7 +212,12 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
     const walkKey = `${s.level}|${s.x.toFixed(2)}|${s.z.toFixed(2)}|${s.onStair}|${locked}`
     if (walkKey !== lastWalk) { lastWalk = walkKey; bus.emit('walk_state', { level: s.level, levelName: floorOf(level, s.level).name, x: s.x, z: s.z, onStair: !!s.onStair, locked }) }
     minimap?.draw(s)
-    if (art.preview.hit) anchors.set('hang-widget', art.preview.hit.point); else anchors.set('hang-widget', null)
+    // R3 anchors: the HANG widget rides the wall where the held work will go; a looked-at work gets its title
+    const hangOn = mode === 'hang' && locked
+    anchors.set('hang-widget', hangOn && art.preview.hit ? art.preview.hit.point : null)
+    const lookedNow = hangOn && !art.held ? art.lookedAt() : null
+    if (lookedNow) { const a = art.library.find((x) => x.id === lookedNow.art); const pf = floorOf(level, lookedNow.level).floorY; const w = level.walls.find((x) => x.id === lookedNow.wall); if (a && w) { const [dx, dz] = [w.b[0] - w.a[0], w.b[1] - w.a[1]]; const L = Math.hypot(dx, dz) || 1; const uc = lookedNow.u + a.w / 200; anchors.set('work', new THREE.Vector3(w.a[0] + dx / L * uc, pf + lookedNow.topY + 0.08, w.a[1] + dz / L * uc), `${a.title} · ${a.w} × ${a.h} cm`) } }
+    else anchors.set('work', null)
     const sz = renderer.size; anchors.publish(camera, sz.x, sz.y)
   })
   bus.toast(`level built · ${level.walls.length} walls · click to walk`)

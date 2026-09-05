@@ -152,6 +152,8 @@ Each gate is live on the site and tested before the next. Old app stays live unt
 
 **R2 BUILT 2026-09-05**, live on main. Composer: render (depth) → edges (outline + dither, one pass) → output → LUT (neutral, `textures/lut.cube` loads over it when it exists) → SMAA. Sky dome shader (horizon = the fog colour, so the void stays the void; clouds drift), hedge spheres → instanced leaf cards with a wind sway, fresnel on the street glass, world-space noise over every tile. Eight dials + quality chips on the LEVEL card, all on by default, remembered per browser. PROVEN on localhost: each dial changes the frame, none breaks hang. OPEN: his eye on the look; the sky's Tokyo tint is a first guess (dark overcast), the LUT is neutral until he grades.
 | **R3 anchors** | HANG widget and work labels follow the world | he hangs with the widget on the wall |
+
+**R3 BUILT 2026-09-05**, live on main. `anchors.ts` publishes `hang-widget` (the held work's ghost point) and `work` (above the looked-at work, with its title and size) every frame, only when a pixel moved. The HANG card rides the wall beside the ghost while a wall is hit (accent ring, no drag while riding) and returns to its own place after. A looked-at work shows its label. Glow now sits on the edges only, never on the image. PROVEN on localhost. OPEN: his hang.
 | **R4 sculpture** | ART gate 2 from the old plan, on the new loader (Draco if a mesh ships) | his words when we get there |
 
 Where the code lives: **branch** (owner). `web/` on branch `remake`, main stays live, merge at R1 parity. Pages deploys main only, the branch is previewed on localhost until parity.

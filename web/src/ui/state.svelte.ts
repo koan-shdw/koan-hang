@@ -18,6 +18,7 @@ export const ui = $state({
   helpShown: false,
   debugShown: false,
   toasts: [] as Toast[],
+  anchors: {} as Record<string, { x: number; y: number; visible: boolean; text?: string }>,
 })
 
 let toastSeq = 0
@@ -35,6 +36,7 @@ bus.on('map_show', ({ show }) => { ui.mapShown = show })
 bus.on('help_toggle', () => { ui.helpShown = !ui.helpShown })
 bus.on('overlays_close', () => { ui.helpShown = false; ui.debugShown = false })
 bus.on('debug_toggle', () => { ui.debugShown = !ui.debugShown })
+bus.on('anchor', (a) => { ui.anchors[a.id] = a })
 bus.on('toast', ({ msg, kind, ms }) => {
   const t: Toast = { id: toastSeq++, msg, kind: kind ?? 'ok' }
   ui.toasts.push(t)

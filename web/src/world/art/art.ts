@@ -214,8 +214,9 @@ export class ArtSystem {
   private glow(): void {
     const look = this.selected ? null : this.lookedAt()
     for (const [id, g] of this.meshes) {
-      const e = id === this.selected ? 0.35 : look && id === look.id ? 0.12 : 0
-      g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) for (const mm of (Array.isArray(m.material) ? m.material : [m.material]) as THREE.MeshStandardMaterial[]) mm.emissive.setRGB(0, e, e * 0.62) })
+      // the glow sits on the edges and back, never on the image: selected = bright, looked at = faint
+      const e = id === this.selected ? 0.5 : look && id === look.id ? 0.18 : 0
+      g.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) for (const mm of (Array.isArray(m.material) ? m.material : [m.material]) as THREE.MeshStandardMaterial[]) { if (mm.map) continue; mm.emissive.setRGB(0, e, e * 0.62) } })
     }
   }
   swap(step: number): void {

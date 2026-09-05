@@ -31,7 +31,7 @@ export interface Events {
   map_show: { show: boolean }
   help_toggle: Record<string, never>
   overlays_close: Record<string, never>
-  anchor: { id: string; x: number; y: number; visible: boolean }          // R3: world points the UI may follow
+  anchor: { id: string; x: number; y: number; visible: boolean; text?: string }   // R3: world points the UI follows (HANG widget, work labels)
   // ui → world
   set_mode: { mode: Mode }
   set_look: { look: Look }

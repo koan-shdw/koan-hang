@@ -46,6 +46,7 @@
   <div class="crosshair" hidden={!ui.hud.cross}></div>
   <div class="doortip" hidden={!ui.hud.doorTip}>{ui.hud.doorTip}</div>
   <div class="hangtip" hidden={!ui.hud.hangTip}>{ui.hud.hangTip}</div>
+  {#if ui.anchors['work']?.visible}<div class="worklabel" style="left:{ui.anchors['work'].x}px; top:{ui.anchors['work'].y}px">{ui.anchors['work'].text}</div>{/if}
 </div>
 
 <div class="top">

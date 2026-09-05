@@ -15,9 +15,10 @@
   const height = $derived(g && g.snap !== 'free' ? g[g.snap] : 0)
   const setHeight = (v: number) => { if (!g || g.snap === 'free') return; const patch: Partial<Guides> = {}; patch[g.snap] = v; bus.emit('set_guides', { patch }) }
   const num = (e: Event) => Number((e.currentTarget as HTMLInputElement).value)
+  const ride = $derived(ui.anchors['hang-widget']?.visible ? { x: ui.anchors['hang-widget'].x, y: ui.anchors['hang-widget'].y } : null)
 </script>
 
-<Card id="hang" title="hang" x={12} y={52} anchor="right" status={ui.art ? `${ui.art.layout.items.length} on walls` : ''}>
+<Card id="hang" title="hang" x={12} y={52} anchor="right" at={ride} status={ui.art ? `${ui.art.layout.items.length} on walls` : ''}>
   <div class="note">{held ? `holding ${held.title} · ${held.w} × ${held.h} cm` : 'holding nothing · click a thumbnail'}</div>
   <div class="legend">snap line</div>
   {#if g}
