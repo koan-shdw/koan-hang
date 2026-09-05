@@ -237,7 +237,7 @@ export function mat(name: string): THREE.MeshStandardMaterial {
   let m = cache.get(name)
   if (m) return m
   const p = PALETTE[name] ?? PALETTE['wall-white']
-  m = new THREE.MeshStandardMaterial({ color: p.color, roughness: p.rough ?? 0.9, metalness: p.metal ?? 0, side: THREE.DoubleSide })
+  m = new THREE.MeshStandardMaterial({ color: p.color, roughness: p.rough ?? 0.9, metalness: p.metal ?? 0, side: THREE.DoubleSide }); m.name = name
   if (p.opacity !== undefined) { m.transparent = true; m.opacity = p.opacity; m.depthWrite = false }
   if (p.emissive !== undefined) { m.emissive = new THREE.Color(p.emissive); m.emissiveIntensity = 1.4 }
   cache.set(name, m)

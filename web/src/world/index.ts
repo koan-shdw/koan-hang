@@ -10,6 +10,7 @@ import { Walker, isTyping } from './walk'
 import { Minimap } from './minimap'
 import { ArtSystem } from './art/art'
 import { Anchors } from './anchors'
+import { Looks } from './looks'
 
 // three-mesh-bvh: the room's static geometry gets a BVH; raycasts against it are the accelerated kind
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree
@@ -38,7 +39,7 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
   if (level.sky?.fallback) scene.background = new THREE.Color(level.sky.fallback)
   if (level.fog) scene.fog = new THREE.Fog(new THREE.Color(level.fog.color), level.fog.near, level.fog.far)
   if (level.sky?.file) {
-    loader.image(`${DATA}textures/${level.sky.file}`, 'sky').then((tex) => { tex.mapping = THREE.EquirectangularReflectionMapping; scene.background = tex }).catch(() => { /* no panorama yet */ })
+    loader.image(`${DATA}textures/${level.sky.file}`, 'sky').then((tex) => { tex.mapping = THREE.EquirectangularReflectionMapping; looks.setFlatBackground(tex) }).catch(() => { /* no panorama yet */ })
   }
   // tiles: KTX2 first (textures/ktx2/<name>.ktx2, GPU-compressed, mips baked), the jpg through the bitmap worker when a ktx2 is missing
   const aniso = renderer.gl.capabilities.getMaxAnisotropy()
@@ -56,6 +57,8 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
     bus.emit('look', { look })
   }
   applyLook()
+
+  const looks = new Looks(renderer, built.group, new THREE.Color(level.fog?.color ?? level.sky?.fallback ?? 0x232325), DATA)
 
   // the room's BVH: one static mesh of every wall and floor, for occlusion queries (a work behind a wall is not looked at)
   built.group.updateMatrixWorld(true)
@@ -187,7 +190,9 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
 
   // ---- loop --------------------------------------------------------------------------------------------------
   let lastWalk = '', lastHud = ''
+  let elapsed = 0
   renderer.start((dt) => {
+    elapsed += dt; looks.update(elapsed)
     walker.update(dt)
     updateDoors(built.doors, dt)
     art.update()
@@ -237,7 +242,7 @@ export async function startWorld(container: HTMLElement, base: string): Promise<
   ;(window as unknown as { koanHang: unknown }).koanHang = {
     walker, level, scene, renderer: renderer.gl, composer: renderer.composer, camera, shot, plan, view, THREE, built, toggleDoor, art, loader, bus, roomBVH,
     setMode, meshAudit: () => meshAudit(level, built.group), skyLeakAudit: () => skyLeakAudit(level, built.group, built.doors),
-    quality: (q: 'full' | 'balanced' | 'low') => renderer.setQuality(q), getQuality: () => renderer.quality, smaa: renderer.smaa,
+    quality: (q: 'full' | 'balanced' | 'low') => renderer.setQuality(q), getQuality: () => renderer.quality, smaa: renderer.smaa, looks,
   }
 
   const dispose = () => {

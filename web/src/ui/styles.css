@@ -147,3 +147,8 @@ input[type='text'] { background: var(--bg0); border: 1px solid var(--line); colo
 .viewport .loadbar i { display: block; height: 100%; background: var(--accent); opacity: .6; transition: width .15s; }
 .viewport .loadbar span { position: absolute; inset: 0; font-size: 9px; line-height: 12px; text-align: center; color: var(--txt-hi); letter-spacing: 1px; }
 .debug { position: absolute; right: 12px; top: 52px; width: 280px; z-index: 60; }
+
+/* looks dials (R2) */
+.fx { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px 6px; }
+.fxrow { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--body); cursor: pointer; }
+.fxrow input { accent-color: var(--accent); margin: 0; }

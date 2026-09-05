@@ -4,6 +4,9 @@ import type { ArtItem, Layout, Guides } from './world/art/art'
 export type Mode = 'walk' | 'hang' | 'level'
 export type Look = 'clean' | 'wire' | 'textured'
 export type ToastKind = 'ok' | 'warn' | 'bad'
+export type Quality = 'full' | 'balanced' | 'low'
+export type FxKey = 'lut' | 'sky' | 'plants' | 'glass' | 'surface' | 'outline' | 'dither' | 'smaa'
+export type FxState = Record<FxKey, boolean>
 
 export interface WalkSnapshot { level: string; levelName: string; x: number; z: number; onStair: boolean; locked: boolean }
 export interface HudSnapshot { hint: 'walk' | 'hang' | null; cross: boolean; doorTip: string | null; hangTip: string | null }
@@ -20,6 +23,8 @@ export interface Events {
   art_state: ArtSnapshot
   mode: { mode: Mode }
   look: { look: Look }
+  fx: { state: FxState }
+  quality: { quality: Quality }
   toast: { msg: string; kind?: ToastKind; ms?: number }
   loader: LoaderState
   file_ready: { name: string; json: string; skipped: string[] }
@@ -30,6 +35,8 @@ export interface Events {
   // ui → world
   set_mode: { mode: Mode }
   set_look: { look: Look }
+  set_fx: { key: FxKey; on: boolean }
+  set_quality: { quality: Quality }
   set_eye: { cm: number }
   accent: { css: string }
   hold: { id: string | null }

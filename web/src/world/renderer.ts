@@ -32,7 +32,9 @@ export class Renderer {
     this.gl.toneMappingExposure = 1.0
     container.appendChild(this.gl.domElement)
     this.scene.add(this.camera)                    // the held work rides on the camera
-    this.composer = new EffectComposer(this.gl)
+    // the composer's targets carry a depth texture: the edges pass reads the render pass's depth
+    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture(1, 1, THREE.UnsignedIntType) })
+    this.composer = new EffectComposer(this.gl, rt)
     this.composer.addPass(new RenderPass(this.scene, this.camera))
     this.composer.addPass(new OutputPass())
     this.smaa = new SMAAPass(); this.composer.addPass(this.smaa)
@@ -41,6 +43,7 @@ export class Renderer {
     window.addEventListener('resize', () => this.resize())
     document.addEventListener('visibilitychange', () => this.setActive(!document.hidden))
     bus.on('render_active', ({ active }) => this.setActive(active))
+    bus.on('set_quality', ({ quality }) => this.setQuality(quality))
     this.resize()
   }
 
@@ -48,6 +51,7 @@ export class Renderer {
     this.quality = q
     this.gl.setPixelRatio(Math.min(window.devicePixelRatio, DPR[q]))
     this.smaa.enabled = q !== 'low'
+    bus.emit('quality', { quality: q })
     if (persist) { try { localStorage.setItem(QUALITY_KEY, q) } catch { /* private */ } }
     this.resize()
   }

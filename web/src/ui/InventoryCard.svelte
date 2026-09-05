@@ -38,7 +38,7 @@
   const remove = (id: string, title: string) => { if (confirm(`remove ${title} from the library?`)) bus.emit('remove_local', { id }) }
 </script>
 
-<Card id="inventory" title="inventory" x={12} y={280}>
+<Card id="inventory" title="inventory" x={12} y={392}>
   <div class="drop" class:over role="button" tabindex="0" onclick={() => pick.click()} onkeydown={(e) => { if (e.key === 'Enter') pick.click() }}
     ondragover={(e) => { e.preventDefault(); over = true }} ondragleave={() => (over = false)} ondrop={drop}>
     drop images here<small>or click · then type h w d in cm</small>
